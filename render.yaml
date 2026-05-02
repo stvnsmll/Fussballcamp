@@ -31,7 +31,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       pybabel compile -d translations
-      FLASK_APP=application.py flask db upgrade
+      flask --app application:app db upgrade
 
     startCommand: >
       gunicorn application:app
