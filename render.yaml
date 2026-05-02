@@ -42,6 +42,7 @@ services:
       --access-logfile -
       --error-logfile -
 
+    plan: free                 # free instance — spins down after 15 min of inactivity
     healthCheckPath: /
     autoDeploy: true
 
