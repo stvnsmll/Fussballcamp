@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container text-center py-5">
+  <div class="py-4">
+    <div class="font-display fw-bold" style="font-size:7rem;color:var(--green-200);line-height:1">403</div>
+    <h1 class="h3 mt-2">{{ _('Kein Zugriff') }}</h1>
+    <p class="text-muted mt-2 mb-4">{{ _('Sie haben keine Berechtigung, diese Seite aufzurufen.') }}</p>
+    <a href="javascript:history.back()" class="btn btn-outline-primary me-2">{{ _('Zurück') }}</a>
+    <a href="{{ url_for('public.index') }}" class="btn btn-primary">{{ _('Startseite') }}</a>
+  </div>
+</div>
+{% endblock %}

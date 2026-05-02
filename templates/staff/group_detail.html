@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+      <div>
+        <h1>{{ age_group.name }}</h1>
+        <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+          {{ age_group.min_age }}–{{ age_group.max_age }} Jahre ·
+      {{ age_group.confirmed_count }} Kinder
+      {% if age_group.head_coach %}· Haupttrainer: {{ age_group.head_coach.full_name }}{% endif %}
+    </p>
+      </div>
+      <a href="{{ url_for('staff.print_group_roster', age_group_id=age_group.id) }}"
+         target="_blank"
+         style="background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.4);
+                padding:.4rem .85rem; border-radius:5px; font-size:.85rem; text-decoration:none;
+                white-space:nowrap; margin-top:.25rem;">
+        <i class="bi bi-printer"></i> Drucken
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <div class="row g-4">
+
+    {# Children list with medical notes #}
+    <div class="col-lg-8">
+      {% if medical_notes_children %}
+      <div class="alert alert-danger mb-3 animate-in">
+        <strong><i class="bi bi-heart-pulse"></i> {{ medical_notes_children | length }} Kind(er) mit medizinischen Hinweisen</strong>
+      </div>
+      {% for child in medical_notes_children %}
+      <div class="card mb-2 animate-in" style="border-left:4px solid #ef4444">
+        <div class="card-body py-2">
+          <div class="fw-700">{{ child.full_name }}</div>
+          <div style="font-size:.85rem;margin-top:.25rem;white-space:pre-wrap">
+            {{ child.medical_notes }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <hr class="divider">
+      {% endif %}
+
+      <h2 class="h5 fw-800 text-uppercase mb-3 animate-in">Alle Kinder</h2>
+      <div class="card animate-in">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Name</th><th>Alter</th><th>Hinweise</th><th>Notfallkontakt</th></tr></thead>
+            <tbody>
+              {% for reg in registrations %}
+              {% set child = reg.child %}
+              <tr>
+                <td>
+                  <div class="fw-600">{{ child.full_name }}</div>
+                  <div style="font-size:.75rem;color:var(--text-muted)">
+                    {% if reg.independent_travel %}<i class="bi bi-person-walking"></i> Alleine{% endif %}
+                  </div>
+                </td>
+                <td style="font-size:.875rem">
+                  {{ child.date_of_birth.strftime('%d.%m.%Y') }}
+                </td>
+                <td>
+                  {% if reg.absence_reported %}
+                  <span style="display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:5px;padding:.1rem .45rem;font-size:.75rem;font-weight:600;margin-bottom:.2rem">
+                    <i class="bi bi-thermometer"></i> Abgemeldet
+                    {% if reg.absence %}— {{ reg.absence.reason_label }}{% endif %}
+                  </span><br>
+                  {% endif %}
+                  {% if child.has_medical_notes %}
+                  <span class="medical-badge"><i class="bi bi-heart-pulse"></i> Med</span>
+                  {% endif %}
+                </td>
+                <td style="font-size:.8rem">
+                  {% if child.emergency_contacts %}
+                  {% set ec = child.emergency_contacts[0] %}
+                  {{ ec.full_name }}<br>
+                  <a href="tel:{{ ec.phone_primary }}">{{ ec.phone_primary }}</a>
+                  {% else %}
+                  <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" class="text-center py-4 text-muted">Keine Anmeldungen.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {# Right — trainers in this group #}
+    <div class="col-lg-4">
+      <div class="card animate-in animate-in-2">
+        <div class="card-header">Trainer dieser Gruppe</div>
+        <div class="card-body">
+          {% for a in age_group.group_assignments %}
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div style="width:2rem;height:2rem;background:var(--green-200);border-radius:50%;
+                         display:flex;align-items:center;justify-content:center;
+                         font-size:.8rem;font-weight:700;flex-shrink:0">
+              {{ a.staff_user.first_name[0] }}{{ a.staff_user.last_name[0] }}
+            </div>
+            <div>
+              <div class="fw-600" style="font-size:.875rem">{{ a.staff_user.full_name }}</div>
+              <div style="font-size:.72rem;color:var(--text-muted)">
+                {% if a.is_head_coach %}Haupttrainer · {% endif %}
+                {{ a.staff_user.staff_profile.staff_class if a.staff_user.staff_profile else '' }}
+                {% if a.staff_user.staff_profile and a.staff_user.staff_profile.is_first_aid %}
+                · <span style="color:#dc2626"><i class="bi bi-heart-pulse"></i> EA</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <p class="text-muted mb-0" style="font-size:.875rem">Kein Trainer zugewiesen.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

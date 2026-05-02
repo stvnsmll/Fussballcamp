@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5" style="max-width:560px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-lg)">
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <div style="font-size:2.5rem"><i class="bi bi-clipboard"></i></div>
+        <h1 class="h4 fw-800 text-uppercase mt-2">{{ _('Datenschutz aktualisiert') }}</h1>
+        <p class="text-muted" style="font-size:.9rem">
+          {{ _('Unsere Datenschutzerklärung wurde aktualisiert. Bitte bestätigen Sie die neue Version, um fortzufahren.') }}
+        </p>
+      </div>
+      {% if consent_version %}
+      <div class="p-3 mb-3 rounded" style="background:var(--cream-dark);font-size:.875rem">
+        <div class="fw-600 mb-1">{{ _('Version') }} {{ consent_version.version }}
+          <span class="text-muted fw-400 ms-1">
+            ({{ _('gültig ab') }} {{ consent_version.effective_date.strftime('%d.%m.%Y') }})
+          </span>
+        </div>
+        <p class="mb-2 text-muted">{{ consent_version.summary }}</p>
+        <a href="{{ url_for('public.datenschutz') }}" target="_blank" style="font-size:.82rem">
+          {{ _('Vollständige Datenschutzerklärung lesen') }} →
+        </a>
+      </div>
+      {% endif %}
+      <form method="POST" action="{{ url_for('auth.reconfirm_consent', next=request.args.get('next','')) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {{ form.hidden_tag() }}
+        <div class="p-3 rounded mb-4" style="background:var(--cream-dark)">
+          <div class="form-check consent-check">
+            {{ form.consent(class='form-check-input' + (' is-invalid' if form.consent.errors else '')) }}
+            <label class="form-check-label" for="{{ form.consent.id }}">
+              {{ _('Ich habe die aktualisierte') }}
+              <a href="{{ url_for('public.datenschutz') }}" target="_blank">{{ _('Datenschutzerklärung') }}</a>
+              {{ _('gelesen und stimme zu.') }}
+            </label>
+            {% for e in form.consent.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">{{ _('Bestätigen und fortfahren') }}</button>
+      </form>
+      <p class="text-center mt-3 mb-0 text-muted" style="font-size:.8rem">
+        {{ _('Sie können sich auch') }}
+        <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-link btn-sm p-0" style="font-size:.8rem">{{ _('abmelden') }}</button>
+        </form>
+        {{ _('ohne zu bestätigen.') }}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

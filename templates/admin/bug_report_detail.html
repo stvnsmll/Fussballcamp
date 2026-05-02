@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Meldung') }} #{{ report.id }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      <span class="badge badge-{{ report.severity }}">{{ report.severity_label }}</span>
+      <span class="badge badge-{{ report.status }} ms-1">{{ report.status_label }}</span>
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:760px">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="card animate-in">
+        <div class="card-body">
+          <h2 class="h5 fw-700">{{ report.subject }}</h2>
+          <div class="text-muted" style="font-size:.8rem;margin-bottom:1rem">
+            {{ _('Von') }} {{ report.reporter_role }} ({{ report.reporter_email }}) ·
+            {{ report.created_at.strftime('%d.%m.%Y %H:%M') }}
+            {% if report.page_url %}· Seite: <code>{{ report.page_url }}</code>{% endif %}
+          </div>
+          <div style="white-space:pre-wrap;font-size:.9rem;line-height:1.6">{{ report.description }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card animate-in animate-in-2">
+        <div class="card-header">{{ _('Status &amp; Notizen') }}</div>
+        <div class="card-body">
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              {{ form.status.label(class='form-label') }}
+              {{ form.status(class='form-select form-select-sm') }}
+            </div>
+            <div class="mb-3">
+              {{ form.admin_notes.label(class='form-label') }}
+              {{ form.admin_notes(class='form-control form-control-sm', rows=4) }}
+            </div>
+            <button class="btn btn-primary btn-sm w-100">{{ _('Speichern') }}</button>
+          </form>
+          {% if report.resolved_at %}
+          <div class="mt-2 text-muted" style="font-size:.75rem">
+            {{ _('Gelöst') }} {{ report.resolved_at.strftime('%d.%m.%Y') }}
+            {% if report.resolved_by %}{{ _('von') }} {{ report.resolved_by.full_name }}{% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <a href="{{ url_for('admin.bug_report_list') }}" class="btn btn-outline-secondary btn-sm w-100 mt-2">← {{ _('Zurück') }}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

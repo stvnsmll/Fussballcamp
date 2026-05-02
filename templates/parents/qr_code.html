@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>QR-Code</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.5rem 0 0">{{ child.full_name }}</p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5 text-center" style="max-width:480px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-lg)">
+    <div class="card-body p-4">
+      <p class="text-muted mb-3" style="font-size:.875rem">
+        Zeigen Sie diesen Code beim Check-In dem Betreuer.
+      </p>
+      <div class="qr-container d-inline-block mb-3">
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR-Code für {{ child.full_name }}"
+             style="width:220px;height:220px;display:block">
+      </div>
+      <div class="fw-700 font-display" style="font-size:1.3rem">{{ child.full_name }}</div>
+      {% if registration %}
+      <div class="text-muted" style="font-size:.85rem">{{ registration.age_group.name if registration.age_group else '' }}</div>
+      {% endif %}
+      <hr class="my-3">
+      <div class="d-flex gap-2 justify-content-center">
+        <a href="{{ url_for('parents.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Zurück</a>
+        <button onclick="window.print()" class="btn btn-outline-primary btn-sm">Drucken</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

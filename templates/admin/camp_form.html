@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Camp bearbeiten') if camp else _('Neue Camp-Session') }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.camp_list') }}">{{ _('Sessions') }}</a></li>
+        <li class="breadcrumb-item active">{{ camp.name if camp else _('Neu') }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5" style="max-width:680px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {% if form.errors %}
+        <div class="alert alert-danger mb-3" style="font-size:.875rem">
+          <strong>Bitte Fehler korrigieren:</strong>
+          <ul class="mb-0 mt-1">
+            {% for field, errors in form.errors.items() %}
+              {% for error in errors %}
+              <li>{{ field }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">{{ _('Grunddaten') }}</h2>
+        <div class="row g-3 mb-3">
+          <div class="col-sm-9">
+            {{ form.name.label(class='form-label') }}
+            {{ form.name(class='form-control' + (' is-invalid' if form.name.errors else '')) }}
+            {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-3">
+            {{ form.year.label(class='form-label') }}
+            {{ form.year(class='form-control' + (' is-invalid' if form.year.errors else '')) }}
+            {% for e in form.year.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6">
+            {{ form.start_date.label(class='form-label') }}
+            {{ form.start_date(class='form-control' + (' is-invalid' if form.start_date.errors else ''), type='date') }}
+            {% for e in form.start_date.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6">
+            {{ form.end_date.label(class='form-label') }}
+            {{ form.end_date(class='form-control' + (' is-invalid' if form.end_date.errors else ''), type='date') }}
+            {% for e in form.end_date.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-12">
+            {{ form.location.label(class='form-label') }}
+            {{ form.location(class='form-control', placeholder='z.B. Sportplatz Musterstadt') }}
+          </div>
+          <div class="col-12">
+            {{ form.description.label(class='form-label') }}
+            {{ form.description(class='form-control', rows=3) }}
+          </div>
+        </div>
+
+        <hr class="divider">
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">{{ _('Anmeldung') }}</h2>
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            {{ form.registration_opens_at.label(class='form-label') }}
+            {{ form.registration_opens_at(class='form-control') }}
+            <div class="form-text">{{ _('Leer lassen um sofort zu öffnen.') }}</div>
+          </div>
+          <div class="col-sm-6">
+            {{ form.registration_closes_at.label(class='form-label') }}
+            {{ form.registration_closes_at(class='form-control') }}
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.registration_open(class='form-check-input') }}
+              {{ form.registration_open.label(class='form-check-label') }}
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">{{ _('Status &amp; Einstellungen') }}</h2>
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            {{ form.status.label(class='form-label') }}
+            {{ form.status(class='form-select') }}
+            <div class="form-text">
+              <strong>draft</strong> — {{ _('nur Admins sichtbar') }} ·
+              <strong>published</strong> — {{ _('öffentlich') }} ·
+              <strong>archived</strong> — {{ _('abgeschlossen') }}
+            </div>
+          </div>
+          <div class="col-sm-4">
+            {{ form.max_registrants.label(class='form-label') }}
+            {{ form.max_registrants(class='form-control') }}
+            <div class="form-text">0 = kein Limit</div>
+          </div>
+          <div class="col-sm-4">
+            {{ form.min_age_limit.label(class='form-label') }}
+            {{ form.min_age_limit(class='form-control') }}
+            <div class="form-text">0 = kein Mindestalter</div>
+            {% for e in form.min_age_limit.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-4">
+            {{ form.max_age_limit.label(class='form-label') }}
+            {{ form.max_age_limit(class='form-control') }}
+            <div class="form-text">0 = kein Höchstalter</div>
+            {% for e in form.max_age_limit.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.require_head_coaches(class='form-check-input') }}
+              {{ form.require_head_coaches.label(class='form-check-label') }}
+              <div class="form-text">{{ _('Zeigt orangefarbene Warnung wenn eine Gruppe keinen Haupttrainer hat.') }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn btn-primary flex-fill">
+            {{ _('Änderungen speichern') if camp else _('Session erstellen') }}
+          </button>
+          <a href="{{ url_for('admin.camp_list') }}" class="btn btn-outline-secondary">{{ _('Abbrechen') }}</a>
+        </div>
+
+        {% if camp %}
+        <hr class="mt-4">
+        <div class="row g-2">
+          <div class="col-sm-6">
+            <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}"
+               class="btn btn-outline-secondary btn-sm w-100">{{ _('Altersgruppen verwalten') }} →</a>
+          </div>
+          <div class="col-sm-6">
+            <a href="{{ url_for('admin.group_planner', camp_id=camp.id) }}"
+               class="btn btn-outline-secondary btn-sm w-100">{{ _('Gruppenplanung') }} →</a>
+          </div>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  {# Danger zone — outside main form to avoid nested form issue #}
+  {% if camp and camp.status not in ('active', 'open') %}
+  <div class="container pb-5" style="max-width:760px">
+    <hr>
+    <div class="p-3 rounded" style="border:1px solid rgba(239,68,68,.3)">
+      <div class="fw-600 mb-1" style="color:#b91c1c;font-size:.875rem">{{ _('Gefahrenzone') }}</div>
+      <form method="POST" action="{{ url_for('admin.camp_delete', camp_id=camp.id) }}"
+            id="delCampForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                          onclick="showConfirmModal({iconClass:'bi-calendar-x-fill',iconColor:'#dc2626',title:'Camp löschen?',body:'Das Camp <strong>{{ camp.name }}</strong> wird dauerhaft gelöscht.',warning:'Alle Gruppen und Anmeldedaten werden ebenfalls entfernt. Nicht rückgängig zu machen.',confirmLabel:'Ja, Camp löschen',onConfirm:function(){document.getElementById('delCampForm').submit();}})">
+                        {{ _('Camp löschen') }}
+                      </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

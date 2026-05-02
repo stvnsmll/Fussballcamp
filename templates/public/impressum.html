@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container"><h1>{{ _('Impressum') }}</h1></div>
+</div>
+{% endblock %}
+{% block extra_style %}
+.legal-section { margin-bottom: 2rem; }
+.legal-section h2 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; padding-bottom: .35rem;
+  border-bottom: 2px solid var(--lime); display: inline-block; }
+.legal-section p { font-size: .9rem; line-height: 1.75; color: #2d3e33; }
+{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:640px">
+  <div class="legal-section animate-in">
+    <h2>{{ _('Angaben gemäß § 5 TMG') }}</h2>
+    <p>
+      <strong>{{ config.CAMP_ORGANISER_NAME or config.CAMP_NAME }}</strong><br>
+      {% if config.CAMP_ORGANISER_ADDRESS %}
+      {{ config.CAMP_ORGANISER_ADDRESS | replace('\n', '<br>') | safe }}<br>
+      {% endif %}
+    </p>
+  </div>
+  <div class="legal-section animate-in">
+    <h2>{{ _('Kontakt') }}</h2>
+    <p>
+      {% if config.CAMP_CONTACT_PHONE %}{{ _('Telefon') }}: {{ config.CAMP_CONTACT_PHONE }}<br>{% endif %}
+      {{ _('E-Mail') }}: <a href="mailto:{{ config.CAMP_CONTACT_EMAIL }}">{{ config.CAMP_CONTACT_EMAIL }}</a>
+    </p>
+  </div>
+  <div class="legal-section animate-in">
+    <h2>{{ _('Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV') }}</h2>
+    <p>
+      {{ config.CAMP_ORGANISER_NAME or config.CAMP_NAME }}<br>
+      {% if config.CAMP_ORGANISER_ADDRESS %}
+      {{ config.CAMP_ORGANISER_ADDRESS | replace('\n', '<br>') | safe }}
+      {% endif %}
+    </p>
+  </div>
+  <div class="legal-section animate-in">
+    <h2>{{ _('Haftungsausschluss') }}</h2>
+    <p>
+      <strong>{{ _('Haftung für Inhalte:') }}</strong>
+      {{ _('Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.') }}
+    </p>
+    <p>
+      <strong>{{ _('Haftung für Links:') }}</strong>
+      {{ _('Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben.') }}
+    </p>
+  </div>
+  <div class="legal-section animate-in">
+    <h2>{{ _('Urheberrecht') }}</h2>
+    <p>
+      {{ _('Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht.') }}
+    </p>
+  </div>
+</div>
+{% endblock %}

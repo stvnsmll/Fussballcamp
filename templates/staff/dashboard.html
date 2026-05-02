@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Team-Dashboard</h1>
+    {% if camp_cards %}
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {{ camp_cards | length }} aktive{{ 's Camp' if camp_cards|length == 1 else ' Camps' }}
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+.camp-card-wrap {
+  display: flex;
+  gap: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--cream-dark);
+  margin-bottom: 1.5rem;
+}
+.camp-card-body {
+  flex: 1;
+  padding: 1.25rem;
+  background: var(--white);
+  min-width: 0;
+}
+.camp-action-panel {
+  display: flex;
+  flex-direction: row;   /* side by side on desktop */
+  flex-shrink: 0;
+  border-left: 1px solid rgba(0,0,0,.08);
+}
+/* On mobile, card wraps and action panel becomes full-width stacked column */
+@media (max-width: 540px) {
+  .camp-card-wrap { flex-wrap: wrap; }
+  .camp-action-panel {
+    flex-direction: column;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(0,0,0,.08);
+    flex-direction: row;  /* keep side by side even when full-width on mobile */
+  }
+}
+.camp-action-btn {
+  width: 100px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  text-decoration: none;
+  transition: background .15s;
+}
+/* Divider between the two buttons */
+.camp-action-btn + .camp-action-btn {
+  border-left: 1px solid rgba(0,0,0,.08);
+}
+@media (max-width: 540px) {
+  .camp-action-btn { flex: 1; width: auto; }
+}
+.camp-action-btn.btn-active-green {
+  background: var(--green-700);
+  color: var(--lime);
+}
+.camp-action-btn.btn-active-green:hover { background: var(--green-800); }
+.camp-action-btn.btn-active-amber {
+  background: #92400e;
+  color: #fcd34d;
+}
+.camp-action-btn.btn-active-amber:hover { background: #78350f; }
+.camp-action-btn.btn-disabled {
+  background: var(--cream-dark);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.camp-action-btn i { font-size: 1.5rem; }
+.camp-stats { display: flex; gap: 1.5rem; margin-top: .75rem; flex-wrap: wrap; }
+.camp-stat { text-align: center; }
+.camp-stat-n { font-size: 1.4rem; font-weight: 800; line-height: 1; }
+.camp-stat-l { font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-top: .1rem; }
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+
+  {% if not camp_cards %}
+  <div class="alert alert-info mt-3">Kein aktives Camp. Bitte Admin kontaktieren.</div>
+
+  {% else %}
+
+  {# ── Per-camp cards ──────────────────────────────────────────────────── #}
+  {% for card in camp_cards %}
+  {% set camp = card.camp %}
+  {% set is_today = card.is_today %}
+  {% set stats = card.stats %}
+
+  <div class="camp-card-wrap animate-in">
+
+    {# Left — camp info + stats #}
+    <div class="camp-card-body">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+        <div>
+          <div class="fw-800 font-display text-uppercase" style="font-size:1.05rem">{{ camp.name }}</div>
+          <div class="text-muted" style="font-size:.8rem">
+            <i class="bi bi-calendar"></i>
+            {{ camp.start_date.strftime('%d.%m.') }}–{{ camp.end_date.strftime('%d.%m.%Y') }}
+            {% if camp.location %} · <i class="bi bi-geo-alt"></i> {{ camp.location }}{% endif %}
+            {% if is_today %} · <strong style="color:var(--green-600)">Tag {{ card.camp_day }}</strong>{% endif %}
+          </div>
+        </div>
+        <div class="d-flex gap-1 flex-wrap">
+          <span class="badge badge-{{ camp.status }}" style="font-size:.7rem">{{ camp.status }}</span>
+          {% if camp.registration_open %}<span class="badge badge-confirmed" style="font-size:.7rem">Anmeldung offen</span>{% endif %}
+        </div>
+      </div>
+
+      {# Head coach warning #}
+      {% if card.head_coach_warnings %}
+      <div class="alert alert-warning py-1 px-2 mb-2" style="font-size:.78rem">
+        <i class="bi bi-exclamation-triangle"></i>
+        {% for w in card.head_coach_warnings %}<span>{{ w }}</span>{% if not loop.last %}, {% endif %}{% endfor %}
+        fehlt ein Haupttrainer.
+      </div>
+      {% endif %}
+
+      {# Today's stats — only shown on camp days #}
+      {% if is_today and stats %}
+      <div class="camp-stats">
+        <div class="camp-stat">
+          <div class="camp-stat-n">{{ stats.total_confirmed }}</div>
+          <div class="camp-stat-l">Angemeldet</div>
+        </div>
+        <div class="camp-stat">
+          <div class="camp-stat-n" style="color:var(--green-600)">{{ stats.checked_in_today }}</div>
+          <div class="camp-stat-l">Heute da</div>
+        </div>
+        <div class="camp-stat">
+          <div class="camp-stat-n" style="color:#f59e0b">{{ stats.still_present }}</div>
+          <div class="camp-stat-l">Noch da</div>
+        </div>
+        <div class="camp-stat">
+          <div class="camp-stat-n" style="color:var(--text-muted)">{{ stats.checked_out }}</div>
+          <div class="camp-stat-l">Ausgecheckt</div>
+        </div>
+      </div>
+      {% elif not is_today %}
+      <div style="font-size:.78rem;color:var(--text-muted);margin-top:.5rem">
+        {% if today < camp.start_date %}
+          Beginnt in {{ (camp.start_date - today).days }} Tag{{ 'en' if (camp.start_date - today).days != 1 else '' }}
+        {% else %}
+          Camp beendet
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {# Admin edit links #}
+      {% if current_user.role == 'admin' %}
+      <div class="d-flex gap-2 mt-2 flex-wrap">
+        <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}" class="btn btn-sm btn-outline-secondary" style="font-size:.75rem">Bearbeiten</a>
+        <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}" class="btn btn-sm btn-outline-secondary" style="font-size:.75rem">Altersgruppen</a>
+        <a href="{{ url_for('admin.roster', camp_id=camp.id) }}" class="btn btn-sm btn-outline-secondary" style="font-size:.75rem">Teilnehmerliste</a>
+      </div>
+      {% endif %}
+    </div>
+
+    {# Right — action buttons panel #}
+    <div class="camp-action-panel">
+
+      {# Check-In #}
+      {% if is_today %}
+      <a href="{{ url_for('staff.checkin_mode_camp', camp_id=camp.id) }}"
+         class="camp-action-btn btn-active-green" style="padding-top: 10px; padding-bottom: 10px;">
+        <i class="bi bi-clipboard-check"></i>
+        Check-In/Out
+      </a>
+      {% else %}
+      <span class="camp-action-btn btn-disabled"  style="padding-top: 10px; padding-bottom: 10px;">
+        <i class="bi bi-clipboard"></i>
+        Check-In/Out
+      </span>
+      {% endif %}
+
+
+
+    </div>
+
+  </div>
+  {% endfor %}
+
+  {# ── Quick links ─────────────────────────────────────────────────────── #}
+  <div class="row g-3 mt-1">
+    <div class="col-md-6">
+      <a href="{{ url_for('staff.roster') }}" class="card text-decoration-none h-100">
+        <div class="card-body d-flex gap-3 align-items-center">
+          <span style="font-size:1.8rem"><i class="bi bi-people"></i></span>
+          <div>
+            <div class="fw-700 font-display text-uppercase" style="font-size:.9rem">Anwesenheitsliste</div>
+            <div class="text-muted" style="font-size:.8rem">Alle Kinder nach Gruppe</div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-md-6">
+      <a href="{{ url_for('staff.child_info_scan') }}" class="card text-decoration-none h-100">
+        <div class="card-body d-flex gap-3 align-items-center">
+          <span style="font-size:1.8rem"><i class="bi bi-person-badge"></i></span>
+          <div>
+            <div class="fw-700 font-display text-uppercase" style="font-size:.9rem">Kind-Info scannen</div>
+            <div class="text-muted" style="font-size:.8rem">QR-Code für Kind-Details</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

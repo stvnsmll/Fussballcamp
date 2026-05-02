@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Trainerplanung') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ camp.name }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+
+  {% if conflicts %}
+  <div class="alert alert-warning mb-4">
+    <strong><i class="bi bi-exclamation-triangle"></i> {{ _('Haupttrainer fehlt in') }} {{ conflicts | length }} {{ _('Gruppe(n):') }}</strong>
+    {% for g in conflicts %}<strong>{{ g.name }}</strong>{% if not loop.last %}, {% endif %}{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not trainers %}
+  <div class="alert alert-info">
+    {{ _('Noch kein Trainer eingeladen.') }} 
+    <a href="{{ url_for('admin.invite_staff') }}">{{ _('Trainer einladen') }} →</a>
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+    {% for group in camp.age_groups %}
+    {% set head_coach = group.head_coach %}
+    {% set group_assignments = group.group_assignments | selectattr('staff_user', 'defined') | list %}
+    <div class="col-lg-6 animate-in animate-in-{{ loop.index % 4 + 1 }}">
+      <div class="card h-100 {{ 'border-start border-4' if not head_coach else '' }}"
+           style="{{ 'border-left-color:#f59e0b!important' if not head_coach else '' }}">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>{{ group.name }}
+            <span class="text-muted fw-400" style="font-size:.8rem">
+              ({{ group.min_age }}–{{ group.max_age }} J. · {{ group.confirmed_count }} Kinder)
+            </span>
+          </span>
+          {% if not head_coach %}
+          <span class="badge badge-waitlisted">{{ _('Haupttrainer fehlt') }}</span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+
+          {# Head coach assignment #}
+          <div class="mb-3">
+            <div class="form-label" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)">
+              {{ _('Haupttrainer') }}
+            </div>
+            {% set hc_assignment = group.group_assignments | selectattr('is_head_coach') | first %}
+            {% if head_coach and hc_assignment %}
+            <div class="d-flex justify-content-between align-items-center p-2 rounded"
+                 style="background:rgba(27,63,42,.08)">
+              <div class="fw-600">{{ head_coach.full_name }}</div>
+              <form method="POST" action="{{ url_for('admin.remove_trainer', camp_id=camp.id, assignment_id=hc_assignment.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-xs btn-outline-danger"
+                        style="font-size:.72rem;padding:.2rem .5rem">{{ _('Entfernen') }}</button>
+              </form>
+            </div>
+            {% else %}
+            <form method="POST" action="{{ url_for('admin.assign_trainer', camp_id=camp.id) }}"
+                  class="d-flex gap-2">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="age_group_id" value="{{ group.id }}">
+              <select name="staff_user_id" class="form-select form-select-sm flex-fill">
+                <option value="">— {{ _('Trainer auswählen') }} —</option>
+                {% for t in trainers %}
+                <option value="{{ t.id }}">{{ t.full_name }}</option>
+                {% endfor %}
+              </select>
+              <button class="btn btn-sm btn-primary">{{ _('Zuweisen') }}</button>
+            </form>
+            {% endif %}
+          </div>
+
+          {# All assignments for this group #}
+          {% if group_assignments %}
+          <div class="form-label" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)">
+            Team ({{ group_assignments | length }})
+          </div>
+          {% for a in group_assignments %}
+          <div class="d-flex justify-content-between align-items-center mb-1"
+               style="font-size:.875rem">
+            <div>
+              {{ a.staff_user.full_name }}
+              {% if a.is_head_coach %}
+              <span class="badge badge-confirmed ms-1" style="font-size:.65rem">HT</span>
+              {% endif %}
+              {% if a.staff_user.staff_profile and a.staff_user.staff_profile.is_first_aid %}
+              <span class="badge ms-1" style="background:rgba(239,68,68,.1);color:#dc2626;font-size:.65rem"><i class="bi bi-heart-pulse"></i> EA</span>
+              {% endif %}
+            </div>
+            <span class="text-muted" style="font-size:.78rem">
+              {{ a.staff_user.staff_profile.staff_class if a.staff_user.staff_profile else '' }}
+            </span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted" style="font-size:.82rem">{{ _('Noch kein Team zugewiesen.') }}</p>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <div class="alert alert-info">
+        {{ _('Noch keine Gruppen.') }} <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}">{{ _('Gruppen erstellen') }} →</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Anmeldung bearbeiten') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {{ reg.child.full_name }} · {{ reg.camp_session.name if reg.camp_session else '' }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:620px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            {{ form.status.label(class='form-label') }}
+            {{ form.status(class='form-select') }}
+          </div>
+          <div class="col-sm-6">
+            {{ form.age_group_id.label(class='form-label') }}
+            {{ form.age_group_id(class='form-select') }}
+          </div>
+          {% if reg.status == 'waitlisted' %}
+          <div class="col-sm-6">
+            {{ form.waitlist_position.label(class='form-label') }}
+            {{ form.waitlist_position(class='form-control', type='number', min=1) }}
+          </div>
+          {% endif %}
+        </div>
+
+        <hr class="divider">
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">{{ _('Einwilligungen') }}</h2>
+        <div class="row g-2 mb-3">
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.independent_travel(class='form-check-input') }}
+              {{ form.independent_travel.label(class='form-check-label') }}
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.photo_consent(class='form-check-input') }}
+              {{ form.photo_consent.label(class='form-check-label') }}
+            </div>
+          </div>
+        </div>
+
+        {# Show override reason field if age group was manually changed #}
+        {% if reg.admin_override %}
+        <div class="p-3 mb-3 rounded" style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.2)">
+          <div style="font-size:.8rem;font-weight:600;color:#4f46e5;margin-bottom:.35rem">
+            {{ _('Gruppenüberschreibung aktiv') }}
+          </div>
+          <div style="font-size:.82rem">{{ _('Grund:') }} {{ reg.admin_override_reason or '—' }}</div>
+        </div>
+        {% endif %}
+
+        <div class="mb-3">
+          {{ form.admin_override_reason.label(class='form-label') }}
+          {{ form.admin_override_reason(class='form-control', rows=2,
+             placeholder='{{ _("Pflichtfeld wenn Altersgruppe geändert wird") }}') }}
+          <div class="form-text">{{ _('Wird im Audit-Log gespeichert.') }}</div>
+        </div>
+
+        <div class="d-flex gap-3">
+          <button type="submit" class="btn btn-primary flex-fill">{{ _('Speichern') }}</button>
+          <a href="{{ url_for('admin.user_detail', user_id=reg.child.parent_user_id) }}"
+             class="btn btn-outline-secondary">{{ _('Abbrechen') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

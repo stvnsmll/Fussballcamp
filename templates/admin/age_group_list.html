@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Altersgruppen') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ camp.name }}</p>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.camp_list') }}">Sessions</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}">{{ camp.name }}</a></li>
+        <li class="breadcrumb-item active">Altersgruppen</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.age_group_create', camp_id=camp.id) }}"
+         class="btn btn-primary btn-sm">+ {{ _('Gruppe hinzufügen') }}</a>
+      <a href="{{ url_for('admin.group_planner', camp_id=camp.id) }}"
+         class="btn btn-outline-secondary btn-sm"><i class="bi bi-sliders"></i> {{ _('Gruppenplanung') }}</a>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.roster', camp_id=camp.id) }}"
+         class="btn btn-outline-secondary btn-sm" target="_blank"><i class="bi bi-printer"></i> {{ _('Teilnehmerliste drucken') }}</a>
+      <a href="{{ url_for('admin.trainer_assignments', camp_id=camp.id) }}"
+         class="btn btn-outline-secondary btn-sm"><i class="bi bi-award"></i> {{ _('Trainerplanung') }} →</a>
+    </div>
+  </div>
+
+  {% if not age_groups %}
+  <div class="card text-center py-5" style="border:2px dashed var(--cream-dark)">
+    <div class="card-body">
+      <div style="font-size:2.5rem;opacity:.25"><i class="bi bi-people"></i></div>
+      <p class="text-muted mt-2 mb-3">{{ _('Noch keine Gruppen erstellt.') }}</p>
+      <a href="{{ url_for('admin.age_group_create', camp_id=camp.id) }}"
+         class="btn btn-primary">{{ _('Erste Gruppe erstellen') }}</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{{ _('Gruppe') }}</th>
+            <th>{{ _('Alter') }}</th>
+            <th>{{ _('Haupttrainer') }}</th>
+            <th class="text-center">{{ _('Kinder') }}</th>
+            <th class="text-center">{{ _('Warteliste') }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for group in age_groups %}
+          {% set head_coach = group.head_coach %}
+          <tr>
+            <td class="fw-600">{{ group.name }}</td>
+            <td style="font-size:.875rem">{{ group.min_age }}–{{ group.max_age }} {{ _('Jahre') }}</td>
+            <td>
+              {% if head_coach %}
+              <span class="fw-500">{{ head_coach.full_name }}</span>
+              {% else %}
+              <span class="badge badge-cancelled"><i class="bi bi-exclamation-triangle"></i> {{ _('Fehlt') }}</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if group.capacity %}
+                {% set pct = (group.confirmed_count / group.capacity * 100) | round | int %}
+                <span class="{{ 'text-danger fw-700' if group.is_full else '' }}">
+                  {{ group.confirmed_count }} / {{ group.capacity }}
+                </span>
+                <div class="progress mt-1" style="height:4px;background:var(--cream-dark);border-radius:2px">
+                  <div style="width:{{ [pct,100]|min }}%;background:{{ '#ef4444' if group.is_full else 'var(--green-600)' }};height:4px;border-radius:2px"></div>
+                </div>
+              {% else %}
+                <span class="fw-600">{{ group.confirmed_count }}</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {% if group.waitlist_count %}
+              <span class="badge badge-waitlisted">{{ group.waitlist_count }}</span>
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="d-flex gap-1 justify-content-end">
+                <a href="{{ url_for('admin.age_group_edit', camp_id=camp.id, group_id=group.id) }}"
+                   class="btn btn-xs btn-outline-primary" style="font-size:.75rem;padding:.2rem .6rem">{{ _('Bearbeiten') }}</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot style="border-top:2px solid var(--cream-dark)">
+          <tr>
+            <td colspan="2" class="text-muted" style="font-size:.8rem">{{ _('Gesamt') }}</td>
+            <td></td>
+            <td class="text-center fw-700">
+              {% set total_confirmed = age_groups | sum(attribute='confirmed_count') %}
+              {% if camp.max_registrants %}
+                {{ total_confirmed }} / {{ camp.max_registrants }}
+                <div class="progress mt-1" style="height:4px;background:var(--cream-dark);border-radius:2px">
+                  <div style="width:{{ [(total_confirmed / camp.max_registrants * 100)|int,100]|min }}%;background:{% if total_confirmed >= camp.max_registrants %}#ef4444{% else %}var(--green-600){% endif %};height:4px;border-radius:2px"></div>
+                </div>
+              {% else %}
+                {{ total_confirmed }}
+              {% endif %}
+            </td>
+            <td class="text-center fw-700">
+              {{ age_groups | sum(attribute='waitlist_count') }}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

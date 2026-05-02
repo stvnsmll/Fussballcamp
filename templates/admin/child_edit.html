@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ child.full_name }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {% if child.parent %}{{ _('Elternteil') }}: {{ child.parent.full_name }}{% endif %}
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:660px">
+
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">{{ _('Kindsdaten') }}</h2>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            {{ form.first_name.label(class='form-label') }}
+            {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else '')) }}
+            {% for e in form.first_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6">
+            {{ form.last_name.label(class='form-label') }}
+            {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else '')) }}
+            {% for e in form.last_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6">
+            {{ form.date_of_birth.label(class='form-label') }}
+            {{ form.date_of_birth(class='form-control', type='date') }}
+          </div>
+          <div class="col-12">
+            {{ form.medical_notes.label(class='form-label') }}
+            {{ form.medical_notes(class='form-control', rows=3) }}
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.photo_consent_default(class='form-check-input') }}
+              {{ form.photo_consent_default.label(class='form-check-label') }}
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">{{ _('Speichern') }}</button>
+      </form>
+    </div>
+  </div>
+
+  {# Registrations for this child #}
+  {% if child.registrations %}
+  <div class="card mt-3 animate-in animate-in-2">
+    <div class="card-header">{{ _('Anmeldungen') }}</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>{{ _('Camp') }}</th><th>{{ _('Gruppe') }}</th><th>{{ _('Status') }}</th><th></th></tr></thead>
+        <tbody>
+          {% for reg in child.registrations %}
+          <tr>
+            <td style="font-size:.875rem">{{ reg.camp_session.name if reg.camp_session else '—' }}</td>
+            <td style="font-size:.875rem">{{ reg.age_group.name if reg.age_group else '—' }}</td>
+            <td><span class="badge badge-{{ reg.status }}">{{ reg.status }}</span></td>
+            <td>
+              <a href="{{ url_for('admin.registration_edit', registration_id=reg.id) }}"
+                 class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:.2rem .5rem">
+                Bearb.
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  {# Emergency contact #}
+  {% if child.emergency_contacts %}
+  {% set ec = child.emergency_contacts[0] %}
+  <div class="card mt-3 animate-in animate-in-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      {{ _('Notfallkontakt') }}
+      <a href="{{ url_for('admin.child_edit_emergency_contact', child_id=child.id) }}"
+         class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:.2rem .5rem">
+        Bearbeiten
+      </a>
+    </div>
+    <div class="card-body" style="font-size:.875rem">
+      <div class="fw-600">{{ ec.full_name }}{% if ec.relationship %} ({{ ec.relationship }}){% endif %}</div>
+      <div>{{ ec.phone_primary }}</div>
+      {% if ec.phone_secondary %}<div>{{ ec.phone_secondary }}</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

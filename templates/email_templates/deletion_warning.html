@@ -1,0 +1,64 @@
+{% extends "email_templates/_base_email.html" %}
+
+{% block title %}Hinweis zur Datenlöschung – {{ camp_name }}{% endblock %}
+{% block preheader %}Ihr Konto beim {{ camp_name }} wird am {{ deletion_date.strftime('%d.%m.%Y') }} gelöscht, sofern Sie sich nicht anmelden.{% endblock %}
+
+{% block header_stripe %}
+<tr>
+  <td style="background-color:#fee2e2;padding:10px 40px;">
+    <p style="margin:0;font-size:12px;font-weight:700;color:#991b1b;letter-spacing:.06em;text-transform:uppercase;">
+      Datenschutzhinweis
+    </p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+
+  <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-0.4px;">
+    Hallo {{ user.first_name }},
+  </h1>
+  <p style="margin:0 0 24px;font-size:15px;color:#4b5563;line-height:1.6;">
+    gemäß unserer Datenschutzrichtlinie werden Konten, die längere Zeit nicht genutzt
+    wurden, automatisch gelöscht. Ihr Konto beim
+    <strong style="color:#1b3f2a;">{{ camp_name }}</strong> ist davon betroffen.
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         style="margin:0 0 24px;border-radius:8px;">
+    <tr>
+      <td style="background-color:#fef2f2;border-left:4px solid #ef4444;padding:14px 16px;">
+        <p style="margin:0;font-size:14px;color:#991b1b;line-height:1.6;">
+          Ihr Konto wird am
+          <strong>{{ deletion_date.strftime('%d. %B %Y') }}</strong>
+          unwiderruflich gelöscht, sofern Sie sich vorher nicht anmelden.
+        </p>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.6;">
+    Falls Sie Ihr Konto behalten möchten, melden Sie sich bitte einmalig vor
+    diesem Datum an. Dadurch wird die Löschfrist automatisch zurückgesetzt.
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+    <tr>
+      <td style="background-color:#b8f442;border-radius:9px;">
+        <a href="{{ login_url }}"
+           class="cta-button"
+           style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:800;
+                  color:#1b3f2a;text-decoration:none;border-radius:9px;
+                  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+          Jetzt anmelden →
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0;font-size:13px;color:#9ca3af;line-height:1.6;">
+    Falls Sie kein Konto mehr benötigen, müssen Sie nichts tun. Alle Daten
+    werden fristgerecht gelöscht.
+  </p>
+
+{% endblock %}

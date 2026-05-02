@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}admin/dashboard{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Admin-Dashboard') }}</h1>
+    {% if camp_session %}
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ camp_session.name }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+
+  {% if camp_session %}
+  {# Stats row #}
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-2 animate-in">
+      <div class="stat-card accent">
+        <div class="stat-number">{{ stats.confirmed }}</div>
+        <div class="stat-label">{{ _('Bestätigt') }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-2 animate-in animate-in-1">
+      <div class="stat-card">
+        <div class="stat-number" style="color:#d97706">{{ stats.waitlisted }}</div>
+        <div class="stat-label">{{ _('Warteliste') }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-2 animate-in animate-in-2">
+      <div class="stat-card">
+        <div class="stat-number" style="color:#6366f1">{{ stats.pending }}</div>
+        <div class="stat-label">{{ _('Ausstehend') }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3 animate-in animate-in-3">
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.total_parents }}</div>
+        <div class="stat-label">{{ _('Eltern') }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3 animate-in animate-in-4">
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.total_staff }}</div>
+        <div class="stat-label">{{ _('Team') }}</div>
+      </div>
+    </div>
+  </div>
+
+  {# Head coach warnings #}
+  {% if head_coach_warnings %}
+  <div class="alert alert-warning mb-4">
+    <strong><i class="bi bi-exclamation-triangle"></i> {{ _('Haupttrainer fehlt:') }}</strong>
+    {% for g in head_coach_warnings %}{{ g.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+    — <a href="{{ url_for('admin.trainer_assignments', camp_id=camp_session.id) }}">Jetzt zuweisen</a>
+  </div>
+  {% endif %}
+
+  {# Quick action cards #}
+  <div class="row g-3 mb-4">
+    {% set actions = [
+      (url_for('admin.camp_list'), 'bi bi-house-heart', _('Alle Camps'), _('Entwürfe, aktive und archivierte Camps')),
+      (url_for('admin.manual_entry'), 'bi bi-pencil-square', _('Manuelle Anmeldung'), _('Papierformular eintragen')),
+      (url_for('admin.user_list'), 'bi bi-people', _('Benutzerverwaltung'), _('Eltern, Team, Admins, Kinder')),
+      (url_for('admin.invite_staff'), 'bi bi-envelope', _('Team einladen'), _('Einladungslink senden')),
+      (url_for('admin.analytics'), 'bi bi-bar-chart', _('Analytics'), _('Nutzungsstatistiken')),
+      (url_for('admin.bug_report_list'), 'bi bi-bug', _('Fehlermeldungen'), _('Bug Reports verwalten')),
+      (url_for('admin.dev_tools'), 'bi bi-tools', _('Dev Tools'), _('Entwickler-Toggles')),
+      (url_for('admin.csv_import'), 'bi bi-file-earmark-arrow-up', _('CSV-Import'), _('Historische Daten importieren')),
+    ] %}
+    {% for href, icon, label, desc in actions %}
+    <div class="col-sm-6 col-lg-3 animate-in animate-in-{{ loop.index % 4 + 1 }}">
+      <a href="{{ href }}" class="card text-decoration-none h-100">
+        <div class="card-body">
+          <div style="font-size:1.8rem mb-1"><i class="{{ icon }}"></i></div>
+          <div class="fw-700 font-display text-uppercase" style="font-size:.95rem">{{ label }}</div>
+          <div class="text-muted" style="font-size:.78rem">{{ desc }}</div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Camp session management #}
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card animate-in">
+        <div class="card-header"><i class="bi bi-house-heart"></i> {{ camp_session.name }}</div>
+        <div class="card-body" style="font-size:.875rem">
+          <div class="d-flex gap-2 mb-2 flex-wrap">
+            <span class="badge badge-{{ camp_session.status }}">{{ camp_session.status }}</span>
+            {% if camp_session.registration_open %}
+            <span class="badge badge-confirmed">{{ _('Anmeldung offen') }}</span>
+            {% endif %}
+          </div>
+          <div><i class="bi bi-calendar"></i> {{ camp_session.start_date.strftime('%d.%m.') }} – {{ camp_session.end_date.strftime('%d.%m.%Y') }}</div>
+          {% if camp_session.location %}<div><i class="bi bi-geo-alt"></i> {{ camp_session.location }}</div>{% endif %}
+          <hr class="my-2">
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('admin.camp_edit', camp_id=camp_session.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Bearbeiten') }}</a>
+            <a href="{{ url_for('admin.age_group_list', camp_id=camp_session.id) }}" class="btn btn-sm btn-outline-secondary">{{ _('Altersgruppen') }}</a>
+            <form method="POST" action="{{ url_for('admin.send_reminder', camp_id=camp_session.id) }}" class="d-inline"
+                  id="reminderForm">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-envelope"></i> {{ _('Erinnerung senden') }}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card animate-in animate-in-2">
+        <div class="card-header"><i class="bi bi-exclamation-triangle"></i> {{ _('Letzte Fehler') }}</div>
+        <div class="card-body p-0">
+          {% if recent_errors %}
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <tbody>
+                {% for err in recent_errors %}
+                <tr>
+                  <td class="text-nowrap" style="font-size:.75rem;color:var(--text-muted)">
+                    {{ err.occurred_at.strftime('%d.%m %H:%M') }}
+                  </td>
+                  <td><span class="badge badge-high">{{ err.error_type }}</span></td>
+                  <td style="font-size:.8rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                    {{ err.route or '' }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="p-2 text-center">
+            <a href="{{ url_for('admin.analytics') }}" style="font-size:.8rem">{{ _('Alle Fehler ansehen') }} →</a>
+          </div>
+          {% else %}
+          <p class="text-muted p-3 mb-0" style="font-size:.875rem">{{ _('Keine Fehler.') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  {# No camp session #}
+  <div class="card text-center py-5 animate-in" style="border:2px dashed var(--cream-dark)">
+    <div class="card-body">
+      <div style="font-size:3rem;opacity:.3"><i class="bi bi-house-heart"></i></div>
+      <p class="text-muted mt-2 mb-3">{{ _('Noch keine Camp-Session erstellt.') }}</p>
+      <a href="{{ url_for('admin.camp_create') }}" class="btn btn-lime">{{ _('Camp erstellen') }} →</a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Screen styles                                                        */
+  /* ------------------------------------------------------------------ */
+
+  .roster-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .roster-toolbar h1 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .roster-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .roster-header-block {
+    background: #1b3f2a;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0;
+  }
+
+  .roster-header-block h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .roster-header-block .group-meta {
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+
+  .roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-top: none;
+    background: #fff;
+    margin-bottom: 2rem;
+  }
+
+  .roster-table th {
+    background: #f0ede4;
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .roster-table td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+
+  .roster-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .roster-table tr:nth-child(even) td {
+    background: #fafaf7;
+  }
+
+  .travel-badge {
+    display: inline-block;
+    background: #b8f442;
+    color: #1b3f2a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .travel-none {
+    color: #bbb;
+    font-size: 0.82rem;
+  }
+
+  .emergency-contact-phone {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #444;
+  }
+
+  .no-emergency {
+    color: #bbb;
+    font-size: 0.82rem;
+    font-style: italic;
+  }
+
+  .row-number {
+    color: #bbb;
+    font-size: 0.75rem;
+    text-align: right;
+    width: 2rem;
+    user-select: none;
+  }
+
+  .empty-group {
+    padding: 1rem;
+    color: #888;
+    font-style: italic;
+    border: 1px solid #ddd;
+    border-top: none;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Print styles                                                         */
+  /* ------------------------------------------------------------------ */
+
+  @media print {
+    nav,
+    .roster-toolbar .btn,
+    .roster-toolbar .print-hint,
+    footer,
+    .flash-messages {
+      display: none !important;
+    }
+
+    body {
+      background: #fff !important;
+      font-size: 10pt;
+      color: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .roster-toolbar {
+      margin-bottom: 0.4cm;
+    }
+
+    .roster-toolbar h1 {
+      font-size: 14pt;
+    }
+
+    .roster-meta {
+      font-size: 8pt;
+      color: #555;
+      margin-bottom: 0.4cm;
+    }
+
+    .roster-header-block {
+      background: #1b3f2a !important;
+      color: #fff !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border-radius: 0;
+      padding: 0.25cm 0.4cm;
+    }
+
+    .roster-header-block h2 {
+      font-size: 12pt;
+    }
+
+    .roster-table {
+      font-size: 9pt;
+      border: 0.5pt solid #ccc;
+      border-top: none;
+    }
+
+    .roster-table th {
+      background: #e8e8e8 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 0.15cm 0.3cm;
+      font-size: 7.5pt;
+    }
+
+    .roster-table td {
+      padding: 0.2cm 0.3cm;
+      border-bottom: 0.3pt solid #ddd;
+    }
+
+    .roster-table tr:nth-child(even) td {
+      background: #f8f8f8 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .travel-badge {
+      background: #b8f442 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-size: 7pt;
+    }
+
+    .emergency-contact-phone {
+      font-size: 8pt;
+    }
+
+    @page {
+      margin: 1.5cm 1.5cm 2cm 1.5cm;
+      size: A4 portrait;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="roster-toolbar">
+  <div>
+    <a href="{{ url_for('staff.group_detail', age_group_id=age_group.id) }}"
+       class="btn btn-ghost btn-sm print-hint">← Zurück zur Gruppe</a>
+    <h1>Teilnehmerliste — {{ age_group.name }}</h1>
+  </div>
+  <button onclick="window.print()" class="btn btn-primary print-hint">
+    <i class="bi bi-printer"></i> Drucken / Als PDF speichern
+  </button>
+</div>
+
+<p class="roster-meta print-hint">
+  {{ camp_session.name }} &middot;
+  {{ camp_session.start_date.strftime('%d.%m.%Y') }}–{{ camp_session.end_date.strftime('%d.%m.%Y') }}
+  &middot; Erstellt {{ now.strftime('%d.%m.%Y, %H:%M') }} Uhr
+  &middot; Nur bestätigte Anmeldungen
+</p>
+
+<div class="roster-header-block">
+  <h2>
+    {{ age_group.name }}
+    <small style="font-weight:400; font-size:0.8em; opacity:0.7;">
+      ({{ age_group.min_age }}–{{ age_group.max_age }} Jahre)
+    </small>
+  </h2>
+  <span class="group-meta">
+    {% if age_group.head_coach %}
+    Leitung: {{ age_group.head_coach.full_name }} &middot;
+    {% endif %}
+    {{ registrations | length }} Kinder
+  </span>
+</div>
+
+{% if registrations %}
+<table class="roster-table">
+  <thead>
+    <tr>
+      <th class="row-number">#</th>
+      <th>Name</th>
+      <th>Notfallkontakt</th>
+      <th>Telefon</th>
+      <th>Heimweg alleine</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for reg in registrations %}
+    {% set child = reg.child %}
+    {% set ec = child.emergency_contacts[0] if child.emergency_contacts else none %}
+    <tr>
+      <td class="row-number">{{ loop.index }}</td>
+      <td>
+        <strong>{{ child.last_name }}</strong>, {{ child.first_name }}
+      </td>
+      <td>
+        {% if ec %}
+        {{ ec.full_name }}
+        {% if ec.relationship %}
+        <br><span style="font-size:0.75rem; color:#777;">{{ ec.relationship }}</span>
+        {% endif %}
+        {% else %}
+        <span class="no-emergency">Kein Kontakt hinterlegt</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if ec %}
+        <span class="emergency-contact-phone">{{ ec.phone_primary }}</span>
+        {% if ec.phone_secondary %}
+        <br><span class="emergency-contact-phone" style="color:#999;">{{ ec.phone_secondary }}</span>
+        {% endif %}
+        {% else %}
+        <span class="travel-none">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if reg.independent_travel %}
+        <span class="travel-badge"><i class="bi bi-check"></i> Ja</span>
+        {% else %}
+        <span class="travel-none">Nein</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<div class="empty-group">
+  Keine bestätigten Anmeldungen in dieser Gruppe.
+</div>
+{% endif %}
+{% endblock %}

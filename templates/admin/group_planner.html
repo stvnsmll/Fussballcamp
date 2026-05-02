@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Gruppenplanung') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ camp.name }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+.arow { display:flex; align-items:center; gap:.6rem; margin-bottom:.35rem; }
+.albl { width:2.2rem; font-size:.75rem; font-weight:600; text-align:right; color:var(--text-muted); flex-shrink:0; }
+.abar { height:1.4rem; background:var(--green-200); border-radius:4px; display:flex; align-items:center; padding:0 .4rem; font-size:.7rem; font-weight:700; color:var(--green-800); min-width:1.8rem; }
+
+.bar-container { position:relative; height:2.5rem; margin:1.25rem 0 1.5rem; border-radius:12px; overflow:visible; }
+.bar-bg { position:absolute; inset:0; border-radius:12px; display:flex; box-shadow:0 2px 8px rgba(0,0,0,.15); overflow:hidden; pointer-events:none; }
+.seg { height:100%; display:flex; align-items:center; justify-content:center; font-size:.85rem; font-weight:800; color:white; overflow:hidden; min-width:0; }
+.seg:first-child { border-radius:12px 0 0 12px; }
+.seg:last-child  { border-radius:0 12px 12px 0; }
+.seg span { padding:0 .4rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 3px rgba(0,0,0,.3); }
+
+.handle-zone { position:absolute; top:50%; transform:translateY(-50%); width:48px; height:64px; margin-left:-24px; cursor:ew-resize; touch-action:none; display:flex; align-items:center; justify-content:center; z-index:10; }
+.handle-pip { width:18px; height:3rem; background:white; border:2.5px solid var(--green-700); border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.handle-pip::after { content:'⋮'; color:var(--green-700); font-size:1.1rem; }
+.handle-zone.active .handle-pip { background:var(--lime); border-color:var(--green-800); }
+
+.chip { border-radius:10px; padding:.8rem 1rem; margin-bottom:.5rem; border-left:4px solid; position:relative; overflow:hidden; }
+.chip-bar { position:absolute; top:0; left:0; bottom:0; opacity:.15; }
+.chip-row { position:relative; display:flex; justify-content:space-between; align-items:center; }
+.chip-count { font-size:2rem; font-weight:800; line-height:1; }
+.chip-sub { font-size:.8rem; opacity:.7; margin-top:.1rem; }
+
+.cbtn { width:2.8rem; height:2.8rem; border-radius:50%; border:2px solid var(--green-600); background:white; color:var(--green-700); font-size:1.4rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; touch-action:manipulation; }
+.cbtn:active { background:var(--green-600); color:white; }
+.cnum { font-size:2rem; font-weight:800; color:var(--green-800); min-width:2.5rem; text-align:center; }
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+  <div class="row g-4">
+
+    {# LEFT — age distribution #}
+    <div class="col-lg-4 animate-in">
+      <div class="card h-100">
+        <div class="card-header">{{ _('Altersverteilung') }} ({{ total_registered }} {{ _('Kinder') }})</div>
+        {% if camp.max_registrants %}
+        <div class="px-3 pt-2 pb-0">
+          <div class="d-flex justify-content-between align-items-center" style="font-size:.8rem">
+            <span class="text-muted">Gesamtlimit</span>
+            <span class="fw-600 {% if total_registered >= camp.max_registrants %}text-danger{% else %}text-success{% endif %}">
+              {{ total_registered }} / {{ camp.max_registrants }}
+            </span>
+          </div>
+          <div class="progress mt-1 mb-2" style="height:4px">
+            <div class="progress-bar {% if total_registered >= camp.max_registrants %}bg-danger{% else %}bg-success{% endif %}"
+                 style="width:{{ [(total_registered / camp.max_registrants * 100)|int, 100]|min }}%"></div>
+          </div>
+        </div>
+        {% else %}
+        <div class="px-3 pt-2 pb-0" style="font-size:.78rem;color:var(--text-muted)">
+          Kein Gesamtlimit gesetzt — <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}">Camp bearbeiten</a>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          {% if age_distribution %}
+          {% set max_count = age_distribution.values() | max %}
+          {% for age, count in age_distribution.items() | sort %}
+          <div class="arow">
+            <div class="albl">{{ age }}J</div>
+            <div class="abar" style="width:{{ [(count / max_count * 100) | round | int, 8] | max }}%">{{ count }}</div>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted">{{ _('Noch keine bestätigten Anmeldungen.') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# RIGHT — interactive planner #}
+    <div class="col-lg-8 animate-in animate-in-2">
+      <div class="card">
+        <div class="card-header">{{ _('Gruppen vorschlagen') }}</div>
+        <div class="card-body">
+          {% if age_distribution %}
+
+          <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+            <label class="form-label mb-0 fw-600">{{ _('Anzahl Gruppen') }}</label>
+            <button class="cbtn" id="btnM">−</button>
+            <span class="cnum" id="cnum">{{ age_groups | length or 3 }}</span>
+            <button class="cbtn" id="btnP">+</button>
+            <button class="btn btn-outline-primary btn-sm ms-auto" id="btnA"><i class="bi bi-stars"></i> {{ _('Automatisch') }}</button>
+          </div>
+
+          <div class="text-muted mb-2" style="font-size:.78rem">{{ _('Trennlinien ziehen zum Anpassen') }}</div>
+
+          <div class="bar-container" id="barContainer">
+            <div class="bar-bg" id="barBg"></div>
+          </div>
+
+          <div id="chips"></div>
+
+          <form method="POST" action="{{ url_for('admin.group_planner_save', camp_id=camp.id) }}" id="savePlanForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="plan_json" id="planJson">
+            <div class="alert alert-warning mt-3 mb-2" style="font-size:.82rem">
+              <i class="bi bi-exclamation-triangle"></i> {{ _('Das Speichern weist') }} <strong>{{ _('alle') }}</strong>
+              {{ _('bestehenden Anmeldungen neu zu. Manuelle Gruppenüberschreibungen gehen verloren.') }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              {{ _('Gruppen übernehmen &amp; Anmeldungen neu zuweisen') }}
+            </button>
+          </form>
+
+          {% else %}
+          <p class="text-muted">{{ _('Noch keine bestätigten Anmeldungen.') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if age_groups %}
+  <div class="card mt-4 animate-in animate-in-3">
+    <div class="card-header">{{ _('Aktuelle Gruppen') }}</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead><tr>
+          <th>{{ _('Gruppe') }}</th>
+          <th>{{ _('Alter') }}</th>
+          <th>{{ _('Kinder') }}</th>
+          <th>{{ _('Gruppenlimit') }}</th>
+        </tr></thead>
+        <tbody>
+          {% for g in age_groups %}
+          <tr>
+            <td class="fw-600">{{ g.name }}</td>
+            <td style="font-size:.8rem">{{ g.min_age }}–{{ g.max_age }} J.</td>
+            <td>{{ g.confirmed_count }}</td>
+            <td class="text-muted">{{ g.capacity if g.capacity else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot style="border-top:2px solid var(--cream-dark)">
+          <tr>
+            <td colspan="2" class="text-muted" style="font-size:.8rem">Gesamt</td>
+            <td class="fw-700">
+              {% set total = age_groups | sum(attribute='confirmed_count') %}
+              {% if camp.max_registrants %}{{ total }} / {{ camp.max_registrants }}{% else %}{{ total }}{% endif %}
+            </td>
+            <td class="text-muted" style="font-size:.78rem">
+              {% if not camp.max_registrants %}kein Gesamtlimit —
+                <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}" style="font-size:.78rem">festlegen</a>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const D = {{ age_distribution | tojson }};
+const campId = {{ camp.id }};
+const ages = Object.keys(D).map(Number).sort((a,b)=>a-b);
+const total = ages.reduce((s,a)=>s+D[a],0);
+const C = ['#2e7347','#4caf75','#6366f1','#d97706','#dc2626','#0891b2','#7c3aed','#059669'];
+
+// Current group boundaries from DB — used to initialise sliders
+const currentGroups = {{ age_groups | map(attribute='min_age') | list | tojson }};
+
+let n = {{ age_groups | length or 3 }};
+let cuts = [];
+let handles = [];
+
+// Build initial cuts from current group min_ages (each group's start age = a cut point)
+function cutsFromCurrentGroups() {
+  const res = [];
+  // Each group after the first starts at a new min_age — find that age's index
+  for (let g = 1; g < currentGroups.length; g++) {
+    const idx = ages.indexOf(currentGroups[g]);
+    if (idx > 0) res.push(idx);
+  }
+  return res.length === n - 1 ? res : autoCuts(n);
+}
+
+function kidsBefore(idx) {
+  return ages.slice(0, idx).reduce((s,a)=>s+(D[a]||0), 0);
+}
+function idxToPct(idx) {
+  return kidsBefore(idx) / total;
+}
+function pctToIdx(pct) {
+  let cum = 0;
+  for (let i = 0; i < ages.length; i++) {
+    cum += (D[ages[i]]||0) / total;
+    if (pct <= cum + 1e-9) return i + 1;
+  }
+  return ages.length;
+}
+function autoCuts(n) {
+  const res = [];
+  let cum = 0, grp = 0;
+  for (let i = 0; i < ages.length - 1; i++) {
+    cum += D[ages[i]] || 0;
+    if (cum >= total / n * (grp + 1) && res.length < n - 1) {
+      res.push(i + 1);
+      grp++;
+    }
+  }
+  while (res.length < n - 1) res.push(Math.round(ages.length * (res.length + 1) / n));
+  return res.slice(0, n - 1);
+}
+function computeGroups() {
+  const b = [0, ...cuts, ages.length];
+  return b.slice(0,-1).map((s, gi) => {
+    const sl = ages.slice(s, b[gi+1]);
+    const cnt = sl.reduce((x,a)=>x+(D[a]||0),0);
+    return { name:`Gruppe ${gi+1}`, min:sl[0], max:sl[sl.length-1], cnt, col:C[gi%C.length] };
+  }).filter(g => g.min !== undefined);
+}
+function updateSegments() {
+  const gs = computeGroups();
+  document.getElementById('barBg').innerHTML = gs.map(g => {
+    const w = (g.cnt / total * 100).toFixed(2);
+    return `<div class="seg" style="width:${w}%;background:${g.col}"><span>${g.cnt||''}</span></div>`;
+  }).join('');
+  const mx = Math.max(...gs.map(g=>g.cnt), 1);
+  document.getElementById('chips').innerHTML = gs.map(g => `
+    <div class="chip" style="background:${g.col}12;border-color:${g.col}">
+      <div class="chip-bar" style="width:${Math.round(g.cnt/mx*100)}%;background:${g.col}"></div>
+      <div class="chip-row">
+        <div>
+          <div style="font-weight:700;color:${g.col}">${g.name}</div>
+          <div class="chip-sub">U${g.min}–U${g.max}</div>
+        </div>
+        <div class="chip-count" style="color:${g.col}">${g.cnt}</div>
+      </div>
+    </div>`).join('');
+  // Update plan JSON — capacity intentionally excluded, managed in age group settings
+  document.getElementById('planJson').value = JSON.stringify(gs.map(g => ({
+    name: g.name, min_age: g.min, max_age: g.max, count: g.cnt
+  })));
+}
+function updateHandlePositions() {
+  handles.forEach((h, hi) => {
+    h.style.left = (idxToPct(cuts[hi]) * 100) + '%';
+  });
+}
+function fullRender() {
+  updateSegments();
+  handles.forEach(h => h.remove());
+  handles = [];
+  const container = document.getElementById('barContainer');
+  cuts.forEach((ci, hi) => {
+    const zone = document.createElement('div');
+    zone.className = 'handle-zone';
+    zone.innerHTML = '<div class="handle-pip"></div>';
+    zone.style.left = (idxToPct(ci) * 100) + '%';
+    container.appendChild(zone);
+    handles.push(zone);
+    zone.addEventListener('mousedown', startDrag(hi));
+    zone.addEventListener('touchstart', startDrag(hi), {passive: false});
+  });
+}
+function startDrag(hi) {
+  return function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = handles[hi];
+    zone.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    const container = document.getElementById('barContainer');
+    function getClientX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+    function onMove(e) {
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const pct = Math.max(0.001, Math.min(0.999, (getClientX(e) - rect.left) / rect.width));
+      let newIdx = pctToIdx(pct);
+      newIdx = Math.max(1, Math.min(ages.length - 1, newIdx));
+      const lo = hi === 0 ? 1 : cuts[hi-1] + 1;
+      const hi2 = hi === cuts.length-1 ? ages.length-1 : cuts[hi+1] - 1;
+      const clamped = Math.max(lo, Math.min(hi2, newIdx));
+      if (clamped !== cuts[hi]) {
+        cuts[hi] = clamped;
+        updateSegments();
+        updateHandlePositions();
+      }
+    }
+    function onEnd() {
+      zone.classList.remove('active');
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onEnd);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+    }
+    window.addEventListener('mousemove', onMove, {passive:false});
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onMove, {passive:false});
+    window.addEventListener('touchend', onEnd);
+  };
+}
+document.getElementById('btnP').addEventListener('click', () => {
+  if (n >= ages.length) return;
+  n++; cuts = autoCuts(n);
+  document.getElementById('cnum').textContent = n;
+  fullRender();
+});
+document.getElementById('btnM').addEventListener('click', () => {
+  if (n <= 1) return;
+  n--; cuts = autoCuts(n);
+  document.getElementById('cnum').textContent = n;
+  fullRender();
+});
+document.getElementById('btnA').addEventListener('click', () => {
+  // Fetch server recommendation
+  fetch(`/admin/camps/${campId}/gruppen-planer/empfehlung?n=${n}`)
+    .then(r=>r.json())
+    .then(data => {
+      if (data.success && data.plan) {
+        const newCuts = [];
+        for (let i = 1; i < data.plan.length; i++) {
+          const idx = ages.indexOf(data.plan[i].min_age);
+          if (idx > 0) newCuts.push(idx);
+        }
+        if (newCuts.length === n - 1) {
+          cuts = newCuts;
+        } else {
+          cuts = autoCuts(n);
+        }
+        fullRender();
+      }
+    }).catch(() => { cuts = autoCuts(n); fullRender(); });
+});
+
+if (total > 0) {
+  // Start with current group positions if they match, else auto-split
+  cuts = (currentGroups.length === n) ? cutsFromCurrentGroups() : autoCuts(n);
+  fullRender();
+}
+</script>
+{% endblock %}

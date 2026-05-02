@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Screen styles                                                        */
+  /* ------------------------------------------------------------------ */
+
+  .roster-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .roster-toolbar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .roster-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .roster-summary {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .roster-summary-item {
+    background: #f4f3ed;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .roster-summary-item strong {
+    display: block;
+    font-size: 1.5rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    color: #1b3f2a;
+  }
+
+  .roster-group {
+    margin-bottom: 3rem;
+  }
+
+  .roster-group-header {
+    background: #1b3f2a;
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .roster-group-header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  .roster-group-header .group-count {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  .roster-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    border: 1px solid #ddd;
+    border-top: none;
+    background: #fff;
+  }
+
+  .roster-table th {
+    background: #f0ede4;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #444;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .roster-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+
+  .roster-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .roster-table tr:hover td {
+    background: #fafaf7;
+  }
+
+  .travel-badge {
+    display: inline-block;
+    background: #b8f442;
+    color: #1b3f2a;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .travel-none {
+    color: #bbb;
+    font-size: 0.8rem;
+  }
+
+  .empty-group {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #888;
+    font-style: italic;
+    border: 1px solid #ddd;
+    border-top: none;
+    background: #fff;
+  }
+
+  .emergency-contact-name {
+    font-weight: 500;
+  }
+
+  .emergency-contact-phone {
+    font-size: 0.8rem;
+    color: #555;
+    font-family: monospace;
+  }
+
+  .no-emergency {
+    color: #bbb;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  .row-number {
+    color: #bbb;
+    font-size: 0.75rem;
+    text-align: right;
+    width: 2rem;
+    user-select: none;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Print styles — this is what matters when Ctrl+P is pressed          */
+  /* ------------------------------------------------------------------ */
+
+  @media print {
+    /* Hide everything except the roster content */
+    nav,
+    .roster-toolbar .btn,
+    .roster-toolbar .print-hint,
+    footer,
+    .flash-messages {
+      display: none !important;
+    }
+
+    body {
+      background: #fff !important;
+      font-size: 10pt;
+      color: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .roster-toolbar {
+      margin-bottom: 0.5cm;
+    }
+
+    .roster-toolbar h1 {
+      font-size: 14pt;
+    }
+
+    .roster-meta {
+      font-size: 8pt;
+      color: #555;
+      margin-bottom: 0.4cm;
+    }
+
+    .roster-summary {
+      margin-bottom: 0.5cm;
+      gap: 1rem;
+    }
+
+    .roster-summary-item {
+      background: #f0f0f0 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 0.3cm 0.5cm;
+      font-size: 9pt;
+    }
+
+    .roster-summary-item strong {
+      font-size: 16pt;
+    }
+
+    /* Each group starts on a new page */
+    .roster-group {
+      page-break-before: always;
+      margin-bottom: 0;
+    }
+
+    .roster-group:first-child {
+      page-break-before: avoid;
+    }
+
+    .roster-group-header {
+      background: #1b3f2a !important;
+      color: #fff !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border-radius: 0;
+      padding: 0.25cm 0.4cm;
+    }
+
+    .roster-group-header h2 {
+      font-size: 12pt;
+    }
+
+    .roster-table {
+      font-size: 9pt;
+      border: 0.5pt solid #ccc;
+      border-top: none;
+    }
+
+    .roster-table th {
+      background: #e8e8e8 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 0.15cm 0.3cm;
+      font-size: 7.5pt;
+    }
+
+    .roster-table td {
+      padding: 0.2cm 0.3cm;
+      border-bottom: 0.3pt solid #ddd;
+    }
+
+    .roster-table tr:hover td {
+      background: none !important;
+    }
+
+    .travel-badge {
+      background: #b8f442 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-size: 7pt;
+    }
+
+    .emergency-contact-phone {
+      font-size: 8pt;
+    }
+
+    /* Page header/footer via CSS — shows camp name and page number */
+    @page {
+      margin: 1.5cm 1.5cm 2cm 1.5cm;
+      size: A4 portrait;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="roster-toolbar">
+  <div>
+    <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}"
+       class="btn btn-ghost btn-sm print-hint">← {{ _('Zurück zu Gruppen') }}</a>
+    <h1>{{ _('Teilnehmerliste') }} — {{ camp.name }}</h1>
+  </div>
+  <div class="d-flex gap-2 print-hint">
+    <button onclick="window.print()" class="btn btn-primary">
+      <i class="bi bi-printer"></i> {{ _('Drucken / Als PDF speichern') }}
+    </button>
+    <a href="{{ url_for('admin.roster_csv', camp_id=camp.id) }}" class="btn btn-outline-secondary">
+      ⬇ CSV
+    </a>
+    <a href="{{ url_for('admin.staff_roster', camp_id=camp.id) }}" class="btn btn-outline-secondary">
+      <i class="bi bi-people"></i> Team-Liste
+    </a>
+    <a href="{{ url_for('admin.name_tags', camp_id=camp.id, kind='kids') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-tag"></i> Namensschilder
+    </a>
+  </div>
+</div>
+
+<p class="roster-meta print-hint">
+  {{ _('Erstellt am') }} {{ now.strftime('%d.%m.%Y, %H:%M') }} Uhr
+  {% if current_user.is_authenticated %}{{ _('von') }} {{ current_user.full_name }}{% endif %}.
+  {{ _('Diese Liste enthält nur bestätigte Anmeldungen.') }}
+</p>
+
+{# Summary row #}
+<div class="roster-summary">
+  <div class="roster-summary-item">
+    <strong>{{ total_confirmed }}</strong>
+    {{ _('Teilnehmer gesamt') }}
+  </div>
+  {% for section in group_sections %}
+  <div class="roster-summary-item">
+    <strong>{{ section.registrations | length }}</strong>
+    {{ section.group.name }}
+  </div>
+  {% endfor %}
+</div>
+
+{# One section per age group #}
+{% for section in group_sections %}
+<div class="roster-group">
+  <div class="roster-group-header">
+    <h2>{{ section.group.name }}
+      <small style="font-weight:400; font-size:0.85em; opacity:0.7;">
+        (U{{ section.group.min_age }}–U{{ section.group.max_age }})
+      </small>
+    </h2>
+    <span class="group-count">{{ section.registrations | length }} {{ _('Kinder') }}</span>
+  </div>
+
+  {% if section.registrations %}
+  <table class="roster-table">
+    <thead>
+      <tr>
+        <th class="row-number">#</th>
+        <th>{{ _('Name') }}</th>
+        <th>{{ _('Notfallkontakt') }}</th>
+        <th>{{ _('Telefon') }}</th>
+        <th>{{ _('Heimweg alleine') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reg in section.registrations %}
+      {% set child = reg.child %}
+      {% set ec = child.emergency_contacts[0] if child.emergency_contacts else none %}
+      <tr>
+        <td class="row-number">{{ loop.index }}</td>
+        <td>
+          <strong>{{ child.last_name }}</strong>, {{ child.first_name }}
+        </td>
+        <td>
+          {% if ec %}
+          <span class="emergency-contact-name">{{ ec.full_name }}</span>
+          {% if ec.relationship %}
+          <br><span style="font-size:0.75rem; color:#777;">{{ ec.relationship }}</span>
+          {% endif %}
+          {% else %}
+          <span class="no-emergency">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if ec %}
+          <span class="emergency-contact-phone">{{ ec.phone_primary }}</span>
+          {% if ec.phone_secondary %}
+          <br><span class="emergency-contact-phone" style="color:#999;">{{ ec.phone_secondary }}</span>
+          {% endif %}
+          {% else %}
+          <span class="travel-none">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if reg.independent_travel %}
+          <span class="travel-badge"><i class="bi bi-check"></i> {{ _('Ja') }}</span>
+          {% else %}
+          <span class="travel-none">{{ _('Nein') }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="empty-group">{{ _('Keine bestätigten Anmeldungen in dieser Gruppe.') }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+
+{% if not group_sections %}
+<p style="color: #888; font-style: italic;">
+  {{ _('Für dieses Camp wurden noch keine Altersgruppen angelegt.') }}
+</p>
+{% endif %}
+{% endblock %}

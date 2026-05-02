@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}staff/confirm_checkin{% endblock %}
+{% block body_class %}checkin-mode{% endblock %}
+{% block extra_style %}
+.confirm-shell {
+  background: var(--green-900);
+  min-height: calc(100vh - 65px);
+  display: flex; align-items: center;
+  padding: 2rem 0;
+}
+.confirm-card {
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(184,244,66,.25);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  color: var(--white);
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+.confirm-avatar {
+  width: 5rem; height: 5rem;
+  background: var(--lime);
+  color: var(--green-900);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 auto 1.25rem;
+}
+{% endblock %}
+{% block page_header %}{% endblock %}
+{% block content %}
+<div class="confirm-shell">
+  <div class="container">
+    <div class="confirm-card animate-in">
+      <div class="confirm-avatar">
+        {{ registration.child.first_name[0] }}{{ registration.child.last_name[0] }}
+      </div>
+      <h1 class="fw-800 text-uppercase mb-1" style="font-size:1.8rem">
+        {{ registration.child.full_name }}
+      </h1>
+      <div style="color:rgba(255,255,255,.55);font-size:.9rem;margin-bottom:1.5rem">
+        {{ registration.age_group.name if registration.age_group else '' }}
+        {% if registration.child.has_medical_notes %}
+        · <span style="color:#fca5a5"><i class="bi bi-heart-pulse"></i> Med. Hinweise</span>
+        {% endif %}
+      </div>
+
+      {% if registration.child.medical_notes %}
+      <div class="p-3 mb-3 rounded text-start" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);font-size:.85rem">
+        <strong style="color:#fca5a5"><i class="bi bi-heart-pulse"></i> Medizinische Hinweise:</strong>
+        <p class="mb-0 mt-1">{{ registration.child.medical_notes }}</p>
+      </div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('staff.do_checkin', registration_id=registration.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="method" value="{{ method }}">
+        <button type="submit" class="btn btn-lime w-100 btn-checkin mb-2">
+          <i class="bi bi-check"></i> Einchecken
+        </button>
+      </form>
+      <a href="{{ url_for('staff.checkin_mode') }}" class="btn w-100"
+         style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)">
+        Abbrechen
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

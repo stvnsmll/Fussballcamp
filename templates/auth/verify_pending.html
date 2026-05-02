@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container text-center py-5" style="max-width:480px">
+  <div class="animate-in">
+    <div style="font-size:3.5rem"><i class="bi bi-mailbox"></i></div>
+    <h1 class="h4 fw-800 text-uppercase mt-3">{{ _('E-Mail bestätigen') }}</h1>
+    <p class="text-muted mt-2">
+      {{ _('Wir haben eine Bestätigungsmail an') }} <strong>{{ email }}</strong> {{ _('gesendet.') }}
+      {{ _('Bitte klicken Sie auf den Link in der E-Mail, um Ihr Konto zu aktivieren.') }}
+    </p>
+    <div class="alert alert-info mt-4" style="font-size:.875rem">
+      {{ _('Keine E-Mail erhalten? Prüfen Sie Ihren Spam-Ordner oder') }}
+      <a href="{{ url_for('auth.resend_verification') }}">{{ _('erneut senden') }}</a>.
+    </div>
+  </div>
+</div>
+{% endblock %}

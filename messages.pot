@@ -1,0 +1,1577 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-04-17 17:49+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: templates/base.html:744 templates/base.html:758
+msgid "Mein Bereich"
+msgstr ""
+
+#: templates/admin/announcement_list.html:5 templates/base.html:748
+msgid "Neuigkeiten"
+msgstr ""
+
+#: templates/base.html:754
+msgid "Team-Dashboard"
+msgstr ""
+
+#: templates/admin/user_list.html:13 templates/base.html:768
+#: templates/base.html:832
+msgid "Admin"
+msgstr ""
+
+#: templates/base.html:777
+msgid "Über uns"
+msgstr ""
+
+#: templates/base.html:789
+msgid "Sprache"
+msgstr ""
+
+#: templates/base.html:823 templates/errors/500.html:9
+msgid "Fehler melden"
+msgstr ""
+
+#: templates/admin/child_edit.html:7 templates/admin/child_list.html:22
+#: templates/admin/waitlist.html:34 templates/base.html:830
+msgid "Elternteil"
+msgstr ""
+
+#: templates/base.html:831
+msgid "Mitarbeiter"
+msgstr ""
+
+#: templates/admin/dashboard.html:72 templates/base.html:837
+#: templates/base.html:841
+msgid "Mein Konto"
+msgstr ""
+
+#: templates/base.html:838
+msgid "E-Mail-Einstellungen"
+msgstr ""
+
+#: templates/base.html:839 templates/public/kontakt.html:44
+msgid "Datenschutz"
+msgstr ""
+
+#: templates/base.html:849
+msgid "Abmelden"
+msgstr ""
+
+#: templates/auth/login.html:56 templates/auth/register.html:99
+#: templates/base.html:856 templates/public/index.html:149
+msgid "Anmelden"
+msgstr ""
+
+#: templates/base.html:859
+msgid "Registrieren"
+msgstr ""
+
+#: templates/admin/age_group_form.html:5
+msgid "Gruppe bearbeiten"
+msgstr ""
+
+#: templates/admin/age_group_form.html:5
+msgid "Neue Gruppe"
+msgstr ""
+
+#: templates/admin/age_group_form.html:8 templates/admin/camp_form.html:8
+msgid "Sessions"
+msgstr ""
+
+#: templates/admin/age_group_form.html:9 templates/admin/camp_list.html:55
+#: templates/admin/camp_list.html:81
+msgid "Gruppen"
+msgstr ""
+
+#: templates/admin/age_group_form.html:10 templates/admin/camp_form.html:9
+msgid "Neu"
+msgstr ""
+
+#: templates/admin/age_group_form.html:44
+msgid "Reihenfolge in Listen"
+msgstr ""
+
+#: templates/admin/age_group_form.html:48
+#: templates/admin/bug_report_detail.html:43 templates/admin/child_edit.html:46
+#: templates/admin/registration_edit.html:71 templates/admin/settings.html:31
+#: templates/admin/user_edit.html:62
+msgid "Speichern"
+msgstr ""
+
+#: templates/admin/age_group_form.html:50
+#: templates/admin/announcement_form.html:104
+#: templates/admin/camp_form.html:118 templates/admin/registration_edit.html:73
+#: templates/admin/user_edit.html:64
+msgid "Abbrechen"
+msgstr ""
+
+#: templates/admin/age_group_list.html:5 templates/admin/dashboard.html:106
+msgid "Altersgruppen"
+msgstr ""
+
+#: templates/admin/age_group_list.html:23
+msgid "Gruppe hinzufügen"
+msgstr ""
+
+#: templates/admin/age_group_list.html:25 templates/admin/camp_form.html:130
+#: templates/admin/dashboard.html:67 templates/admin/group_planner.html:5
+msgid "Gruppenplanung"
+msgstr ""
+
+#: templates/admin/age_group_list.html:29
+msgid "Teilnehmerliste drucken"
+msgstr ""
+
+#: templates/admin/age_group_list.html:31
+#: templates/admin/trainer_assignments.html:5
+msgid "Trainerplanung"
+msgstr ""
+
+#: templates/admin/age_group_list.html:39
+msgid "Noch keine Gruppen erstellt."
+msgstr ""
+
+#: templates/admin/age_group_list.html:41
+msgid "Erste Gruppe erstellen"
+msgstr ""
+
+#: templates/admin/age_group_list.html:50 templates/admin/child_edit.html:57
+#: templates/admin/group_planner.html:112
+msgid "Gruppe"
+msgstr ""
+
+#: templates/admin/age_group_list.html:51
+#: templates/admin/group_planner.html:112
+msgid "Alter"
+msgstr ""
+
+#: templates/admin/age_group_list.html:52
+#: templates/admin/trainer_assignments.html:50
+msgid "Haupttrainer"
+msgstr ""
+
+#: templates/admin/age_group_list.html:53
+msgid "Belegt / Kap."
+msgstr ""
+
+#: templates/admin/age_group_list.html:54 templates/admin/camp_list.html:59
+#: templates/admin/camp_list.html:75 templates/admin/dashboard.html:28
+#: templates/admin/dashboard.html:65 templates/admin/waitlist.html:5
+msgid "Warteliste"
+msgstr ""
+
+#: templates/admin/age_group_list.html:63 templates/admin/manual_entry.html:386
+msgid "Jahre"
+msgstr ""
+
+#: templates/admin/age_group_list.html:68
+msgid "Fehlt"
+msgstr ""
+
+#: templates/admin/age_group_list.html:90
+#: templates/admin/announcement_list.html:51 templates/admin/camp_list.html:53
+#: templates/admin/dashboard.html:105 templates/admin/user_detail.html:17
+msgid "Bearbeiten"
+msgstr ""
+
+#: templates/admin/age_group_list.html:98
+msgid "Gesamt"
+msgstr ""
+
+#: templates/admin/analytics.html:5 templates/admin/dashboard.html:70
+#: templates/admin/settings.html:13
+msgid "Analytics"
+msgstr ""
+
+#: templates/admin/analytics.html:7
+msgid ""
+"Nur für interne Performance-Überwachung · Keine persönlichen Daten "
+"gespeichert"
+msgstr ""
+
+#: templates/admin/analytics.html:17
+msgid "7 Tage"
+msgstr ""
+
+#: templates/admin/analytics.html:17
+msgid "30 Tage"
+msgstr ""
+
+#: templates/admin/analytics.html:17
+msgid "90 Tage"
+msgstr ""
+
+#: templates/admin/analytics.html:17
+msgid "1 Jahr"
+msgstr ""
+
+#: templates/admin/analytics.html:27
+msgid "Seitenaufrufe"
+msgstr ""
+
+#: templates/admin/analytics.html:30
+msgid "Login-Fehler"
+msgstr ""
+
+#: templates/admin/analytics.html:33
+msgid "Logins"
+msgstr ""
+
+#: templates/admin/analytics.html:36
+msgid "Fehler"
+msgstr ""
+
+#: templates/admin/analytics.html:45
+msgid "Meistbesuchte Seiten"
+msgstr ""
+
+#: templates/admin/analytics.html:49 templates/admin/analytics.html:104
+#: templates/admin/analytics.html:125
+msgid "Route"
+msgstr ""
+
+#: templates/admin/analytics.html:49 templates/admin/analytics.html:104
+msgid "Aufrufe"
+msgstr ""
+
+#: templates/admin/analytics.html:67
+msgid "Gerättyp"
+msgstr ""
+
+#: templates/admin/analytics.html:72 templates/admin/analytics.html:88
+msgid "unbekannt"
+msgstr ""
+
+#: templates/admin/analytics.html:83
+msgid "Check-In Methode"
+msgstr ""
+
+#: templates/admin/analytics.html:92
+msgid "Keine Daten"
+msgstr ""
+
+#: templates/admin/analytics.html:101
+msgid "Langsamste Seiten (Ø ms)"
+msgstr ""
+
+#: templates/admin/analytics.html:122 templates/admin/dashboard.html:119
+msgid "Letzte Fehler"
+msgstr ""
+
+#: templates/admin/analytics.html:125
+msgid "Zeit"
+msgstr ""
+
+#: templates/admin/analytics.html:125
+msgid "Typ"
+msgstr ""
+
+#: templates/admin/announcement_form.html:5
+msgid "Neuigkeit bearbeiten"
+msgstr ""
+
+#: templates/admin/announcement_form.html:5
+#: templates/admin/announcement_list.html:13
+#: templates/announcements/feed.html:25
+msgid "Neue Neuigkeit"
+msgstr ""
+
+#: templates/admin/announcement_form.html:59
+msgid "Eltern &amp; Team"
+msgstr ""
+
+#: templates/admin/announcement_form.html:60
+msgid "nur Team"
+msgstr ""
+
+#: templates/admin/announcement_form.html:66
+msgid "Kommagetrennte Gruppennamen, oder leer für alle."
+msgstr ""
+
+#: templates/admin/announcement_form.html:92
+msgid "Aktuelles Bild"
+msgstr ""
+
+#: templates/admin/announcement_form.html:101
+#: templates/admin/camp_form.html:116
+msgid "Änderungen speichern"
+msgstr ""
+
+#: templates/admin/announcement_form.html:101
+msgid "Veröffentlichen"
+msgstr ""
+
+#: templates/admin/announcement_list.html:20
+msgid "Noch keine Neuigkeiten erstellt."
+msgstr ""
+
+#: templates/admin/announcement_list.html:21
+msgid "Erste Neuigkeit"
+msgstr ""
+
+#: templates/admin/announcement_list.html:29
+msgid "Titel"
+msgstr ""
+
+#: templates/admin/announcement_list.html:29
+msgid "Sichtbarkeit"
+msgstr ""
+
+#: templates/admin/announcement_list.html:29
+msgid "Gepinnt"
+msgstr ""
+
+#: templates/admin/announcement_list.html:29
+#: templates/admin/bug_report_list.html:30
+msgid "Datum"
+msgstr ""
+
+#: templates/admin/announcement_list.html:55
+msgid "Neuigkeit löschen?"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:5
+msgid "Meldung"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:21
+msgid "Von"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:31
+msgid "Status &amp; Notizen"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:47
+#: templates/admin/bug_report_list.html:12
+msgid "Gelöst"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:48 templates/admin/roster.html:306
+msgid "von"
+msgstr ""
+
+#: templates/admin/bug_report_detail.html:53 templates/errors/403.html:8
+msgid "Zurück"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:5 templates/admin/dashboard.html:73
+msgid "Fehlermeldungen"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:12
+msgid "Offen"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:12
+#: templates/admin/bug_report_list.html:19 templates/admin/user_list.html:13
+msgid "Alle"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:12
+msgid "Kein Fix"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:19
+msgid "Hoch"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:19
+msgid "Mittel"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:19
+msgid "Gering"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:30
+msgid "Betreff"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:30
+msgid "Seite"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:30
+msgid "Schwere"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:30 templates/admin/child_edit.html:57
+#: templates/admin/invite_staff.html:54
+msgid "Status"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:40 templates/admin/child_list.html:51
+#: templates/admin/user_list.html:51
+msgid "Öffnen"
+msgstr ""
+
+#: templates/admin/bug_report_list.html:43
+msgid "Keine Meldungen."
+msgstr ""
+
+#: templates/admin/camp_form.html:5
+msgid "Camp bearbeiten"
+msgstr ""
+
+#: templates/admin/camp_form.html:5
+msgid "Neue Camp-Session"
+msgstr ""
+
+#: templates/admin/camp_form.html:36
+msgid "Grunddaten"
+msgstr ""
+
+#: templates/admin/camp_form.html:69
+msgid "Anmeldung"
+msgstr ""
+
+#: templates/admin/camp_form.html:74
+msgid "Leer lassen um sofort zu öffnen."
+msgstr ""
+
+#: templates/admin/camp_form.html:89
+msgid "Status &amp; Einstellungen"
+msgstr ""
+
+#: templates/admin/camp_form.html:95
+msgid "nur Admins sichtbar"
+msgstr ""
+
+#: templates/admin/camp_form.html:96
+msgid "öffentlich"
+msgstr ""
+
+#: templates/admin/camp_form.html:97
+msgid "abgeschlossen"
+msgstr ""
+
+#: templates/admin/camp_form.html:109
+msgid "Zeigt orangefarbene Warnung wenn eine Gruppe keinen Haupttrainer hat."
+msgstr ""
+
+#: templates/admin/camp_form.html:116
+msgid "Session erstellen"
+msgstr ""
+
+#: templates/admin/camp_form.html:126
+msgid "Altersgruppen verwalten"
+msgstr ""
+
+#: templates/admin/camp_form.html:143 templates/admin/user_detail.html:125
+msgid "Gefahrenzone"
+msgstr ""
+
+#: templates/admin/camp_form.html:147
+msgid "Camp löschen"
+msgstr ""
+
+#: templates/admin/camp_list.html:5
+msgid "Camp-Sessions"
+msgstr ""
+
+#: templates/admin/camp_list.html:12
+msgid "Neue Session"
+msgstr ""
+
+#: templates/admin/camp_list.html:19
+msgid "Noch keine Camp-Sessions erstellt."
+msgstr ""
+
+#: templates/admin/camp_list.html:20
+msgid "Erste Session erstellen"
+msgstr ""
+
+#: templates/admin/camp_list.html:44 templates/admin/dashboard.html:98
+msgid "Anmeldung offen"
+msgstr ""
+
+#: templates/admin/camp_list.html:47
+msgid "Haupttrainer erforderlich"
+msgstr ""
+
+#: templates/admin/camp_list.html:57 templates/admin/user_detail.html:103
+msgid "Trainer"
+msgstr ""
+
+#: templates/admin/camp_list.html:69 templates/admin/dashboard.html:22
+msgid "Bestätigt"
+msgstr ""
+
+#: templates/admin/camp_list.html:87
+msgid "Tage"
+msgstr ""
+
+#: templates/admin/child_edit.html:19
+msgid "Kindsdaten"
+msgstr ""
+
+#: templates/admin/child_edit.html:54
+msgid "Anmeldungen"
+msgstr ""
+
+#: templates/admin/child_edit.html:57
+msgid "Camp"
+msgstr ""
+
+#: templates/admin/child_edit.html:83 templates/admin/roster.html:342
+msgid "Notfallkontakt"
+msgstr ""
+
+#: templates/admin/child_list.html:5
+msgid "Kinderverwaltung"
+msgstr ""
+
+#: templates/admin/child_list.html:12
+msgid "Name oder Elternteil suchen…"
+msgstr ""
+
+#: templates/admin/child_list.html:14 templates/admin/user_list.html:24
+msgid "Suchen"
+msgstr ""
+
+#: templates/admin/child_list.html:15
+msgid "Löschen"
+msgstr ""
+
+#: templates/admin/child_list.html:22 templates/admin/waitlist.html:34
+msgid "Kind"
+msgstr ""
+
+#: templates/admin/child_list.html:22 templates/admin/manual_entry.html:145
+msgid "Geburtsdatum"
+msgstr ""
+
+#: templates/admin/child_list.html:22
+msgid "Akt. Anmeldung"
+msgstr ""
+
+#: templates/admin/child_list.html:55
+msgid "Keine Kinder gefunden."
+msgstr ""
+
+#: templates/admin/dashboard.html:5
+msgid "Admin-Dashboard"
+msgstr ""
+
+#: templates/admin/dashboard.html:34 templates/admin/invite_staff.html:68
+msgid "Ausstehend"
+msgstr ""
+
+#: templates/admin/dashboard.html:40 templates/admin/user_list.html:13
+msgid "Eltern"
+msgstr ""
+
+#: templates/admin/dashboard.html:46 templates/admin/user_list.html:13
+msgid "Team"
+msgstr ""
+
+#: templates/admin/dashboard.html:54
+msgid "Haupttrainer fehlt:"
+msgstr ""
+
+#: templates/admin/dashboard.html:63 templates/admin/manual_entry.html:5
+msgid "Manuelle Anmeldung"
+msgstr ""
+
+#: templates/admin/dashboard.html:63 templates/admin/manual_entry.html:6
+msgid "Papierformular eintragen"
+msgstr ""
+
+#: templates/admin/dashboard.html:64 templates/admin/user_list.html:5
+msgid "Benutzerverwaltung"
+msgstr ""
+
+#: templates/admin/dashboard.html:64
+msgid "Eltern, Team, Admins"
+msgstr ""
+
+#: templates/admin/dashboard.html:65
+msgid "Warteplätze verwalten"
+msgstr ""
+
+#: templates/admin/dashboard.html:66
+msgid "Trainer zuweisen"
+msgstr ""
+
+#: templates/admin/dashboard.html:66
+msgid "Haupttrainer festlegen"
+msgstr ""
+
+#: templates/admin/dashboard.html:67
+msgid "Gruppen aufteilen"
+msgstr ""
+
+#: templates/admin/dashboard.html:68
+msgid "Neuigkeit erstellen"
+msgstr ""
+
+#: templates/admin/dashboard.html:68
+msgid "Eltern und Team informieren"
+msgstr ""
+
+#: templates/admin/dashboard.html:69 templates/admin/invite_staff.html:5
+msgid "Team einladen"
+msgstr ""
+
+#: templates/admin/dashboard.html:69
+msgid "Einladungslink senden"
+msgstr ""
+
+#: templates/admin/dashboard.html:70
+msgid "Nutzungsstatistiken"
+msgstr ""
+
+#: templates/admin/dashboard.html:71
+msgid "Dev Tools"
+msgstr ""
+
+#: templates/admin/dashboard.html:71
+msgid "Entwickler-Toggles"
+msgstr ""
+
+#: templates/admin/dashboard.html:72
+msgid "Eigenes Konto bearbeiten"
+msgstr ""
+
+#: templates/admin/dashboard.html:73
+msgid "Bug Reports verwalten"
+msgstr ""
+
+#: templates/admin/dashboard.html:74
+msgid "Alle Camps"
+msgstr ""
+
+#: templates/admin/dashboard.html:74
+msgid "Entwürfe, aktive und archivierte Camps"
+msgstr ""
+
+#: templates/admin/dashboard.html:108
+msgid "Erinnerungsmail an alle Eltern senden?"
+msgstr ""
+
+#: templates/admin/dashboard.html:110
+msgid "Erinnerung senden"
+msgstr ""
+
+#: templates/admin/dashboard.html:140
+msgid "Alle Fehler ansehen"
+msgstr ""
+
+#: templates/admin/dashboard.html:143
+msgid "Keine Fehler."
+msgstr ""
+
+#: templates/admin/dashboard.html:155
+msgid "Noch keine Camp-Session erstellt."
+msgstr ""
+
+#: templates/admin/dashboard.html:156
+msgid "Camp erstellen"
+msgstr ""
+
+#: templates/admin/group_planner.html:46
+msgid "Altersverteilung"
+msgstr ""
+
+#: templates/admin/group_planner.html:46 templates/admin/group_planner.html:113
+#: templates/admin/roster.html:333 templates/admin/user_detail.html:59
+msgid "Kinder"
+msgstr ""
+
+#: templates/admin/group_planner.html:57 templates/admin/group_planner.html:99
+msgid "Noch keine bestätigten Anmeldungen."
+msgstr ""
+
+#: templates/admin/group_planner.html:66
+msgid "Gruppen vorschlagen"
+msgstr ""
+
+#: templates/admin/group_planner.html:71
+msgid "Anzahl Gruppen"
+msgstr ""
+
+#: templates/admin/group_planner.html:75
+msgid "Automatisch"
+msgstr ""
+
+#: templates/admin/group_planner.html:78
+msgid "Trennlinien ziehen zum Anpassen"
+msgstr ""
+
+#: templates/admin/group_planner.html:90
+msgid "Das Speichern weist"
+msgstr ""
+
+#: templates/admin/group_planner.html:90
+msgid "alle"
+msgstr ""
+
+#: templates/admin/group_planner.html:91
+msgid ""
+"bestehenden Anmeldungen neu zu. Manuelle Gruppenüberschreibungen gehen "
+"verloren."
+msgstr ""
+
+#: templates/admin/group_planner.html:94
+msgid "Gruppen übernehmen &amp; Anmeldungen neu zuweisen"
+msgstr ""
+
+#: templates/admin/group_planner.html:108
+msgid "Aktuelle Gruppen"
+msgstr ""
+
+#: templates/admin/group_planner.html:113
+msgid "Kapazität"
+msgstr ""
+
+#: templates/admin/invite_staff.html:7
+msgid "Einladungslink per E-Mail versenden"
+msgstr ""
+
+#: templates/admin/invite_staff.html:40
+msgid "Der Eingeladene erhält einen Link, der für"
+msgstr ""
+
+#: templates/admin/invite_staff.html:41
+msgid "gültig ist. Er muss kein bestehendes Konto haben."
+msgstr ""
+
+#: templates/admin/invite_staff.html:43
+msgid "Einladung senden"
+msgstr ""
+
+#: templates/admin/invite_staff.html:51
+msgid "Zuletzt eingeladen"
+msgstr ""
+
+#: templates/admin/invite_staff.html:54 templates/admin/manual_entry.html:94
+#: templates/admin/user_detail.html:22 templates/admin/user_edit.html:28
+#: templates/admin/user_list.html:35 templates/public/impressum.html:28
+#: templates/public/kontakt.html:28
+msgid "E-Mail"
+msgstr ""
+
+#: templates/admin/invite_staff.html:54
+msgid "Gesendet"
+msgstr ""
+
+#: templates/admin/invite_staff.html:64
+msgid "Angenommen"
+msgstr ""
+
+#: templates/admin/invite_staff.html:66
+msgid "Abgelaufen"
+msgstr ""
+
+#: templates/admin/manual_entry.html:57
+msgid "Elternteil suchen oder neu anlegen"
+msgstr ""
+
+#: templates/admin/manual_entry.html:62
+msgid "Name, E-Mail oder Telefon suchen…"
+msgstr ""
+
+#: templates/admin/manual_entry.html:76
+msgid "Anderer Elternteil"
+msgstr ""
+
+#: templates/admin/manual_entry.html:86 templates/admin/manual_entry.html:137
+msgid "Vorname"
+msgstr ""
+
+#: templates/admin/manual_entry.html:90 templates/admin/manual_entry.html:141
+msgid "Nachname"
+msgstr ""
+
+#: templates/admin/manual_entry.html:102
+msgid "Straße"
+msgstr ""
+
+#: templates/admin/manual_entry.html:106
+msgid "Stadt"
+msgstr ""
+
+#: templates/admin/manual_entry.html:110
+msgid "PLZ"
+msgstr ""
+
+#: templates/admin/manual_entry.html:123
+msgid "Bestehendes Kind auswählen"
+msgstr ""
+
+#: templates/admin/manual_entry.html:132
+msgid "Neues Kind"
+msgstr ""
+
+#: templates/admin/manual_entry.html:150
+msgid "Medizinische Hinweise"
+msgstr ""
+
+#: templates/admin/manual_entry.html:152
+msgid "Allergien, Erkrankungen, Medikamente"
+msgstr ""
+
+#: templates/admin/manual_entry.html:155
+msgid "Notfallkontakt — Name"
+msgstr ""
+
+#: templates/admin/manual_entry.html:159
+msgid "Notfallkontakt — Beziehung"
+msgstr ""
+
+#: templates/admin/manual_entry.html:160
+msgid "z.B. Mutter"
+msgstr ""
+
+#: templates/admin/manual_entry.html:163
+msgid "Notfallkontakt — Telefon"
+msgstr ""
+
+#: templates/admin/manual_entry.html:171
+msgid "Altersgruppe (optional — überschreibt Auto-Zuweisung)"
+msgstr ""
+
+#: templates/admin/manual_entry.html:173
+msgid "Automatisch zuweisen"
+msgstr ""
+
+#: templates/admin/manual_entry.html:185
+msgid "Einwilligungen auf Papierformular"
+msgstr ""
+
+#: templates/admin/manual_entry.html:189
+msgid ""
+"Diese Felder dokumentieren, was der/die Erziehungsberechtigte auf dem "
+"Papierformular unterschrieben hat. Die digitale Einwilligung erfolgt "
+"separat per E-Mail-Bestätigung."
+msgstr ""
+
+#: templates/admin/manual_entry.html:193
+msgid ""
+"Datenschutz / Datenverarbeitung <i class=\"bi bi-check\"></i> (auf "
+"Formular)"
+msgstr ""
+
+#: templates/admin/manual_entry.html:197
+msgid "Fotoerlaubnis <i class=\"bi bi-check\"></i> (auf Formular)"
+msgstr ""
+
+#: templates/admin/manual_entry.html:201
+msgid "Heimweg alleine <i class=\"bi bi-check\"></i> (auf Formular)"
+msgstr ""
+
+#: templates/admin/manual_entry.html:206
+msgid "Anmeldung speichern &amp; E-Mail senden"
+msgstr ""
+
+#: templates/admin/manual_entry.html:209
+msgid ""
+"Eine Bestätigungs-E-Mail wird an den/die Erziehungsberechtigte(n) "
+"gesendet."
+msgstr ""
+
+#: templates/admin/manual_entry.html:386
+msgid "Alter am Campstart:"
+msgstr ""
+
+#: templates/admin/registration_edit.html:5
+msgid "Anmeldung bearbeiten"
+msgstr ""
+
+#: templates/admin/registration_edit.html:37
+msgid "Einwilligungen"
+msgstr ""
+
+#: templates/admin/registration_edit.html:57
+msgid "Gruppenüberschreibung aktiv"
+msgstr ""
+
+#: templates/admin/registration_edit.html:59
+msgid "Grund:"
+msgstr ""
+
+#: templates/admin/registration_edit.html:67
+msgid "Wird im Audit-Log gespeichert."
+msgstr ""
+
+#: templates/admin/roster.html:285
+msgid "Zurück zu Gruppen"
+msgstr ""
+
+#: templates/admin/roster.html:286
+msgid "Teilnehmerliste"
+msgstr ""
+
+#: templates/admin/roster.html:290
+msgid "Drucken / Als PDF speichern"
+msgstr ""
+
+#: templates/admin/roster.html:305
+msgid "Erstellt am"
+msgstr ""
+
+#: templates/admin/roster.html:307
+msgid "Diese Liste enthält nur bestätigte Anmeldungen."
+msgstr ""
+
+#: templates/admin/roster.html:314
+msgid "Teilnehmer gesamt"
+msgstr ""
+
+#: templates/admin/roster.html:341 templates/admin/user_detail.html:21
+#: templates/admin/user_list.html:35
+msgid "Name"
+msgstr ""
+
+#: templates/admin/roster.html:343 templates/admin/user_detail.html:23
+#: templates/public/impressum.html:27 templates/public/kontakt.html:36
+msgid "Telefon"
+msgstr ""
+
+#: templates/admin/roster.html:344
+msgid "Heimweg alleine"
+msgstr ""
+
+#: templates/admin/roster.html:378
+msgid "Ja"
+msgstr ""
+
+#: templates/admin/roster.html:380
+msgid "Nein"
+msgstr ""
+
+#: templates/admin/roster.html:389
+msgid "Keine bestätigten Anmeldungen in dieser Gruppe."
+msgstr ""
+
+#: templates/admin/roster.html:396
+msgid "Für dieses Camp wurden noch keine Altersgruppen angelegt."
+msgstr ""
+
+#: templates/admin/settings.html:5
+msgid "Einstellungen"
+msgstr ""
+
+#: templates/admin/settings.html:18
+msgid "Analytics-Aufbewahrungsdauer (Tage)"
+msgstr ""
+
+#: templates/admin/settings.html:24
+msgid "0 = unbegrenzt · max. 3650 (10 Jahre)"
+msgstr ""
+
+#: templates/admin/settings.html:28
+msgid ""
+"Analytics-Ereignisse älter als dieser Wert werden täglich um 03:00 Uhr "
+"gelöscht. Ändert sich sofort ohne Neustart."
+msgstr ""
+
+#: templates/admin/settings.html:37
+msgid "DSGVO-Einstellungen"
+msgstr ""
+
+#: templates/admin/settings.html:41
+msgid "Datenspeicherungsfrist"
+msgstr ""
+
+#: templates/admin/settings.html:42
+msgid "Jahre nach letzter Campanmeldung"
+msgstr ""
+
+#: templates/admin/settings.html:50
+msgid "Einwilligungsversion"
+msgstr ""
+
+#: templates/admin/settings.html:58
+msgid "Diese Werte werden in"
+msgstr ""
+
+#: templates/admin/settings.html:58
+msgid "oder als Umgebungsvariablen gesetzt und erfordern einen Neustart."
+msgstr ""
+
+#: templates/admin/settings.html:64
+msgid "Systeminfo"
+msgstr ""
+
+#: templates/admin/settings.html:68
+msgid "Umgebung"
+msgstr ""
+
+#: templates/admin/settings.html:72
+msgid "Datenbank"
+msgstr ""
+
+#: templates/admin/settings.html:73
+msgid "PostgreSQL"
+msgstr ""
+
+#: templates/admin/settings.html:73
+msgid "SQLite"
+msgstr ""
+
+#: templates/admin/settings.html:76
+msgid "S3-Bucket"
+msgstr ""
+
+#: templates/admin/settings.html:77
+msgid "— (lokaler Speicher)"
+msgstr ""
+
+#: templates/admin/settings.html:80
+msgid "Scheduler"
+msgstr ""
+
+#: templates/admin/settings.html:81
+msgid "Deaktiviert"
+msgstr ""
+
+#: templates/admin/settings.html:81 templates/admin/user_list.html:35
+msgid "Aktiv"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:16
+msgid "Haupttrainer fehlt in"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:16
+msgid "Gruppe(n):"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:23
+msgid "Noch kein Trainer eingeladen."
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:24
+msgid "Trainer einladen"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:42
+msgid "Haupttrainer fehlt"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:60
+msgid "Entfernen"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:69
+msgid "Trainer auswählen"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:74
+msgid "Zuweisen"
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:102
+msgid "Noch kein Team zugewiesen."
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:111
+msgid "Noch keine Gruppen."
+msgstr ""
+
+#: templates/admin/trainer_assignments.html:111
+msgid "Gruppen erstellen"
+msgstr ""
+
+#: templates/admin/user_detail.html:16
+msgid "Kontodaten"
+msgstr ""
+
+#: templates/admin/user_detail.html:24
+msgid "Adresse"
+msgstr ""
+
+#: templates/admin/user_detail.html:25 templates/admin/user_list.html:35
+msgid "Verifiziert"
+msgstr ""
+
+#: templates/admin/user_detail.html:26
+msgid "Konto aktiv"
+msgstr ""
+
+#: templates/admin/user_detail.html:27
+msgid "Einwilligung"
+msgstr ""
+
+#: templates/admin/user_detail.html:28
+msgid "Erstellt"
+msgstr ""
+
+#: templates/admin/user_detail.html:32
+msgid "Manuell eingetragen — E-Mail-Bestätigung ausstehend"
+msgstr ""
+
+#: templates/admin/user_detail.html:40
+msgid "Passwort zurücksetzen"
+msgstr ""
+
+#: templates/admin/user_detail.html:46
+#: templates/auth/password_reset_confirm.html:8
+msgid "Neues Passwort"
+msgstr ""
+
+#: templates/admin/user_detail.html:47
+msgid "Setzen"
+msgstr ""
+
+#: templates/admin/user_detail.html:78
+msgid "Bearb."
+msgstr ""
+
+#: templates/admin/user_detail.html:81
+msgid "QR neu generieren"
+msgstr ""
+
+#: templates/admin/user_detail.html:87
+msgid "Keine Kinder."
+msgstr ""
+
+#: templates/admin/user_detail.html:96
+msgid "Staff-Profil"
+msgstr ""
+
+#: templates/admin/user_detail.html:101
+msgid "Funktion"
+msgstr ""
+
+#: templates/admin/user_detail.html:103
+msgid "Allgemein"
+msgstr ""
+
+#: templates/admin/user_detail.html:103
+msgid "Verpflegung"
+msgstr ""
+
+#: templates/admin/user_detail.html:111
+msgid "Ersthelfer"
+msgstr ""
+
+#: templates/admin/user_detail.html:114
+msgid "Interne Notizen"
+msgstr ""
+
+#: templates/admin/user_detail.html:128
+msgid "Konto wirklich löschen? Nicht rückgängig zu machen."
+msgstr ""
+
+#: templates/admin/user_detail.html:130
+msgid "Konto löschen (DSGVO)"
+msgstr ""
+
+#: templates/admin/user_edit.html:5
+msgid "Benutzer bearbeiten"
+msgstr ""
+
+#: templates/admin/user_edit.html:30
+msgid "E-Mail kann nur der Benutzer selbst ändern."
+msgstr ""
+
+#: templates/admin/user_list.html:23
+msgid "Suche…"
+msgstr ""
+
+#: templates/admin/user_list.html:26
+msgid "Einladen"
+msgstr ""
+
+#: templates/admin/user_list.html:35
+msgid "Rolle"
+msgstr ""
+
+#: templates/admin/user_list.html:54
+msgid "Keine Benutzer gefunden."
+msgstr ""
+
+#: templates/admin/waitlist.html:16
+msgid "Keine Kinder auf der Warteliste."
+msgstr ""
+
+#: templates/admin/waitlist.html:21
+msgid "Bewerben Sie sich bei den Familien direkt, bevor Sie Plätze vergeben."
+msgstr ""
+
+#: templates/admin/waitlist.html:22
+msgid "Die App sendet"
+msgstr ""
+
+#: templates/admin/waitlist.html:22
+msgid "keine automatische"
+msgstr ""
+
+#: templates/admin/waitlist.html:22
+msgid "Benachrichtigung beim Hochstufen."
+msgstr ""
+
+#: templates/admin/waitlist.html:52
+msgid "auf bestätigt setzen?"
+msgstr ""
+
+#: templates/admin/waitlist.html:57
+msgid "Gruppe voll"
+msgstr ""
+
+#: templates/admin/waitlist.html:57
+msgid "Hochstufen"
+msgstr ""
+
+#: templates/announcements/feed.html:24
+msgid "Listenansicht / Löschen"
+msgstr ""
+
+#: templates/auth/login.html:20
+msgid "Logo"
+msgstr ""
+
+#: templates/auth/login.html:29
+msgid "Willkommen"
+msgstr ""
+
+#: templates/auth/login.html:30
+msgid "Melden Sie sich in Ihrem Konto an"
+msgstr ""
+
+#: templates/auth/login.html:53
+msgid "Passwort vergessen?"
+msgstr ""
+
+#: templates/auth/login.html:60
+msgid "Noch kein Konto?"
+msgstr ""
+
+#: templates/auth/login.html:61 templates/public/index.html:148
+msgid "Jetzt registrieren"
+msgstr ""
+
+#: templates/auth/login.html:75
+msgid "Sponsoren"
+msgstr ""
+
+#: templates/auth/password_reset_confirm.html:29
+msgid "Passwort speichern"
+msgstr ""
+
+#: templates/auth/password_reset_request.html:8
+msgid "Passwort vergessen"
+msgstr ""
+
+#: templates/auth/password_reset_request.html:10
+msgid ""
+"Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum "
+"Zurücksetzen."
+msgstr ""
+
+#: templates/auth/password_reset_request.html:20
+msgid "Link anfordern"
+msgstr ""
+
+#: templates/auth/password_reset_request.html:23
+msgid "Zurück zur Anmeldung"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:8
+msgid "Datenschutz aktualisiert"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:10
+msgid ""
+"Unsere Datenschutzerklärung wurde aktualisiert. Bitte bestätigen Sie die "
+"neue Version, um fortzufahren."
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:15
+msgid "Version"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:17
+msgid "gültig ab"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:22
+msgid "Vollständige Datenschutzerklärung lesen"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:33
+msgid "Ich habe die aktualisierte"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:34 templates/auth/register.html:89
+msgid "Datenschutzerklärung"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:35
+msgid "gelesen und stimme zu."
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:40
+msgid "Bestätigen und fortfahren"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:43
+msgid "Sie können sich auch"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:46
+msgid "abmelden"
+msgstr ""
+
+#: templates/auth/reconfirm_consent.html:48
+msgid "ohne zu bestätigen."
+msgstr ""
+
+#: templates/auth/register.html:15 templates/auth/register.html:95
+msgid "Konto erstellen"
+msgstr ""
+
+#: templates/auth/register.html:16
+msgid "Kostenlos registrieren und Kind anmelden"
+msgstr ""
+
+#: templates/auth/register.html:88
+msgid "Ich habe die"
+msgstr ""
+
+#: templates/auth/register.html:90
+msgid "gelesen und stimme der Verarbeitung meiner Daten zu."
+msgstr ""
+
+#: templates/auth/register.html:99
+msgid "Bereits ein Konto?"
+msgstr ""
+
+#: templates/auth/verify_pending.html:6
+msgid "E-Mail bestätigen"
+msgstr ""
+
+#: templates/auth/verify_pending.html:8
+msgid "Wir haben eine Bestätigungsmail an"
+msgstr ""
+
+#: templates/auth/verify_pending.html:8
+msgid "gesendet."
+msgstr ""
+
+#: templates/auth/verify_pending.html:9
+msgid "Bitte klicken Sie auf den Link in der E-Mail, um Ihr Konto zu aktivieren."
+msgstr ""
+
+#: templates/auth/verify_pending.html:12
+msgid "Keine E-Mail erhalten? Prüfen Sie Ihren Spam-Ordner oder"
+msgstr ""
+
+#: templates/auth/verify_pending.html:13
+msgid "erneut senden"
+msgstr ""
+
+#: templates/errors/403.html:6
+msgid "Kein Zugriff"
+msgstr ""
+
+#: templates/errors/403.html:7
+msgid "Sie haben keine Berechtigung, diese Seite aufzurufen."
+msgstr ""
+
+#: templates/errors/403.html:9
+msgid "Startseite"
+msgstr ""
+
+#: templates/errors/404.html:6
+msgid "Seite nicht gefunden"
+msgstr ""
+
+#: templates/errors/404.html:7
+msgid "Die gesuchte Seite existiert nicht oder wurde verschoben."
+msgstr ""
+
+#: templates/errors/404.html:8 templates/errors/500.html:8
+msgid "Zur Startseite"
+msgstr ""
+
+#: templates/errors/500.html:6
+msgid "Serverfehler"
+msgstr ""
+
+#: templates/errors/500.html:7
+msgid "Es ist ein unerwarteter Fehler aufgetreten. Wir wurden benachrichtigt."
+msgstr ""
+
+#: templates/parents/child_added_confirm.html:7
+msgid "wurde hinzugefügt!"
+msgstr ""
+
+#: templates/parents/child_added_confirm.html:9
+msgid ""
+"Sie können Ihr Kind jetzt für das Camp anmelden oder weitere Kinder "
+"hinzufügen."
+msgstr ""
+
+#: templates/parents/child_added_confirm.html:15
+msgid "für das Camp anmelden"
+msgstr ""
+
+#: templates/parents/child_added_confirm.html:19
+msgid "Weiteres Kind hinzufügen"
+msgstr ""
+
+#: templates/parents/child_added_confirm.html:22
+msgid "Zum Dashboard"
+msgstr ""
+
+#: templates/public/impressum.html:4 templates/public/kontakt.html:43
+msgid "Impressum"
+msgstr ""
+
+#: templates/public/impressum.html:16
+msgid "Angaben gemäß § 5 TMG"
+msgstr ""
+
+#: templates/public/impressum.html:25 templates/public/kontakt.html:5
+msgid "Kontakt"
+msgstr ""
+
+#: templates/public/impressum.html:32
+msgid "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV"
+msgstr ""
+
+#: templates/public/impressum.html:41
+msgid "Haftungsausschluss"
+msgstr ""
+
+#: templates/public/impressum.html:43
+msgid "Haftung für Inhalte:"
+msgstr ""
+
+#: templates/public/impressum.html:44
+msgid ""
+"Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf "
+"diesen Seiten nach den allgemeinen Gesetzen verantwortlich."
+msgstr ""
+
+#: templates/public/impressum.html:47
+msgid "Haftung für Links:"
+msgstr ""
+
+#: templates/public/impressum.html:48
+msgid ""
+"Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren "
+"Inhalte wir keinen Einfluss haben."
+msgstr ""
+
+#: templates/public/impressum.html:52
+msgid "Urheberrecht"
+msgstr ""
+
+#: templates/public/impressum.html:54
+msgid ""
+"Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen "
+"Seiten unterliegen dem deutschen Urheberrecht."
+msgstr ""
+
+#: templates/public/index.html:56
+msgid "Unsere Sponsoren"
+msgstr ""
+
+#: templates/public/index.html:120
+msgid "Kostenloses"
+msgstr ""
+
+#: templates/public/index.html:121
+msgid "Fußballcamp"
+msgstr ""
+
+#: templates/public/index.html:138
+msgid "Anmeldung geöffnet!"
+msgstr ""
+
+#: templates/public/index.html:141
+msgid "Jetzt kostenlos anmelden und einen Platz für Ihr Kind sichern."
+msgstr ""
+
+#: templates/public/index.html:145
+msgid "Kind anmelden"
+msgstr ""
+
+#: templates/public/index.html:156
+msgid "Anmeldung derzeit geschlossen"
+msgstr ""
+
+#: templates/public/index.html:159
+msgid "Öffnet am"
+msgstr ""
+
+#: templates/public/index.html:161
+msgid "Schauen Sie bald wieder vorbei."
+msgstr ""
+
+#: templates/public/index.html:169
+msgid ""
+"Noch kein Camp geplant. Melden Sie sich an und bleiben Sie auf dem "
+"Laufenden."
+msgstr ""
+
+#: templates/public/index.html:171
+msgid "Account erstellen"
+msgstr ""
+
+#: templates/public/index.html:214
+msgid "Für alle Kinder"
+msgstr ""
+
+#: templates/public/index.html:214
+msgid ""
+"Offen für alle Altersgruppen von U6 bis U16. Kostenlos und ohne "
+"Vorkenntnisse."
+msgstr ""
+
+#: templates/public/index.html:215
+msgid "Profi-Trainingseinheiten"
+msgstr ""
+
+#: templates/public/index.html:215
+msgid "Erfahrene Trainer begleiten die Kinder durch spannende Übungen und Spiele."
+msgstr ""
+
+#: templates/public/index.html:216
+msgid "Abschlussfest"
+msgstr ""
+
+#: templates/public/index.html:216
+msgid "Am letzten Tag feiern wir gemeinsam mit Pokalen, Urkunden und viel Spaß."
+msgstr ""
+
+#: templates/public/kontakt.html:20
+msgid "Ort"
+msgstr ""
+
+#: templates/public/kontakt.html:52
+msgid "Nachricht schicken"
+msgstr ""
+
+#: templates/public/kontakt.html:54
+msgid "Wir antworten in der Regel innerhalb von 1–2 Werktagen."
+msgstr ""
+
+#: templates/public/kontakt.html:58
+msgid "Ihre Nachricht wurde gesendet. Wir melden uns bald bei Ihnen."
+msgstr ""
+
+#: templates/public/kontakt.html:85
+msgid "Nachricht senden"
+msgstr ""
+

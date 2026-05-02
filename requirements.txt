@@ -1,0 +1,56 @@
+# =============================================================================
+# FUSSBALLCAMP — Python Dependencies
+# =============================================================================
+# Install:  pip install -r requirements.txt
+# Dev only: pip install -r requirements.txt -r requirements-dev.txt
+# =============================================================================
+
+# Core Flask
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.7
+Flask-Login==0.6.3
+Flask-Mail==0.10.0
+Werkzeug==3.0.3
+
+# Database
+# SQLite is included with Python — no extra package needed for dev
+
+# AWS S3
+boto3==1.34.144
+botocore==1.34.144
+
+# QR code generation
+qrcode[pil]==7.4.2
+
+# Background scheduler (staff auto-checkout)
+APScheduler==3.10.4
+
+# Environment variable loading
+python-dotenv==1.0.1
+
+# Fake data generation (seed script)
+Faker==25.8.0
+
+# Form handling & validation
+Flask-WTF==1.2.1
+flask-limiter==3.8.0
+WTForms==3.1.2
+
+# Image handling
+Pillow==10.4.0
+
+# Utilities
+email-validator==2.2.0       # validates email format in WTForms
+
+bleach==6.1.0
+
+# Internationalisation
+Flask-Babel==4.0.0
+
+# Production WSGI server
+gunicorn==22.0.0
+
+# Testing
+pytest==8.2.0
+pytest-flask==1.3.0

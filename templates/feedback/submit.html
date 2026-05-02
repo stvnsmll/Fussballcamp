@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Fehler melden</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">Helfen Sie uns, die App zu verbessern</p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:580px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST" id="bugForm">
+        {{ form.hidden_tag() }}
+        {{ form.page_url(id='pageUrl') }}
+        <div class="mb-3">
+          {{ form.subject.label(class='form-label') }}
+          {{ form.subject(class='form-control' + (' is-invalid' if form.subject.errors else ''), placeholder='z.B. QR-Code wird nicht geladen') }}
+          {% for e in form.subject.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.description.label(class='form-label') }}
+          {{ form.description(class='form-control' + (' is-invalid' if form.description.errors else ''), rows=5, placeholder='Was ist passiert? Was habe ich erwartet?') }}
+          {% for e in form.description.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-4">
+          {{ form.severity.label(class='form-label') }}
+          {{ form.severity(class='form-select') }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Meldung einreichen</button>
+      </form>
+    </div>
+  </div>
+  <div class="text-center mt-3">
+    <a href="{{ url_for('feedback.my_reports') }}" style="font-size:.875rem">Meine bisherigen Meldungen →</a>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const ref = document.referrer;
+if (ref) {
+  try { document.getElementById('pageUrl').value = new URL(ref).pathname; } catch(e) {}
+}
+</script>
+{% endblock %}

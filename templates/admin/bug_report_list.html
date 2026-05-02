@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Fehlermeldungen') }}</h1>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    {% for s, label in [('open', _('Offen')),('all', _('Alle')),('resolved', _('Gelöst')),('wontfix', _('Kein Fix'))] %}
+    <a href="{{ url_for('admin.bug_report_list', status=s) }}"
+       class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-outline-secondary' }}">
+      {{ label }}
+      {% if s == 'open' and counts and counts.new %}<span class="badge bg-danger ms-1" style="font-size:.65rem">{{ counts.new }}</span>{% endif %}
+    </a>
+    {% endfor %}
+    {% for s, label in [('all', _('Alle')),('high', _('Hoch')),('medium', _('Mittel')),('low', _('Gering'))] %}
+    <a href="{{ url_for('admin.bug_report_list', status=status_filter, schweregrad=s) }}"
+       class="btn btn-sm {{ 'btn-outline-primary' if severity_filter == s else 'btn-outline-secondary' }}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="card" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>#</th><th>{{ _('Betreff') }}</th><th>{{ _('Seite') }}</th><th>{{ _('Schwere') }}</th><th>{{ _('Status') }}</th><th>{{ _('Datum') }}</th><th></th></tr></thead>
+        <tbody>
+          {% for r in reports.items %}
+          <tr>
+            <td class="text-muted" style="font-size:.8rem">#{{ r.id }}</td>
+            <td class="fw-600" style="max-width:220px">{{ r.subject }}</td>
+            <td style="font-size:.78rem;font-family:monospace;color:var(--text-muted)">{{ r.page_url or '—' }}</td>
+            <td><span class="badge badge-{{ r.severity }}">{{ r.severity_label }}</span></td>
+            <td><span class="badge badge-{{ r.status }}">{{ r.status_label }}</span></td>
+            <td style="font-size:.78rem;white-space:nowrap">{{ r.created_at.strftime('%d.%m.%Y') }}</td>
+            <td><a href="{{ url_for('admin.bug_report_detail', report_id=r.id) }}" class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:.2rem .5rem">{{ _('Öffnen') }}</a></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center py-4 text-muted">{{ _('Keine Meldungen.') }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

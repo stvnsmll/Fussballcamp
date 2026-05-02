@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}admin/dev_tools{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1><i class="bi bi-tools"></i> Dev Tools</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">Einstellungen werden bei Server-Neustart zurückgesetzt.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #e5e5ea;
+  border-radius: 31px;
+  transition: .25s;
+}
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  transition: .25s;
+}
+.toggle-switch input:checked + .toggle-slider { background: #34c759; }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+.toggle-switch input:disabled + .toggle-slider { opacity: .4; cursor: not-allowed; }
+
+/* Warning colour for suppress email */
+.toggle-switch.warning input:checked + .toggle-slider { background: #ff9500; }
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--cream-dark);
+  gap: 1rem;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-weight: 600; margin-bottom: .15rem; }
+.toggle-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.4; }
+.toggle-tip { font-size: .78rem; color: var(--green-600); margin-top: .2rem; }
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5" style="max-width:600px">
+
+  {% if not is_dev %}
+  <div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle"></i> <strong>Produktionsmodus erkannt.</strong> Diese Tools sind für den Produktionsbetrieb nicht gedacht.
+  </div>
+  {% endif %}
+
+  <div class="card mt-4 animate-in">
+    <div class="card-header">Entwickler-Toggles</div>
+
+    {# Open Registration #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_open_registration">
+      <div>
+        <div class="toggle-label">Offene Registrierung</div>
+        <div class="toggle-desc">Erlaubt Kontoerstellung ohne Einladungslink.</div>
+      </div>
+      <label class="toggle-switch" title="Klicken zum Umschalten">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)" {{ 'checked' if dev_open_registration }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+
+    {# Suppress Emails #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_suppress_email">
+      <div>
+        <div class="toggle-label">E-Mail-Versand unterdrücken</div>
+        <div class="toggle-desc">Keine E-Mails werden versendet — nur geloggt.</div>
+      </div>
+      <label class="toggle-switch warning" title="Klicken zum Umschalten">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)" {{ 'checked' if dev_suppress_email }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+
+    {# Language Switcher #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_language_switcher">
+      <div>
+        <div class="toggle-label">Sprachumschalter anzeigen</div>
+        <div class="toggle-desc">Blendet <i class="bi bi-globe"></i> in der Navigation ein oder aus.</div>
+      </div>
+      <label class="toggle-switch" title="Klicken zum Umschalten">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)" {{ 'checked' if show_language_switcher }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+
+    {# Template name in HTML comment #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_show_template">
+      <div style="flex:1">
+        <div class="toggle-label">Template-Name im HTML</div>
+        <div class="toggle-desc">Fügt einen HTML-Kommentar mit dem Template-Namen auf jeder Seite hinzu. Nützlich beim Debuggen.</div>
+      </div>
+      <label class="toggle-switch" title="Klicken zum Umschalten">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)" {{ 'checked' if show_template_name }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+
+    {# Disable feedback rate limit #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_disable_rate_limit">
+      <div style="flex:1">
+        <div class="toggle-label">Rate-Limit Feedback deaktivieren</div>
+        <div class="toggle-desc">Hebt das Limit von 5 Feedback-Meldungen pro Stunde auf.</div>
+      </div>
+      <label class="toggle-switch" title="Klicken zum Umschalten">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)" {{ 'checked' if disable_rate_limit }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+
+    {# Set Camp to Today #}
+    <form method="POST" class="toggle-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="toggle_camp_today">
+      <div>
+        <div class="toggle-label">Camp-Datum auf heute setzen</div>
+        <div class="toggle-desc">
+          {% if camp %}
+          <strong>{{ camp.name }}</strong>
+          ({{ camp.start_date.strftime('%d.%m.%Y') }}–{{ camp.end_date.strftime('%d.%m.%Y') }})
+          {% else %}
+          Kein aktives Camp gefunden.
+          {% endif %}
+        </div>
+        <div class="toggle-tip"><i class="bi bi-lightbulb"></i> Schaltet Check-In frei</div>
+      </div>
+      <label class="toggle-switch" style="{{ 'opacity:.4;pointer-events:none' if not camp }}">
+        <input type="checkbox" onchange="setTimeout(() => this.form.submit(), 120)"
+               {{ 'checked' if dev_camp_today }} {{ 'disabled' if not camp }}>
+        <span class="toggle-slider"></span>
+      </label>
+    </form>
+    
+    {# Toast Duration #}
+    <form method="POST" class="toggle-row" id="toastDurationForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="set_toast_duration">
+      <div style="flex:1">
+        <div class="toggle-label">Toast-Anzeigedauer</div>
+        <div class="toggle-desc">Wie lange Benachrichtigungen sichtbar bleiben.</div>
+        <div class="d-flex align-items-center gap-2 mt-2">
+          <input type="range" name="toast_duration" min="2" max="30"
+                 value="{{ toast_duration }}"
+                 style="flex:1;accent-color:var(--green-700)"
+                 oninput="document.getElementById('tdVal').textContent=this.value">
+          <span id="tdVal" style="font-weight:700;color:var(--green-700);min-width:2.5rem">{{ toast_duration }}s</span>
+          <button type="submit" class="btn btn-sm btn-outline-primary" style="font-size:.75rem">Setzen</button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <p class="text-muted mt-3" style="font-size:.75rem">
+    <i class="bi bi-exclamation-triangle"></i> Alle Toggles werden beim Neustart des Servers zurückgesetzt.
+  </p>
+  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 60" width="160" height="60">
+  <!-- Background -->
+  <rect width="160" height="60" rx="6" fill="#f4f3ed"/>
+  <rect width="160" height="60" rx="6" fill="none" stroke="#e8e6de" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- Label -->
+  <text x="80" y="26" font-family="sans-serif" font-size="9"
+        fill="#7a9485" text-anchor="middle" letter-spacing="1">SPONSOR</text>
+  <text x="80" y="41" font-family="sans-serif" font-size="9"
+        fill="#7a9485" text-anchor="middle" letter-spacing="1">LOGO</text>
+</svg>

@@ -1,0 +1,55 @@
+{% extends "email_templates/_base_email.html" %}
+
+{% block title %}Warteliste – {{ child.full_name }} – {{ camp_name }}{% endblock %}
+{% block preheader %}{{ child.full_name }} steht auf der Warteliste für {{ camp_name }} {{ camp_session.year }}. Position: {{ registration.waitlist_position or '–' }}.{% endblock %}
+
+{% block header_stripe %}
+<tr>
+  <td style="background-color:#fbbf24;padding:10px 40px;">
+    <p style="margin:0;font-size:12px;font-weight:700;color:#78350f;letter-spacing:.06em;text-transform:uppercase;">
+      ⏳ Warteliste
+    </p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+
+  <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-0.4px;">
+    Hallo {{ user.first_name }},
+  </h1>
+  <p style="margin:0 0 24px;font-size:15px;color:#4b5563;line-height:1.6;">
+    <strong style="color:#1b3f2a;">{{ child.full_name }}</strong> steht auf der
+    Warteliste für das <strong style="color:#1b3f2a;">{{ camp_name }} {{ camp_session.year }}</strong>.
+    {% if registration.waitlist_position %}
+    Aktuelle Position: <strong>{{ registration.waitlist_position }}</strong>.
+    {% endif %}
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         style="margin:0 0 28px;border-radius:8px;">
+    <tr>
+      <td style="background-color:#fffbeb;border-left:4px solid #fbbf24;padding:14px 16px;">
+        <p style="margin:0;font-size:13px;color:#78350f;line-height:1.6;">
+          Wir kontaktieren Sie direkt, sobald ein Platz frei wird.
+          Die Nachrückreihenfolge wird manuell vom Camp-Team verwaltet.
+        </p>
+      </td>
+    </tr>
+  </table>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">
+    <tr>
+      <td style="background-color:#b8f442;border-radius:9px;">
+        <a href="{{ url_for('parents.dashboard', _external=True) }}"
+           class="cta-button"
+           style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:800;
+                  color:#1b3f2a;text-decoration:none;border-radius:9px;
+                  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+          Elternbereich öffnen →
+        </a>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}

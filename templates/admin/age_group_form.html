@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Gruppe bearbeiten') if group else _('Neue Gruppe') }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.camp_list') }}">{{ _('Sessions') }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}">{{ _('Gruppen') }}</a></li>
+        <li class="breadcrumb-item active">{{ group.name if group else _('Neu') }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:520px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="row g-3">
+          <div class="col-12">
+            {{ form.name.label(class='form-label') }}
+            {{ form.name(class='form-control' + (' is-invalid' if form.name.errors else ''),
+               placeholder='z.B. U10') }}
+            {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-6">
+            {{ form.min_age.label(class='form-label') }}
+            {{ form.min_age(class='form-control', type='number', min=0, max=20) }}
+          </div>
+          <div class="col-sm-6">
+            {{ form.max_age.label(class='form-label') }}
+            {{ form.max_age(class='form-control', type='number', min=0, max=20) }}
+          </div>
+          <div class="col-sm-6">
+            {{ form.capacity.label(class='form-label') }}
+            {{ form.capacity(class='form-control', type='number', min=0) }}
+          </div>
+          <div class="col-sm-6">
+            {{ form.display_order.label(class='form-label') }}
+            {{ form.display_order(class='form-control', type='number', min=1) }}
+            <div class="form-text">{{ _('Reihenfolge in Listen') }}</div>
+          </div>
+        </div>
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn btn-primary flex-fill">{{ _('Speichern') }}</button>
+          <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}"
+             class="btn btn-outline-secondary">{{ _('Abbrechen') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

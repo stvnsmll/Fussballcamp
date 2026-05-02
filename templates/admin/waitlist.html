@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}admin/waitlist{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Warteliste') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ camp.name }}</p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  {% if not waitlisted_by_group %}
+  <div class="card text-center py-5" style="border:2px dashed var(--cream-dark)">
+    <div class="card-body">
+      <div style="font-size:2.5rem;opacity:.25"><i class="bi bi-check-circle-fill"></i></div>
+      <p class="text-muted mt-2">{{ _('Keine Kinder auf der Warteliste.') }}</p>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info mb-4" style="font-size:.875rem">
+    {{ _('Bewerben Sie sich bei den Familien direkt, bevor Sie Plätze vergeben.') }}
+    {{ _('Die App sendet') }} <strong>{{ _('keine automatische') }}</strong> {{ _('Benachrichtigung beim Hochstufen.') }}
+  </div>
+  <div class="row g-4">
+    {% for group, registrations in waitlisted_by_group.items() %}
+    <div class="col-lg-6 animate-in">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          {{ group }}
+          <span class="badge badge-waitlisted">{{ registrations | length }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>#</th><th>{{ _('Kind') }}</th><th>{{ _('Elternteil') }}</th><th></th></tr></thead>
+            <tbody>
+              {% for reg in registrations %}
+              <tr>
+                <td class="fw-700" style="color:#d97706">{{ reg.waitlist_position }}</td>
+                <td>
+                  <div class="fw-600">{{ reg.child.full_name }}</div>
+                  <div class="text-muted" style="font-size:.75rem">
+                    {{ reg.child.date_of_birth.strftime('%d.%m.%Y') }}
+                  </div>
+                </td>
+                <td style="font-size:.8rem">
+                  {{ reg.child.parent.full_name if reg.child.parent else '—' }}<br>
+                  <span class="text-muted">{{ reg.child.parent.phone or '' }}</span>
+                </td>
+                <td>
+                  <form method="POST"
+                        action="{{ url_for('admin.confirm_from_waitlist', registration_id=reg.id) }}"
+                        id="promoteForm-{{ reg.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-xs btn-lime"
+                            style="font-size:.72rem;padding:.3rem .65rem;font-weight:700"
+                            {{ 'disabled' if reg.age_group.is_full else '' }}
+                            title="{{ _('Gruppe voll') if reg.age_group.is_full else _('Hochstufen') }}">
+                      ↑
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

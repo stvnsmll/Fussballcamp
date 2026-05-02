@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}parents/data_privacy{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Datenschutz &amp; Meine Daten</h1>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:640px">
+
+  <div class="card mb-3 animate-in">
+    <div class="card-header"><i class="bi bi-clipboard"></i> Gespeicherte Daten</div>
+    <div class="card-body" style="font-size:.875rem">
+      <p>Folgende Daten sind zu Ihrem Konto gespeichert:</p>
+      <ul class="mb-2">
+        <li>Name, E-Mail, Telefon, Adresse</li>
+        <li>{{ children | length }} Kind(er) mit Geburtsdaten{% if children %} und Notfallkontakten{% endif %}</li>
+        <li>Anmeldungen und Teilnahmehistorie</li>
+        <li>Einwilligungen mit Datum und Version</li>
+      </ul>
+      <p class="text-muted mb-0">Daten werden {{ config.DATA_RETENTION_YEARS }} Jahre nach Ihrer letzten Campanmeldung gelöscht.</p>
+    </div>
+  </div>
+
+  <div class="card mb-3 animate-in animate-in-2">
+    <div class="card-header">⬇ Datenexport (Art. 20 DSGVO)</div>
+    <div class="card-body">
+      <p style="font-size:.875rem">Laden Sie alle Ihre persönlichen Daten als JSON-Datei herunter.</p>
+      <form method="POST" action="{{ url_for('parents.export_data') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-outline-primary btn-sm">Daten herunterladen</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card animate-in animate-in-3" style="border-color:rgba(239,68,68,.3)">
+    <div class="card-header" style="color:#b91c1c"><i class="bi bi-trash"></i> Konto löschen (Art. 17 DSGVO)</div>
+    <div class="card-body">
+      <p style="font-size:.875rem">
+        Ihr Konto und alle Kinderdaten werden unwiderruflich anonymisiert.
+        Anmeldedaten für statistische Zwecke bleiben erhalten, sind jedoch nicht mehr Ihnen zugeordnet.
+      </p>
+      {% if children | selectattr('registrations') | list %}
+      <div class="alert alert-warning" style="font-size:.82rem">
+        Bitte stornieren Sie zuerst alle aktiven Anmeldungen, bevor Sie Ihr Konto löschen.
+      </div>
+      {% endif %}
+      <form method="POST" action="{{ url_for('parents.request_deletion') }}"
+            id="delSelfAccountForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="button" class="btn btn-danger btn-sm"
+                onclick="showConfirmModal({iconClass:'bi-person-x-fill',iconColor:'#dc2626',title:'Konto löschen?',body:'Ihr Konto wird dauerhaft und unwiderruflich gelöscht.',warning:'Alle Kindprofile und Anmeldedaten werden ebenfalls entfernt.',confirmLabel:'Ja, Konto löschen',onConfirm:function(){document.getElementById("delSelfAccountForm").submit();}})">
+          Konto unwiderruflich löschen
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

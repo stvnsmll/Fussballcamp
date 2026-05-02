@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Einstellungen') }}</h1>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:600px">
+
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-header"><i class="bi bi-bar-chart"></i> {{ _('Analytics') }}</div>
+    <div class="card-body">
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label class="form-label">{{ _('Analytics-Aufbewahrungsdauer (Tage)') }}</label>
+          <div class="d-flex align-items-center gap-3">
+            <input type="number" name="analytics_retention_days"
+                   class="form-control" style="max-width:120px"
+                   value="{{ current_retention }}" min="0" max="3650">
+            <span class="text-muted" style="font-size:.875rem">
+              {{ _('0 = unbegrenzt · max. 3650 (10 Jahre)') }}
+            </span>
+          </div>
+          <div class="form-text">
+            {{ _('Analytics-Ereignisse älter als dieser Wert werden täglich um 03:00 Uhr gelöscht. Ändert sich sofort ohne Neustart.') }}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">{{ _('Speichern') }}</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mt-3 animate-in animate-in-2">
+    <div class="card-header"><i class="bi bi-lock"></i> {{ _('DSGVO-Einstellungen') }}</div>
+    <div class="card-body" style="font-size:.875rem">
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div>
+          <div class="fw-600">{{ _('Datenspeicherungsfrist') }}</div>
+          <div class="text-muted">{{ config.DATA_RETENTION_YEARS }} {{ _('Jahre nach letzter Campanmeldung') }}</div>
+        </div>
+        <code style="font-size:.78rem;background:var(--cream-dark);padding:.2rem .5rem;border-radius:4px">
+          DATA_RETENTION_YEARS
+        </code>
+      </div>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <div class="fw-600">{{ _('Einwilligungsversion') }}</div>
+          <div class="text-muted">v{{ config.CURRENT_CONSENT_VERSION }}</div>
+        </div>
+        <code style="font-size:.78rem;background:var(--cream-dark);padding:.2rem .5rem;border-radius:4px">
+          CURRENT_CONSENT_VERSION
+        </code>
+      </div>
+      <div class="alert alert-info mt-3 mb-0" style="font-size:.8rem">
+        {{ _('Diese Werte werden in') }} <strong>sub_modules/config.py</strong> {{ _('oder als Umgebungsvariablen gesetzt und erfordern einen Neustart.') }}
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-3 animate-in animate-in-3">
+    <div class="card-header"><i class="bi bi-gear"></i> {{ _('Systeminfo') }}</div>
+    <div class="card-body" style="font-size:.82rem">
+      <table class="table table-sm mb-0">
+        <tr>
+          <td class="text-muted">{{ _('Umgebung') }}</td>
+          <td><code>{{ config.get('ENV_MODE','—') }}</code></td>
+        </tr>
+        <tr>
+          <td class="text-muted">{{ _('Datenbank') }}</td>
+          <td><code>{{ _('PostgreSQL') if 'postgresql' in (config.SQLALCHEMY_DATABASE_URI or '') else _('SQLite') }}</code></td>
+        </tr>
+        <tr>
+          <td class="text-muted">{{ _('S3-Bucket') }}</td>
+          <td><code>{{ config.AWS_S3_BUCKET or _('— (lokaler Speicher)') }}</code></td>
+        </tr>
+        <tr>
+          <td class="text-muted">{{ _('Scheduler') }}</td>
+          <td><code>{{ _('Deaktiviert') if config.DISABLE_SCHEDULER else _('Aktiv') }}</code></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

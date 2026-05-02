@@ -1,0 +1,57 @@
+# =============================================================================
+# railway.toml — Fußballcamp on Railway.app
+# =============================================================================
+#
+# First-time setup:
+#   1. railway login && railway init
+#   2. railway add --database postgresql
+#   3. Set env vars: railway variables set KEY=value  (see list below)
+#   4. railway up
+#
+# Railway uses Nixpacks to auto-detect Python and install requirements.txt.
+# No Dockerfile needed.
+#
+# Costs (as of 2025, Hobby plan):
+#   $5/month base + ~$0.000463/vCPU-minute + ~$0.000231/GB-minute
+#   Typical small app: ~$5–10/month total
+#
+# Required env vars to set manually (railway variables set KEY=value):
+#   SECRET_KEY              python -c "import secrets; print(secrets.token_hex(32))"
+#   CAMP_NAME               e.g. "FC Musterstadt Fußballcamp"
+#   CAMP_CONTACT_EMAIL      e.g. info@deincamp.de
+#   CAMP_CONTACT_PHONE      e.g. +49 123 456789 (optional)
+#   CAMP_LOCATION           e.g. Sportanlage Musterstraße 1
+#   CAMP_ORGANISER_NAME     e.g. FC Musterstadt e.V.
+#   CAMP_ORGANISER_ADDRESS  e.g. Musterstraße 1, 12345 Musterstadt
+#   SENDGRID_API_KEY        from sendgrid.com
+#   MAIL_DEFAULT_SENDER     e.g. noreply@deincamp.de
+#   AWS_ACCESS_KEY_ID       (optional — skip for local /tmp/ image storage)
+#   AWS_SECRET_ACCESS_KEY   (optional)
+#   AWS_S3_BUCKET           (optional)
+#
+# DATABASE_URL is injected automatically by Railway when you link a
+# PostgreSQL service to this project.
+# =============================================================================
+
+[build]
+builder          = "nixpacks"
+buildCommand     = "pip install -r requirements.txt && pybabel compile -d translations"
+
+[deploy]
+startCommand     = "gunicorn application:app --workers 2 --threads 2 --timeout 120 --bind 0.0.0.0:$PORT --access-logfile - --error-logfile -"
+healthcheckPath  = "/"
+healthcheckTimeout = 30
+restartPolicyType  = "on-failure"
+restartPolicyMaxRetries = 3
+
+# Release command: runs migrations before traffic switches to new deploy.
+# Railway runs this between build success and start.
+releaseCommand   = "flask db upgrade"
+
+[environments.production.deploy]
+# Production-specific overrides (Railway environment named "production")
+# Add DISABLE_SCHEDULER=0 to let the auto-checkout scheduler run
+
+[[services]]
+# If using Railway's service linking, the PostgreSQL service injects
+# DATABASE_URL automatically — no manual connection string needed.

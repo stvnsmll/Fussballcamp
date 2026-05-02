@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{% block title %}{{ camp_name }}{% endblock %}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; }
+
+    /* Responsive */
+    @media screen and (max-width: 620px) {
+      .email-container { width: 100% !important; }
+      .email-body-cell { padding: 28px 20px !important; }
+      .email-header-cell { padding: 22px 20px !important; }
+      .email-footer-cell { padding: 18px 20px !important; }
+      .cta-button { width: 100% !important; display: block !important; text-align: center !important; }
+    }
+  </style>
+</head>
+
+{#
+  Design tokens (inline everywhere below):
+    Header bg:   #1b3f2a   (forest green)
+    Accent:      #b8f442   (electric lime)
+    Body bg:     #ffffff
+    Page bg:     #f4f3ed   (cream)
+    Footer bg:   #152f20   (darker green)
+    Body text:   #1a1a1a
+    Muted text:  #6b7280
+    Border:      #e8e8e1
+#}
+
+<body style="margin:0;padding:0;background-color:#f4f3ed;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+
+  <!-- Preheader (hidden preview text in inbox) -->
+  <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    {% block preheader %}{{ camp_name }}{% endblock %}
+  </div>
+
+  <!-- Outer wrapper -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background-color:#f4f3ed;margin:0;padding:24px 0 40px;">
+    <tr>
+      <td align="center" valign="top" style="padding:0 16px;">
+
+        <!-- Email container — max 600px -->
+        <table role="presentation" class="email-container" width="600" cellpadding="0" cellspacing="0" border="0"
+               style="width:600px;max-width:600px;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
+
+          {# ============================================================= #}
+          {# HEADER                                                          #}
+          {# ============================================================= #}
+          <tr>
+            <td class="email-header-cell"
+                style="background-color:#1b3f2a;padding:28px 40px 24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td valign="middle">
+                    {# Camp name / logo #}
+                    <span style="font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:bold;color:#b8f442;letter-spacing:-0.3px;text-decoration:none;">
+                      ⚽&nbsp;{{ camp_name }}
+                    </span>
+                  </td>
+                </tr>
+                {% block header_extra %}{% endblock %}
+              </table>
+            </td>
+          </tr>
+
+          {# ============================================================= #}
+          {# HERO STRIPE (optional — override header_stripe block)          #}
+          {# ============================================================= #}
+          {% block header_stripe %}{% endblock %}
+
+          {# ============================================================= #}
+          {# MAIN BODY                                                       #}
+          {# ============================================================= #}
+          <tr>
+            <td class="email-body-cell"
+                style="background-color:#ffffff;padding:40px 40px 36px;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+
+          {# ============================================================= #}
+          {# FOOTER                                                          #}
+          {# ============================================================= #}
+          <tr>
+            <td class="email-footer-cell"
+                style="background-color:#152f20;padding:22px 40px 24px;">
+              <p style="margin:0 0 6px;font-size:12px;color:#86b8a0;line-height:1.6;">
+                <strong style="color:#b8f442;">{{ camp_name }}</strong>
+                {% if config.CAMP_ORGANISER_NAME and config.CAMP_ORGANISER_NAME != camp_name %}
+                  &nbsp;·&nbsp;{{ config.CAMP_ORGANISER_NAME }}
+                {% endif %}
+              </p>
+              {% if config.CAMP_ORGANISER_ADDRESS %}
+              <p style="margin:0 0 4px;font-size:11px;color:#6b9980;line-height:1.5;">
+                {{ config.CAMP_ORGANISER_ADDRESS }}
+              </p>
+              {% endif %}
+              <p style="margin:0 0 10px;font-size:11px;color:#6b9980;line-height:1.5;">
+                {% if config.CAMP_CONTACT_EMAIL %}
+                  <a href="mailto:{{ config.CAMP_CONTACT_EMAIL }}"
+                     style="color:#86b8a0;text-decoration:none;">{{ config.CAMP_CONTACT_EMAIL }}</a>
+                {% endif %}
+                {% if config.CAMP_CONTACT_PHONE %}
+                  &nbsp;·&nbsp;{{ config.CAMP_CONTACT_PHONE }}
+                {% endif %}
+              </p>
+              {% block footer_extra %}{% endblock %}
+              <p style="margin:10px 0 0;font-size:10px;color:#4d7a61;line-height:1.4;border-top:1px solid #2d5a3d;padding-top:10px;">
+                Diese E-Mail wurde automatisch versandt. Bitte antworten Sie nicht direkt auf diese Nachricht.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        {# End email container #}
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

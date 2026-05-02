@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Team einladen') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {{ _('Einladungslink per E-Mail versenden') }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:520px">
+
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.email.label(class='form-label') }}
+          {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''),
+             autocomplete='off', placeholder='{{ _("trainer@beispiel.de") }}') }}
+          {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.role.label(class='form-label') }}
+          {{ form.role(class='form-select') }}
+        </div>
+        <div class="mb-3">
+          {{ form.staff_class.label(class='form-label') }}
+          {{ form.staff_class(class='form-select') }}
+        </div>
+        <div class="mb-4">
+          <div class="form-check">
+            {{ form.is_first_aid(class='form-check-input') }}
+            {{ form.is_first_aid.label(class='form-check-label') }}
+          </div>
+        </div>
+        <div class="p-3 rounded mb-4" style="background:var(--cream-dark);font-size:.82rem">
+          {{ _('Der Eingeladene erhält einen Link, der für') }}
+          <strong>{{ config.INVITE_TOKEN_EXPIRY_HOURS }} Stunden</strong> {{ _('gültig ist. Er muss kein bestehendes Konto haben.') }}
+        </div>
+        <button type="submit" class="btn btn-lime w-100">{{ _('Einladung senden') }}</button>
+      </form>
+    </div>
+  </div>
+
+  {# Recent invites #}
+  {% if recent_invites %}
+  <div class="card mt-3 animate-in animate-in-2">
+    <div class="card-header">{{ _('Zuletzt eingeladen') }}</div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>{{ _('E-Mail') }}</th><th>{{ _('Gesendet') }}</th><th>{{ _('Status') }}</th></tr></thead>
+        <tbody>
+          {% for inv in recent_invites %}
+          <tr>
+            <td style="font-size:.875rem">{{ inv.email }}</td>
+            <td style="font-size:.78rem;color:var(--text-muted)">
+              {{ inv.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </td>
+            <td>
+              {% if inv.used_at %}
+              <span class="badge badge-confirmed">{{ _('Angenommen') }}</span>
+              {% elif inv.is_expired %}
+              <span class="badge badge-cancelled">{{ _('Abgelaufen') }}</span>
+              {% else %}
+              <span class="badge badge-pending">{{ _('Ausstehend') }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

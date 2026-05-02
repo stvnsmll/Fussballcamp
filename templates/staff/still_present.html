@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}staff/still_present{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Noch anwesend</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      Tag {{ camp_day }} · {{ today.strftime('%d.%m.%Y') }}
+      — {{ still_present | length }} Kind(er)
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block extra_style %}
+/* auto-refresh indicator */
+.refresh-badge {
+  font-size:.72rem;color:rgba(255,255,255,.45);
+  display:flex;align-items:center;gap:.3rem;
+}
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  {% if not still_present %}
+  <div class="alert alert-success animate-in">
+    <strong>Alle Kinder sind ausgecheckt.</strong> Gute Arbeit!
+  </div>
+  {% else %}
+  <div class="row g-3">
+    {% for item in still_present %}
+    <div class="col-md-6 animate-in animate-in-{{ loop.index % 4 }}">
+      <div class="card" style="{{ 'border-left:4px solid #ef4444' if not item.independent_travel else 'border-left:4px solid #22c55e' }}">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-700">{{ item.child.full_name }}</div>
+              <div class="text-muted" style="font-size:.8rem">
+                {{ item.age_group.name if item.age_group else '' }}
+              </div>
+            </div>
+            {% if item.independent_travel %}
+            <span class="badge badge-confirmed"><i class="bi bi-person-walking"></i> Alleine</span>
+            {% else %}
+            <span class="badge badge-cancelled"><i class="bi bi-car-front"></i> Abholung</span>
+            {% endif %}
+          </div>
+
+          {% if item.emergency_contacts %}
+          {% set ec = item.emergency_contacts[0] %}
+          <div class="mt-2 pt-2" style="border-top:1px solid var(--cream-dark);font-size:.82rem">
+            <span class="text-muted">Notfallkontakt:</span>
+            <strong>{{ ec.full_name }}</strong>
+            <a href="tel:{{ ec.phone_primary }}" class="ms-2">{{ ec.phone_primary }}</a>
+          </div>
+          {% endif %}
+
+          <div class="mt-2">
+            <a href="{{ url_for('staff.confirm_checkout', registration_id=item.registration.id) }}"
+               class="btn btn-sm btn-primary">Auschecken</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Auto-refresh every 60 seconds
+setTimeout(() => location.reload(), {{ auto_refresh_seconds * 1000 }});
+</script>
+{% endblock %}

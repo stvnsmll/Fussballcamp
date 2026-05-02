@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Datenschutzerklärung</h1>
+    <p style="color:rgba(255,255,255,.55);font-size:.8rem;margin:.4rem 0 0">
+      Stand: {{ config.PRIVACY_POLICY_LAST_UPDATED }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+.legal-section { margin-bottom: 2.5rem; }
+.legal-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: .75rem;
+  padding-bottom: .4rem;
+  border-bottom: 2px solid var(--lime);
+  display: inline-block;
+}
+.legal-section p, .legal-section li { font-size: .9rem; line-height: 1.75; color: #2d3e33; }
+{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:780px">
+
+  <div class="legal-section animate-in">
+    <h2>1. Verantwortlicher</h2>
+    <p>
+      Verantwortlich im Sinne der DSGVO ist:<br>
+      <strong>{{ config.CAMP_ORGANISER_NAME or config.CAMP_NAME }}</strong><br>
+      {% if config.CAMP_ORGANISER_ADDRESS %}
+      {{ config.CAMP_ORGANISER_ADDRESS }}<br>
+      {% endif %}
+      E-Mail: <a href="mailto:{{ config.CAMP_CONTACT_EMAIL }}">{{ config.CAMP_CONTACT_EMAIL }}</a><br>
+      {% if config.CAMP_CONTACT_PHONE %}
+      Telefon: {{ config.CAMP_CONTACT_PHONE }}
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>2. Erhobene Daten und Zwecke</h2>
+    <p>Wir verarbeiten personenbezogene Daten ausschließlich zur Organisation des Fußballcamps:</p>
+    <ul>
+      <li><strong>Elternkonto:</strong> Name, E-Mail-Adresse, Telefonnummer, Postanschrift — für die Kommunikation und Anmeldung</li>
+      <li><strong>Kinddaten:</strong> Vorname, Nachname, Geburtsdatum — zur Einteilung in Altersgruppen</li>
+      <li><strong>Medizinische Hinweise:</strong> nur wenn freiwillig angegeben, nur für Trainer sichtbar</li>
+      <li><strong>Notfallkontakte:</strong> Name und Telefon — nur für Notfälle während des Camps</li>
+      <li><strong>Einwilligungen:</strong> Fotoerlaubnis, Heimweg alleine — mit Datum und Version gespeichert</li>
+      <li><strong>Check-in/Check-out-Daten:</strong> Anwesenheitszeiten während des Camps — für die Aufsichtspflicht</li>
+      <li><strong>Technische Nutzungsdaten:</strong> Anonyme Performance-Metriken (Gerättyp, Seitenaufrufe, Antwortzeiten) — keine personenbezogenen Daten, kein Tracking</li>
+    </ul>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>3. Rechtsgrundlage</h2>
+    <p>
+      Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)
+      sowie Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung, hier: Teilnahme am Camp).
+      Medizinische Hinweise werden nach Art. 9 Abs. 2 lit. c DSGVO verarbeitet
+      (Schutz lebenswichtiger Interessen).
+    </p>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>4. Datenweitergabe</h2>
+    <p>
+      Ihre Daten werden <strong>nicht</strong> an Dritte weitergegeben, verkauft oder für
+      Werbezwecke genutzt. Eine Weitergabe erfolgt nur, wenn wir gesetzlich dazu verpflichtet sind.
+    </p>
+    <p>
+      Für den E-Mail-Versand nutzen wir SendGrid (Twilio Inc., USA) als Auftragsverarbeiter.
+      Es besteht ein Auftragsverarbeitungsvertrag. Die Übermittlung in die USA erfolgt
+      auf Grundlage von Standardvertragsklauseln (Art. 46 DSGVO).
+    </p>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>5. Speicherdauer</h2>
+    <p>
+      Kontodaten werden {{ config.DATA_RETENTION_YEARS }} Jahre nach der letzten Campanmeldung gelöscht.
+      Vor der Löschung erhalten Sie eine Benachrichtigung per E-Mail.
+      Sie können Ihr Konto jederzeit selbst löschen (siehe Abschnitt 7).
+    </p>
+    <p>
+      Check-in-Daten werden nach Abschluss des Camps gelöscht.
+      Anonymisierte Statistiken (ohne Personenbezug) können länger gespeichert werden.
+    </p>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>6. Cookies</h2>
+    <p>
+      Diese Anwendung verwendet ausschließlich technisch notwendige Cookies:
+    </p>
+    <ul>
+      <li><strong>Session-Cookie:</strong> Enthält Ihre Sitzungs-ID, kein Name, keine E-Mail. Wird beim Abmelden gelöscht.</li>
+      <li><strong>Remember-Me-Cookie:</strong> Optionaler Langzeit-Cookie wenn Sie „Angemeldet bleiben" wählen.</li>
+    </ul>
+    <p>
+      Es werden keine Tracking-Cookies, Analyse-Cookies oder Werbe-Cookies gesetzt.
+      Eine Einwilligungsbanner ist daher nicht erforderlich.
+    </p>
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>7. Ihre Rechte (Art. 15–22 DSGVO)</h2>
+    <ul>
+      <li><strong>Auskunft</strong> (Art. 15): Sie können jederzeit Auskunft über Ihre gespeicherten Daten erhalten.</li>
+      <li><strong>Berichtigung</strong> (Art. 16): Sie können unrichtige Daten in Ihrem Konto korrigieren.</li>
+      <li><strong>Löschung</strong> (Art. 17): Sie können Ihr Konto im Bereich „Datenschutz" löschen.</li>
+      <li><strong>Datenübertragbarkeit</strong> (Art. 20): Sie können Ihre Daten als JSON-Datei herunterladen.</li>
+      <li><strong>Widerspruch</strong> (Art. 21): Sie können der Verarbeitung jederzeit widersprechen.</li>
+      <li><strong>Beschwerde</strong>: Sie haben das Recht, sich bei einer Aufsichtsbehörde zu beschweren.</li>
+    </ul>
+    {% if current_user.is_authenticated and current_user.role == 'parent' %}
+    <div class="mt-3">
+      <a href="{{ url_for('parents.data_privacy') }}" class="btn btn-outline-primary btn-sm">
+        Meine Datenschutzoptionen →
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="legal-section animate-in">
+    <h2>8. Kontakt Datenschutz</h2>
+    <p>
+      Bei Fragen zum Datenschutz wenden Sie sich an:<br>
+      <a href="mailto:{{ config.CAMP_CONTACT_EMAIL }}">{{ config.CAMP_CONTACT_EMAIL }}</a>
+    </p>
+  </div>
+
+</div>
+{% endblock %}

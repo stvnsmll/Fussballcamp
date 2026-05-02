@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}auth/login{% endblock %}
+{% block extra_style %}
+.auth-wrap { min-height: calc(100vh - 130px); display:flex; align-items:center; }
+.auth-card { max-width: 420px; width: 100%; margin: 0 auto; }
+.auth-card .card { border: none; box-shadow: var(--shadow-lg); }
+.auth-card .card-body { padding: 2rem; }
+.auth-header { text-align:center; margin-bottom: 1.75rem; }
+.auth-header h1 { font-size: 1.9rem; font-weight: 800; text-transform: uppercase; }
+.auth-header .subtitle { color: var(--text-muted); font-size:.9rem; margin-top:.3rem; }
+{% endblock %}
+{% block content %}
+<div class="auth-wrap py-4" style="flex-direction:column;gap:2rem">
+
+<div class="text-center">
+  {% if config.CAMP_LOGO_PATH or config.CAMP_LOGO_DARK_PATH %}
+  <img src="{{ url_for('static', filename=config.CAMP_LOGO_PATH or config.CAMP_LOGO_DARK_PATH) }}"
+       alt="{{ config.CAMP_NAME }}" style="max-height:64px;width:auto;object-fit:contain">
+  {% else %}
+  <img src="{{ url_for('static', filename='images/placeholder/logo-placeholder.svg') }}"
+       alt="{{ _('Logo') }}" style="max-height:52px;width:auto;object-fit:contain;opacity:.65">
+  {% endif %}
+</div>
+
+<div class="auth-card animate-in">
+  <div class="card">
+    <div class="card-body">
+      <div class="auth-header">
+        <div style="font-size:2rem"><i class="icon-fussball"></i></div>
+        <h1>{{ _('Willkommen') }}</h1>
+        <p class="subtitle">{{ _('Melden Sie sich in Ihrem Konto an') }}</p>
+      </div>
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.email.label(class='form-label') }}
+          {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), autocomplete='email', value=request.args.get('email', '')) }}
+          {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.password.label(class='form-label') }}
+          <div class="password-wrap">
+            {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else ''), autocomplete='current-password', id='passwordField') }}
+            <button type="button" class="pw-toggle" aria-label="Passwort anzeigen"><i class="bi bi-eye"></i></button>
+          </div>
+          {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="form-check">
+            {{ form.remember_me(class='form-check-input') }}
+            {{ form.remember_me.label(class='form-check-label') }}
+          </div>
+          <a href="{{ url_for('auth.password_reset_request') }}" style="font-size:.85rem">
+            {{ _('Passwort vergessen?') }}
+          </a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">{{ _('Anmelden') }}</button>
+      </form>
+      <hr class="my-3">
+      <p class="text-center text-muted mb-0" style="font-size:.875rem">
+        {{ _('Noch kein Konto?') }}
+        <a href="{{ url_for('auth.register') }}" class="fw-600">{{ _('Jetzt registrieren') }}</a>
+      </p>
+      <p class="text-center mb-0 mt-2" style="font-size:.875rem">
+        <a href="{{ url_for('auth.magic_link_request') }}" class="text-muted">
+          <i class="bi bi-envelope"></i> Ohne Passwort per E-Mail anmelden
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+{% if sponsors is defined and sponsors %}
+<div class="text-center w-100" style="max-width:480px">
+  <div class="text-muted mb-2" style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase">
+    {{ _('Sponsoren') }}
+  </div>
+  <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
+    {% for sponsor in sponsors %}
+    {% if sponsor.url %}<a href="{{ sponsor.url }}" target="_blank" rel="noopener noreferrer">{% endif %}
+    <img src="{{ url_for('static', filename='sponsors/' + sponsor.logo_file) if sponsor.logo_file else url_for('static', filename='images/placeholder/sponsor-placeholder.svg') }}"
+         alt="{{ sponsor.name }}" style="height:36px;width:auto;max-width:100px;object-fit:contain;opacity:.6;filter:grayscale(40%)"
+         onerror="this.src='/static/images/placeholder/sponsor-placeholder.svg'">
+    {% if sponsor.url %}</a>{% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+</div>
+{% block scripts %}
+<script>
+(function() {
+  var pw = new URLSearchParams(window.location.search).get('pw');
+  if (pw) {
+    var f = document.getElementById('passwordField');
+    if (f) f.value = pw;
+  }
+})();
+</script>
+{% endblock %}
+{% endblock %}

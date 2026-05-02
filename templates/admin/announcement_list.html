@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Neuigkeiten') }}</h1>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{ url_for('announcements.feed') }}" class="btn btn-outline-secondary btn-sm">← Alle Neuigkeiten</a>
+    <a href="{{ url_for('admin.announcement_create') }}" class="btn btn-lime">+ {{ _('Neue Neuigkeit') }}</a>
+  </div>
+
+  {% if not announcements %}
+  <div class="card text-center py-5" style="border:2px dashed var(--cream-dark)">
+    <div class="card-body">
+      <div style="font-size:2.5rem;opacity:.25"><i class="bi bi-megaphone"></i></div>
+      <p class="text-muted mt-2 mb-3">{{ _('Noch keine Neuigkeiten erstellt.') }}</p>
+      <a href="{{ url_for('admin.announcement_create') }}" class="btn btn-primary">{{ _('Erste Neuigkeit') }}</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="card" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>{{ _('Titel') }}</th><th>{{ _('Sichtbarkeit') }}</th><th>{{ _('Gepinnt') }}</th><th>{{ _('Datum') }}</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for ann in announcements %}
+          <tr>
+            <td class="fw-600">
+              {% if ann.is_pinned %}<i class="bi bi-pin-angle"></i> {% endif %}{{ ann.title }}
+            </td>
+            <td>
+              <span class="badge"
+                    style="{% if ann.visibility == 'open' %}background:rgba(34,197,94,.12);color:#15803d{% elif ann.visibility == 'staff' %}background:rgba(99,102,241,.1);color:#4f46e5{% else %}background:rgba(59,130,246,.1);color:#1d4ed8{% endif %}">
+                {% if ann.visibility == 'open' %}Öffentlich{% elif ann.visibility == 'staff' %}Intern{% else %}Alle Nutzer{% endif %}
+              </span>
+            </td>
+            <td style="text-align: center;"><i class="{{ 'bi bi-check' if ann.is_pinned else '—' }}"></i></td>
+            <td style="font-size:.8rem;white-space:nowrap">
+              {{ ann.created_at.strftime('%d.%m.%Y') }}
+            </td>
+            <td>
+              <div class="d-flex gap-1 justify-content-end">
+                <a href="{{ url_for('admin.announcement_edit', announcement_id=ann.id) }}"
+                   class="btn btn-xs btn-outline-primary" style="font-size:.72rem;padding:.2rem .5rem">
+                  {{ _('Bearbeiten') }}
+                </a>
+                <form method="POST"
+                      action="{{ url_for('admin.announcement_delete', announcement_id=ann.id) }}"
+                      id="delAnnForm-{{ ann.id }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="button" class="btn btn-xs btn-outline-danger"
+                          style="font-size:.72rem;padding:.2rem .5rem"
+                          onclick="showConfirmModal({iconClass:'bi-megaphone-fill',iconColor:'#dc2626',title:'Neuigkeit löschen?',body:'Diese Ankündigung wird dauerhaft gelöscht.',confirmLabel:'Ja, löschen',onConfirm:function(){document.getElementById('delAnnForm-{{ ann.id }}').submit();}})">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

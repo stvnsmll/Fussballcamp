@@ -1,0 +1,241 @@
+{% extends "email_templates/_base_email.html" %}
+
+{% block title %}Anmeldebestätigung – {{ child.full_name }} – {{ camp_name }}{% endblock %}
+{% block preheader %}
+  {% if registration.is_confirmed %}
+    {{ child.full_name }} ist für {{ camp_name }} {{ camp_session.year }} angemeldet. <span style="font-family:sans-serif">&#10003;</span>
+  {% else %}
+    {{ child.full_name }} steht auf der Warteliste für {{ camp_name }} {{ camp_session.year }}.
+  {% endif %}
+{% endblock %}
+
+{% block header_stripe %}
+<tr>
+  <td style="background-color:{% if registration.is_confirmed %}#b8f442{% else %}#fbbf24{% endif %};padding:10px 40px;">
+    <p style="margin:0;font-size:12px;font-weight:700;
+              color:{% if registration.is_confirmed %}#1b3f2a{% else %}#78350f{% endif %};
+              letter-spacing:.06em;text-transform:uppercase;">
+      {% if registration.is_confirmed %}<span style="font-family:sans-serif">&#10003;</span> Anmeldung bestätigt{% else %}⏳ Warteliste{% endif %}
+    </p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+
+  {# Greeting #}
+  <h1 style="margin:0 0 6px;font-size:23px;font-weight:800;color:#1a1a1a;line-height:1.25;letter-spacing:-0.4px;">
+    Hallo {{ user.first_name }},
+  </h1>
+  <p style="margin:0 0 28px;font-size:15px;color:#4b5563;line-height:1.6;">
+    {% if registration.is_confirmed %}
+      die Anmeldung von <strong style="color:#1b3f2a;">{{ child.full_name }}</strong> für das
+      <strong style="color:#1b3f2a;">{{ camp_name }} {{ camp_session.year }}</strong>
+      ist eingegangen und bestätigt. Wir freuen uns auf {{ child.first_name }}!
+    {% else %}
+      <strong style="color:#1b3f2a;">{{ child.full_name }}</strong> steht auf der
+      Warteliste für das <strong>{{ camp_name }} {{ camp_session.year }}</strong>.
+      Wir melden uns sofort, wenn ein Platz frei wird.
+    {% endif %}
+  </p>
+
+  {# Summary card #}
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+         style="margin:0 0 28px;border-radius:10px;overflow:hidden;border:1px solid #e8e8e1;">
+
+    {# Card header #}
+    <tr>
+      <td colspan="2"
+          style="background-color:#1b3f2a;padding:12px 20px;">
+        <p style="margin:0;font-size:13px;font-weight:700;color:#b8f442;letter-spacing:.04em;text-transform:uppercase;">
+          Anmeldungsdetails
+        </p>
+      </td>
+    </tr>
+
+    {# Child name #}
+    <tr style="border-bottom:1px solid #e8e8e1;">
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;background:#fff;width:40%;vertical-align:top;">
+        Kind
+      </td>
+      <td style="padding:12px 20px;font-size:14px;font-weight:700;color:#1a1a1a;background:#fff;vertical-align:top;">
+        {{ child.full_name }}
+      </td>
+    </tr>
+
+    {# Camp #}
+    <tr style="border-bottom:1px solid #e8e8e1;">
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;background:#f9f9f7;vertical-align:top;">
+        Camp
+      </td>
+      <td style="padding:12px 20px;font-size:14px;color:#1a1a1a;background:#f9f9f7;vertical-align:top;">
+        {{ camp_name }} {{ camp_session.year }}
+      </td>
+    </tr>
+
+    {# Dates #}
+    <tr style="border-bottom:1px solid #e8e8e1;">
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;background:#fff;vertical-align:top;">
+        Zeitraum
+      </td>
+      <td style="padding:12px 20px;font-size:14px;color:#1a1a1a;background:#fff;vertical-align:top;">
+        {{ camp_session.start_date.strftime('%d.%m.%Y') }}
+        &ndash;
+        {{ camp_session.end_date.strftime('%d.%m.%Y') }}
+        &nbsp;({{ (camp_session.end_date - camp_session.start_date).days + 1 }} Tage)
+      </td>
+    </tr>
+
+    {# Location #}
+    {% if camp_session.location %}
+    <tr style="border-bottom:1px solid #e8e8e1;">
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;background:#f9f9f7;vertical-align:top;">
+        Ort
+      </td>
+      <td style="padding:12px 20px;font-size:14px;color:#1a1a1a;background:#f9f9f7;vertical-align:top;">
+        {{ camp_session.location }}
+      </td>
+    </tr>
+    {% endif %}
+
+    {# Age group (if already assigned) #}
+    {% if registration.age_group %}
+    <tr style="border-bottom:1px solid #e8e8e1;">
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;background:#fff;vertical-align:top;">
+        Altersgruppe
+      </td>
+      <td style="padding:12px 20px;font-size:14px;color:#1a1a1a;background:#fff;vertical-align:top;">
+        {{ registration.age_group.name }}
+      </td>
+    </tr>
+    {% endif %}
+
+    {# Status #}
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#6b7280;
+                 background:{% if registration.is_confirmed %}#f0fdf4{% else %}#fffbeb{% endif %};
+                 border-radius:0 0 0 10px;vertical-align:top;">
+        Status
+      </td>
+      <td style="padding:12px 20px;font-size:14px;font-weight:700;
+                 color:{% if registration.is_confirmed %}#15803d{% else %}#92400e{% endif %};
+                 background:{% if registration.is_confirmed %}#f0fdf4{% else %}#fffbeb{% endif %};
+                 border-radius:0 0 10px 0;vertical-align:top;">
+        {% if registration.is_confirmed %}
+          <span style="font-family:sans-serif">&#10003;</span> Bestätigt
+        {% else %}
+          ⏳ Warteliste
+          {% if registration.waitlist_position %}
+            – Position {{ registration.waitlist_position }}
+          {% endif %}
+        {% endif %}
+      </td>
+    </tr>
+
+  </table>
+
+  {% if registration.is_confirmed %}
+
+    {# QR-Code hint #}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           style="margin:0 0 24px;border-radius:8px;overflow:hidden;">
+      <tr>
+        <td style="background-color:#f0fdf4;border-left:4px solid #22c55e;padding:14px 16px;">
+          <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#15803d;">
+            <span style="font-family:sans-serif">&#128241;</span> QR-Code für das Check-in
+          </p>
+          <p style="margin:0;font-size:13px;color:#166534;line-height:1.5;">
+            Im Elternbereich finden Sie den persönlichen QR-Code für
+            {{ child.first_name }}. Haben Sie ihn beim Check-in täglich dabei
+            (am Handy oder ausgedruckt).
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    {# What to bring #}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           style="margin:0 0 28px;border-radius:8px;overflow:hidden;border:1px solid #e8e8e1;">
+      <tr>
+        <td style="background-color:#1b3f2a;padding:10px 18px;">
+          <p style="margin:0;font-size:12px;font-weight:700;color:#b8f442;letter-spacing:.05em;text-transform:uppercase;">
+            Was {{ child.first_name }} mitbringen sollte
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color:#ffffff;padding:16px 18px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+            {% set items = [
+              ('⚽', 'Fußballschuhe und Schienbeinschoner'),
+              ('<span style="font-family:sans-serif">&#128092;</span>', 'Sportkleidung (für mehrere Tage)'),
+              ('<span style="font-family:sans-serif">&#128167;</span>', 'Trinkflasche (mind. 1 Liter)'),
+              ('<span style="font-family:sans-serif">&#9728;</span>', 'Sonnencreme und Kopfbedeckung'),
+              ('🩺', 'Alle notwendigen Medikamente beschriftet'),
+            ] %}
+            {% for icon, text in items %}
+            <tr>
+              <td style="padding:5px 0;font-size:13px;color:#1a1a1a;line-height:1.5;vertical-align:top;width:26px;">
+                {{ icon }}&nbsp;
+              </td>
+              <td style="padding:5px 0;font-size:13px;color:#374151;line-height:1.5;vertical-align:top;">
+                {{ text }}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    {# CTA button #}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">
+      <tr>
+        <td style="background-color:#b8f442;border-radius:9px;">
+          <a href="{{ account_url }}"
+             class="cta-button"
+             style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:800;
+                    color:#1b3f2a;text-decoration:none;border-radius:9px;
+                    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            Zum Elternbereich →
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:8px 0 0;font-size:12px;color:#9ca3af;">
+      Dort finden Sie QR-Code, Anmeldungsdetails und Neuigkeiten.
+    </p>
+
+  {% else %}
+
+    {# Waitlist messaging #}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+           style="margin:0 0 24px;border-radius:8px;overflow:hidden;">
+      <tr>
+        <td style="background-color:#fffbeb;border-left:4px solid #fbbf24;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#78350f;line-height:1.6;">
+            Sobald ein Platz für {{ child.first_name }} frei wird, erhalten Sie
+            umgehend eine Nachricht. Eine manuelle Nachrückreihenfolge wird
+            durch das Camp-Team verwaltet.
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">
+      <tr>
+        <td style="background-color:#b8f442;border-radius:9px;">
+          <a href="{{ account_url }}"
+             class="cta-button"
+             style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:800;
+                    color:#1b3f2a;text-decoration:none;border-radius:9px;
+                    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+            Elternbereich öffnen →
+          </a>
+        </td>
+      </tr>
+    </table>
+
+  {% endif %}
+
+{% endblock %}

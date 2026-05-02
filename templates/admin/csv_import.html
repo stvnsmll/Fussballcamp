@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}admin/csv_import{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1><i class="bi bi-file-earmark-arrow-up"></i> Historischer CSV-Import</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0;font-size:.9rem">
+      Vergangene Teilnehmer importieren — ohne aktive Konten, ohne E-Mail-Versand
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5" style="max-width:860px">
+
+  {% if committed %}
+  {# ── Success ── #}
+  <div class="card animate-in" style="border-color:var(--green-600)">
+    <div class="card-body text-center py-5">
+      <div style="font-size:3rem;color:var(--green-600)"><i class="bi bi-check-circle-fill"></i></div>
+      <h2 class="h4 fw-800 mt-3">Import abgeschlossen</h2>
+      <p class="text-muted">{{ success_count }} Kind(er) wurden erfolgreich importiert.</p>
+      <div class="d-flex gap-2 justify-content-center mt-3">
+        <a href="{{ url_for('admin.csv_import') }}" class="btn btn-outline-secondary">Weiterer Import</a>
+        <a href="{{ url_for('admin.child_list') }}" class="btn btn-primary">Kinder ansehen</a>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+
+  {# ── Info box ── #}
+  <div class="alert alert-info mb-4 animate-in">
+    <div class="fw-700 mb-1"><i class="bi bi-info-circle"></i> Hinweise zum Import</div>
+    <ul class="mb-0 mt-1" style="font-size:.875rem;padding-left:1.25rem">
+      <li>Importierte Konten sind <strong>inaktiv</strong> und können sich nicht einloggen</li>
+      <li>Foto-Einwilligung wird immer auf <strong>Nein</strong> gesetzt</li>
+      <li>E-Mails werden als Platzhalter gespeichert (<code>hist_...@import.local</code>)</li>
+      <li>Datenschutz-Aufbewahrungsfristen gelten normal</li>
+      <li>Ein Admin kann ein historisches Konto später reaktivieren und eine echte E-Mail setzen</li>
+    </ul>
+  </div>
+
+  {# ── CSV format ── #}
+  <div class="card mb-4 animate-in animate-in-2">
+    <div class="card-header">CSV-Format</div>
+    <div class="card-body">
+      <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.75rem">
+        Eine Zeile pro Kind. Mehrere Kinder derselben Familie = gleiche Eltern-E-Mail in mehreren Zeilen.
+      </p>
+      <code style="font-size:.78rem;display:block;background:var(--cream-dark);padding:.75rem;border-radius:8px;white-space:pre-wrap">parent_first_name,parent_last_name,parent_email,parent_phone,child_first_name,child_last_name,child_dob,medical_notes,emergency_contact_name,emergency_contact_phone
+
+Thomas,Müller,t.mueller@mail.de,0171234567,Lena,Müller,15.03.2015,,Oma Müller,0175987654
+Thomas,Müller,t.mueller@mail.de,0171234567,Max,Müller,22.07.2018,,Oma Müller,0175987654
+Anna,Schmidt,a.schmidt@mail.de,0162345678,Sophie,Schmidt,08.11.2016,Laktoseintoleranz,Papa Schmidt,0163456789</code>
+      <div class="mt-2" style="font-size:.78rem;color:var(--text-muted)">
+        Pflichtfelder: <code>parent_first_name</code>, <code>parent_last_name</code>,
+        <code>child_first_name</code>, <code>child_dob</code> (TT.MM.JJJJ oder JJJJ-MM-TT)
+      </div>
+    </div>
+  </div>
+
+  {# ── Import form ── #}
+  <div class="card animate-in animate-in-3">
+    <div class="card-header">Daten importieren</div>
+    <div class="card-body p-4">
+      <form method="POST" enctype="multipart/form-data" id="importForm">
+        {{ csrf_token() if csrf_token is defined else '' }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="preview" id="actionField">
+
+        <div class="mb-4">
+          <label class="form-label fw-600">Ziel-Camp <span class="text-danger">*</span></label>
+          {% if target_camps %}
+          <select name="camp_id" class="form-select" required>
+            <option value="">— Camp auswählen —</option>
+            {% for camp in target_camps %}
+            <option value="{{ camp.id }}">
+              {{ camp.name }} ({{ camp.start_date.strftime('%Y') }}) — {{ camp.status }}
+            </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Nur archivierte/abgeschlossene Camps werden angezeigt</div>
+          {% else %}
+          <div class="alert alert-warning mb-0">
+            Kein archiviertes Camp gefunden.
+            <a href="{{ url_for('admin.camp_list') }}">Camp erstellen und archivieren →</a>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-600">CSV-Datei hochladen</label>
+          <input type="file" name="csv_file" class="form-control" accept=".csv,.txt">
+        </div>
+
+        <div class="text-center text-muted my-2" style="font-size:.8rem">— oder —</div>
+
+        <div class="mb-4">
+          <label class="form-label fw-600">CSV-Text direkt einfügen</label>
+          <textarea name="csv_text" class="form-control" rows="8"
+                    style="font-family:monospace;font-size:.8rem"
+                    placeholder="parent_first_name,parent_last_name,...">{{ request.form.get('csv_text', '') }}</textarea>
+        </div>
+
+        {% if errors %}
+        <div class="alert alert-danger mb-4">
+          <div class="fw-700 mb-2"><i class="bi bi-exclamation-triangle"></i> {{ errors|length }} Fehler gefunden</div>
+          <ul class="mb-0" style="font-size:.85rem;padding-left:1.25rem">
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if preview_rows and not errors %}
+        {# ── Preview table ── #}
+        <div class="mb-4">
+          <div class="fw-700 mb-2">
+            <i class="bi bi-eye"></i> Vorschau — {{ row_count }} Zeile(n),
+            {{ preview_rows|length }} Familie(n)
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm" style="font-size:.82rem">
+              <thead>
+                <tr>
+                  <th>Elternteil</th>
+                  <th>E-Mail (wird anonymisiert)</th>
+                  <th>Kind</th>
+                  <th>Geburtsdatum</th>
+                  <th>Med.</th>
+                  <th>Notfallkontakt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in preview_rows %}
+                {% for ch in p.children %}
+                <tr>
+                  {% if loop.first %}
+                  <td rowspan="{{ p.children|length }}" style="vertical-align:top;border-right:2px solid var(--cream-dark)">
+                    <div class="fw-600">{{ p.first_name }} {{ p.last_name }}</div>
+                    <div class="text-muted" style="font-size:.75rem">{{ p.phone or '—' }}</div>
+                  </td>
+                  <td rowspan="{{ p.children|length }}" style="vertical-align:top">
+                    {% if p.email %}
+                    <span class="text-muted" style="font-size:.75rem">{{ p.email }}</span>
+                    <div class="badge" style="background:rgba(239,68,68,.1);color:#dc2626;font-size:.65rem">→ anonymisiert</div>
+                    {% else %}
+                    <span class="text-muted">—</span>
+                    {% endif %}
+                  </td>
+                  {% endif %}
+                  <td class="fw-600">{{ ch.first_name }} {{ ch.last_name }}</td>
+                  <td>{{ ch.dob.strftime('%d.%m.%Y') if ch.dob else '❌ ungültig' }}</td>
+                  <td>{{ '⚕' if ch.medical else '—' }}</td>
+                  <td style="font-size:.75rem">{{ ch.ec_name or '—' }}</td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mb-4" style="font-size:.875rem">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>Bereit zum Import.</strong>
+          Foto-Einwilligung wird auf <strong>Nein</strong> gesetzt.
+          Alle Konten werden als <strong>inaktiv</strong> angelegt.
+          Diese Aktion kann nicht automatisch rückgängig gemacht werden.
+        </div>
+        {% endif %}
+
+        {% if target_camps %}
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="submit" class="btn btn-outline-primary"
+                  onclick="document.getElementById('actionField').value='preview'">
+            <i class="bi bi-eye"></i> Vorschau
+          </button>
+          {% if preview_rows and not errors %}
+          <button type="button" class="btn btn-success"
+                  onclick="showConfirmModal({
+                    iconClass:'bi-file-earmark-arrow-up',
+                    iconColor:'#15803d',
+                    titleColor:'#15803d',
+                    title:'Import bestätigen?',
+                    body:'{{ preview_rows|length }} Familie(n) mit {{ row_count }} Kind(ern) werden importiert.',
+                    warning:'Alle Konten werden inaktiv angelegt. Foto-Einwilligung = Nein.',
+                    confirmLabel:'Ja, importieren',
+                    confirmClass:'btn-success',
+                    onConfirm:function(){
+                      document.getElementById(\"actionField\").value=\"commit\";
+                      document.getElementById(\"importForm\").submit();
+                    }
+                  })">
+            <i class="bi bi-check-circle"></i> Importieren
+          </button>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </form>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

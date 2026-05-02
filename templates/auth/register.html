@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}auth/register{% endblock %}
+{% block extra_style %}
+.auth-wrap { min-height: calc(100vh - 130px); display:flex; align-items:center; padding:2rem 0; }
+.auth-card { max-width:520px; width:100%; margin:0 auto; }
+.auth-card .card { border:none; box-shadow: var(--shadow-lg); }
+.auth-card .card-body { padding: 2rem; }
+.form-control.is-valid,
+.form-control.is-invalid {
+  background-image: none !important;
+  padding-right: 12px; /* optional: reset spacing if bootstrap added extra */
+}
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+<div class="auth-card animate-in">
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center mb-4">
+        <div style="font-size:2rem"><i class="bi bi-hand-wave"></i></div>
+        <h1 class="h3 fw-800 text-uppercase mt-1">{{ _('Konto erstellen') }}</h1>
+        <p class="text-muted" style="font-size:.9rem">{{ _('Kostenlos registrieren und Kind anmelden') }}</p>
+      </div>
+      {% if duplicate_email %}
+      <div class="alert" style="background:#fff8e1;border:1px solid #f59e0b;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem">
+        <div class="fw-700 mb-1"><i class="bi bi-hand-wave"></i> Sieht aus, als hätten Sie bereits ein Konto!</div>
+        <p class="mb-2" style="font-size:.875rem;color:#6b7280">
+          Die E-Mail-Adresse <strong>{{ duplicate_email }}</strong> ist bereits registriert.
+        </p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Anmelden</a>
+          <a href="{{ url_for('auth.password_reset_request') }}" class="btn btn-outline-secondary btn-sm">Passwort vergessen?</a>
+        </div>
+      </div>
+      {% endif %}
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        {{ form.hidden_tag() }}
+        <div class="field-trap" aria-hidden="true" tabindex="-1">
+          {{ form.website(tabindex='-1', autocomplete='off') }}
+        </div>
+        {{ form.form_start() }}
+        <div class="row g-3">
+          <div class="col-6">
+            {{ form.first_name.label(class='form-label') }}
+            {{ form.first_name(class='form-control' + (' is-invalid' if form.first_name.errors else '')) }}
+            {% for e in form.first_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-6">
+            {{ form.last_name.label(class='form-label') }}
+            {{ form.last_name(class='form-control' + (' is-invalid' if form.last_name.errors else '')) }}
+            {% for e in form.last_name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+        <div class="mt-3">
+          {{ form.email.label(class='form-label') }}
+          {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), autocomplete='email') }}
+          {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="row g-3 mt-0">
+          <div class="col-12 col-sm-6">
+            {{ form.phone.label(class='form-label') }}
+            {{ form.phone(class='form-control' + (' is-invalid' if form.phone.errors else ''), type='tel', autocomplete='tel', placeholder='z.B. +49 151 12345678') }}
+            {% for e in form.phone.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            <div class="form-text">{{ form.phone.description }}</div>
+          </div>
+          <div class="col-12 col-sm-6">
+            {{ form.phone_confirm.label(class='form-label') }}
+            {{ form.phone_confirm(class='form-control' + (' is-invalid' if form.phone_confirm.errors else ''), type='tel', autocomplete='off', placeholder='Nummer wiederholen') }}
+            {% for e in form.phone_confirm.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            <div id="phone-match-msg" style="font-size:.8rem;margin-top:.25rem"></div>
+          </div>
+        </div>
+        <div class="mt-3">
+          {{ form.password.label(class='form-label') }}
+          <div class="password-wrap">
+            {{ form.password(class='form-control' + (' is-invalid' if form.password.errors else ''), autocomplete='new-password') }}
+            <button type="button" class="pw-toggle" aria-label="Passwort anzeigen"><i class="bi bi-eye"></i></button>
+          </div>
+          {% for e in form.password.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mt-3">
+          {{ form.password_confirm.label(class='form-label') }}
+          <div class="password-wrap">
+            {{ form.password_confirm(class='form-control' + (' is-invalid' if form.password_confirm.errors else ''), autocomplete='new-password') }}
+            <button type="button" class="pw-toggle" aria-label="Passwort anzeigen"><i class="bi bi-eye"></i></button>
+          </div>
+          {% for e in form.password_confirm.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          <div id="pw-match-msg" style="font-size:.8rem;margin-top:.25rem"></div>
+        </div>
+        <div class="mt-4 p-3 rounded" style="background:var(--cream-dark)">
+          <div class="form-check consent-check">
+            {{ form.consent(class='form-check-input' + (' is-invalid' if form.consent.errors else '')) }}
+            <label class="form-check-label" for="{{ form.consent.id }}">
+              {{ _('Ich habe die') }}
+              <a href="{{ url_for('public.datenschutz') }}" target="_blank">{{ _('Datenschutzerklärung') }}</a>
+              {{ _('gelesen und stimme der Verarbeitung meiner Daten zu.') }}
+            </label>
+            {% for e in form.consent.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-lime w-100 btn-lg mt-4">{{ _('Konto erstellen') }}</button>
+      </form>
+      <hr class="my-3">
+      <p class="text-center text-muted mb-0" style="font-size:.875rem">
+        {{ _('Bereits ein Konto?') }} <a href="{{ url_for('auth.login') }}" class="fw-600">{{ _('Anmelden') }}</a>
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+{% block scripts %}
+<script>
+function watchMatch(aId, bId, msgId, matchText, noMatchText) {
+  const a = document.getElementById(aId);
+  const b = document.getElementById(bId);
+  const msg = document.getElementById(msgId);
+  if (!a || !b || !msg) return;
+  let bTouched = false;  // only show feedback once confirm field has been blurred at least once
+  function check() {
+    if (!bTouched || !b.value) {
+      msg.textContent = '';
+      b.classList.remove('is-valid', 'is-invalid');
+      return;
+    }
+    const ok = a.value === b.value;
+    b.classList.toggle('is-valid', ok);
+    b.classList.toggle('is-invalid', !ok);
+    msg.textContent = ok ? matchText : noMatchText;
+    msg.style.color = ok ? 'var(--green-600)' : '#dc2626';
+  }
+  b.addEventListener('blur', function() { bTouched = true; check(); });
+  a.addEventListener('input', check);  // re-check primary only after confirm already touched
+}
+watchMatch('phone', 'phone_confirm', 'phone-match-msg', '✓ Nummern stimmen überein', '✗ Nummern stimmen nicht überein');
+watchMatch('password', 'password_confirm', 'pw-match-msg', '✓ Passwörter stimmen überein', '✗ Passwörter stimmen nicht überein');
+</script>
+{% endblock %}
+{% endblock %}

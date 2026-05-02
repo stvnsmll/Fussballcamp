@@ -1,0 +1,148 @@
+# =============================================================================
+# render.yaml — Fußballcamp on Render.com
+# =============================================================================
+#
+# First-time setup:
+#   1. Push repo to GitHub/GitLab
+#   2. Connect repo in Render dashboard → "New Blueprint"
+#   3. Set the secret env vars (marked generateValue or sync) in the dashboard
+#   4. Render will create the web service + PostgreSQL database automatically
+#
+# Each deploy runs:
+#   build:   pip install + compile translations
+#   release: flask db upgrade  (migrations applied before new code goes live)
+#   start:   gunicorn
+#
+# Costs (as of 2025, free tier):
+#   Web service (Starter):    ~$7/month
+#   PostgreSQL (Starter):     free (90 days) then ~$7/month
+#   Total:                    ~$7–14/month
+# =============================================================================
+
+services:
+  - type: web
+    name: fussballcamp
+    runtime: python
+    region: frankfurt          # eu-central — closest to Germany
+
+    buildCommand: |
+      pip install -r requirements.txt
+      pybabel compile -d translations
+
+    # Release command runs AFTER the new build is ready but BEFORE traffic
+    # is switched over. Safe place for migrations.
+    releaseCommand: flask db upgrade
+
+    startCommand: >
+      gunicorn application:app
+      --workers 2
+      --threads 2
+      --timeout 120
+      --bind 0.0.0.0:$PORT
+      --access-logfile -
+      --error-logfile -
+
+    healthCheckPath: /
+    autoDeploy: true
+
+    envVars:
+      # -----------------------------------------------------------------------
+      # Set by Render automatically
+      # -----------------------------------------------------------------------
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fussballcamp-db
+          property: connectionString
+
+      - key: PORT
+        value: 10000
+
+      # -----------------------------------------------------------------------
+      # Generate once, never changes
+      # -----------------------------------------------------------------------
+      - key: SECRET_KEY
+        generateValue: true
+
+      # -----------------------------------------------------------------------
+      # Fixed values — safe to store in render.yaml
+      # -----------------------------------------------------------------------
+      - key: APP_ENV
+        value: production
+
+      - key: DISABLE_SCHEDULER
+        value: "0"
+
+      - key: DATA_RETENTION_YEARS
+        value: "2"
+
+      - key: ANALYTICS_RETENTION_DAYS
+        value: "365"
+
+      - key: INVITE_TOKEN_EXPIRY_HOURS
+        value: "72"
+
+      - key: VERIFY_TOKEN_EXPIRY_HOURS
+        value: "24"
+
+      # -----------------------------------------------------------------------
+      # Set manually in Render dashboard (sensitive / site-specific)
+      # -----------------------------------------------------------------------
+
+      # Camp identity
+      - key: CAMP_NAME
+        sync: false            # "sync: false" = must be set manually in dashboard
+
+      - key: CAMP_CONTACT_EMAIL
+        sync: false
+
+      - key: CAMP_CONTACT_PHONE
+        sync: false
+
+      - key: CAMP_LOCATION
+        sync: false
+
+      - key: CAMP_ORGANISER_NAME
+        sync: false
+
+      - key: CAMP_ORGANISER_ADDRESS
+        sync: false
+
+      # SendGrid (https://sendgrid.com — free tier: 100 emails/day)
+      # NOTE: Render's free web service blocks outbound SMTP (ports 25/465/587).
+      # For a no-cost demo, set SENDGRID_API_KEY to any non-empty string (e.g. "demo")
+      # and MAIL_SUPPRESS_SEND=1 so the app starts but silently skips email sending.
+      # For real email, sign up for a free SendGrid account and paste the real key.
+      - key: SENDGRID_API_KEY
+        sync: false
+
+      - key: MAIL_DEFAULT_SENDER
+        sync: false            # e.g. noreply@deincamp.de
+
+      # Set to "1" on the free tier (SMTP ports are blocked anyway).
+      # Set to "0" if you add a real SendGrid key and want emails to actually send.
+      - key: MAIL_SUPPRESS_SEND
+        value: "1"
+
+      # AWS S3 for image uploads (optional — omit to use local /tmp/ fallback)
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+      - key: AWS_S3_BUCKET
+        sync: false
+
+      - key: AWS_S3_REGION
+        value: eu-central-1
+
+# =============================================================================
+# PostgreSQL — Render manages backups and connection pooling
+# =============================================================================
+databases:
+  - name: fussballcamp-db
+    databaseName: fussballcamp
+    user: fussballcamp
+    region: frankfurt
+    plan: free                 # free tier — expires after 30 days; recreate for ongoing demos
+    ipAllowList: []            # only internal Render network — no public access

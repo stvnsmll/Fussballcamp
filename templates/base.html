@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="{{ g.locale or 'de' }}" dir="{{ 'rtl' if g.locale == 'ar' else 'ltr' }}">
+<head>
+  <meta charset="UTF-8">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    /* Custom football icon — inherits currentColor like Bootstrap Icons */
+    .icon-fussball {
+      display: inline-block;
+      width: 1em; height: 1em;
+      background-color: currentColor;
+      -webkit-mask-image: url('/static/images/fussball.svg');
+              mask-image: url('/static/images/fussball.svg');
+      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center; mask-position: center;
+      vertical-align: -0.125em;
+    }
+  </style>
+  <meta name="theme-color" content="#1b3f2a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Fußballcamp">
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}{{ title or '' }} — {{ config.CAMP_NAME }}{% endblock %}</title>
+
+  <!-- Fonts: Barlow Condensed (display) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 RTL/LTR -->
+  {% if g.locale == 'ar' %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+  {% else %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  {% endif %}
+
+  <style>
+    /* =====================================================================
+       DESIGN TOKENS
+       ===================================================================== */
+    :root {
+      --green-900:  #0e1a12;
+      --green-800:  #1b3f2a;
+      --green-700:  #245936;
+      --green-600:  #2e7347;
+      --green-400:  #4caf75;
+      --green-200:  #a8dbb8;
+      --lime:       #b8f442;
+      --lime-dark:  #8ec225;
+      --cream:      #f4f3ed;
+      --cream-dark: #e8e6de;
+      --white:      #ffffff;
+      --text-primary:   #0e1a12;
+      --text-secondary: #4a6455;
+      --text-muted:     #7a9485;
+
+      --status-confirmed:  #22c55e;
+      --status-waitlisted: #f59e0b;
+      --status-pending:    #6366f1;
+      --status-cancelled:  #ef4444;
+      --status-attended:   #06b6d4;
+
+      --severity-low:    #22c55e;
+      --severity-medium: #f59e0b;
+      --severity-high:   #ef4444;
+
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --radius:       10px;
+      --radius-lg:    16px;
+      --shadow-sm:    0 1px 3px rgba(14,26,18,.08);
+      --shadow-md:    0 4px 16px rgba(14,26,18,.12);
+      --shadow-lg:    0 12px 40px rgba(14,26,18,.16);
+      --transition:   .18s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* =====================================================================
+       BASE
+       ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+      font-family: var(--font-display);
+      letter-spacing: .01em;
+      line-height: 1.1;
+    }
+
+    a { color: var(--green-600); text-decoration: none; }
+    a:hover { color: var(--green-700); text-decoration: underline; }
+
+    main { flex: 1; }
+
+    /* =====================================================================
+       NAVIGATION
+       ===================================================================== */
+    .navbar {
+      background: var(--green-900) !important;
+      padding: .75rem 0;
+      border-bottom: 3px solid var(--lime);
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .navbar-brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: .04em;
+      color: var(--white) !important;
+      text-transform: uppercase;
+    }
+
+    .navbar-brand span.accent { color: var(--lime); }
+
+    .navbar .nav-link {
+      color: rgba(255,255,255,.75) !important;
+      font-weight: 500;
+      font-size: .9rem;
+      padding: .4rem .75rem !important;
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link.active {
+      color: var(--white) !important;
+      background: rgba(184,244,66,.12);
+    }
+
+    .navbar-toggler {
+      border-color: rgba(255,255,255,.3);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* Role badge in nav */
+    .nav-role-badge {
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      padding: .2rem .5rem;
+      border-radius: 4px;
+      background: rgba(184,244,66,.2);
+      color: var(--lime);
+      margin-inline-start: .5rem;
+    }
+
+    /* Bug report link */
+    .nav-feedback-link {
+      font-size: .8rem;
+      color: rgba(255,255,255,.45) !important;
+    }
+
+    /* =====================================================================
+       HEAD COACH WARNING BANNER
+       (sticky below nav on staff pages when a group is missing a head coach)
+       ===================================================================== */
+    .banner-head-coach {
+      background: linear-gradient(90deg, #92400e, #b45309);
+      color: #fef3c7;
+      padding: .6rem 1rem;
+      font-size: .875rem;
+      font-weight: 500;
+      text-align: center;
+      border-bottom: 2px solid #f59e0b;
+    }
+
+    /* =====================================================================
+       PAGE HEADER
+       ===================================================================== */
+    .page-header {
+      background: var(--green-800);
+      color: var(--white);
+      padding: 2rem 0 1.75rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 24px,
+        rgba(255,255,255,.025) 24px,
+        rgba(255,255,255,.025) 25px
+      );
+      pointer-events: none;
+    }
+
+    .page-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-header .breadcrumb {
+      background: none;
+      padding: 0;
+      margin: .5rem 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-header .breadcrumb-item,
+    .page-header .breadcrumb-item a {
+      color: rgba(255,255,255,.6);
+      font-size: .85rem;
+    }
+
+    .page-header .breadcrumb-item.active { color: rgba(255,255,255,.9); }
+
+    /* =====================================================================
+       CARDS
+       ===================================================================== */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition);
+    }
+
+    .card:hover { box-shadow: var(--shadow-md); }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--cream-dark);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    /* Stat cards — big number + label */
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+    }
+
+    .stat-card .stat-number {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--green-800);
+      line-height: 1;
+    }
+
+    .stat-card .stat-label {
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-muted);
+      margin-top: .35rem;
+    }
+
+    .stat-card.accent { border-top: 3px solid var(--lime); }
+    .stat-card.accent .stat-number { color: var(--green-700); }
+
+    /* =====================================================================
+       BUTTONS
+       ===================================================================== */
+    .btn {
+      font-family: var(--font-body);
+      font-weight: 600;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      letter-spacing: .02em;
+    }
+
+    .btn-primary {
+      background: var(--green-800);
+      border-color: var(--green-800);
+      color: var(--white);
+    }
+    .btn-primary:hover, .btn-primary:focus {
+      background: var(--green-700);
+      border-color: var(--green-700);
+    }
+
+    .btn-lime {
+      background: var(--lime);
+      border-color: var(--lime);
+      color: var(--green-900);
+      font-weight: 700;
+    }
+    .btn-lime:hover, .btn-lime:focus {
+      background: var(--lime-dark);
+      border-color: var(--lime-dark);
+      color: var(--green-900);
+    }
+
+    .btn-outline-primary {
+      border-color: var(--green-800);
+      color: var(--green-800);
+    }
+    .btn-outline-primary:hover {
+      background: var(--green-800);
+      color: var(--white);
+    }
+
+    /* Large touch-target button (check-in mode) */
+    .btn-checkin {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      border-radius: var(--radius-lg);
+      min-height: 64px;
+    }
+
+    /* =====================================================================
+       FORMS
+       ===================================================================== */
+    .form-label {
+      font-weight: 600;
+      font-size: .875rem;
+      margin-bottom: .35rem;
+      color: var(--text-secondary);
+    }
+
+    .form-control, .form-select {
+      border: 1.5px solid var(--cream-dark);
+      border-radius: var(--radius);
+      padding: .6rem .9rem;
+      background: var(--cream);
+      color: var(--text-primary);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--green-600);
+      box-shadow: 0 0 0 3px rgba(46,115,71,.15);
+      background: var(--white);
+      outline: none;
+    }
+
+    .form-control.is-invalid, .form-select.is-invalid {
+      border-color: var(--status-cancelled);
+    }
+
+    .invalid-feedback { font-size: .8rem; }
+
+    .form-check-input:checked {
+      background-color: var(--green-700);
+      border-color: var(--green-700);
+    }
+
+    .form-text {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    /* Consent checkbox — visually prominent */
+    .consent-check .form-check-label {
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+
+    /* =====================================================================
+       TABLES
+       ===================================================================== */
+    .table {
+      --bs-table-bg: transparent;
+      font-size: .9rem;
+    }
+
+    .table thead th {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--cream-dark);
+      padding: .6rem 1rem;
+      white-space: nowrap;
+    }
+
+    .table td {
+      padding: .75rem 1rem;
+      vertical-align: middle;
+      border-color: var(--cream-dark);
+    }
+
+    .table-hover tbody tr:hover {
+      background: rgba(27,63,42,.04);
+    }
+
+    /* =====================================================================
+       BADGES & STATUS PILLS
+       ===================================================================== */
+    .badge {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: .72rem;
+      letter-spacing: .04em;
+      padding: .3em .65em;
+      border-radius: 6px;
+    }
+
+    .badge-confirmed   { background: rgba(34,197,94,.15);  color: #16a34a; }
+    .badge-waitlisted  { background: rgba(245,158,11,.15); color: #d97706; }
+    .badge-pending     { background: rgba(99,102,241,.15); color: #4f46e5; }
+    .badge-cancelled   { background: rgba(239,68,68,.15);  color: #dc2626; }
+    .badge-attended    { background: rgba(6,182,212,.15);  color: #0891b2; }
+    /* Camp status badges */
+    .badge-draft     { background: rgba(156,163,175,.2);  color: #6b7280; }
+    .badge-upcoming  { background: rgba(99,102,241,.15);  color: #4f46e5; }
+    .badge-open      { background: rgba(34,197,94,.15);   color: #16a34a; }
+    .badge-active    { background: rgba(184,244,66,.2);   color: #3b6d11; }
+    .badge-completed { background: rgba(6,182,212,.15);   color: #0891b2; }
+    .badge-archived  { background: rgba(156,163,175,.15); color: #9ca3af; }
+
+    .badge-high   { background: rgba(239,68,68,.15);  color: #dc2626; }
+    .badge-medium { background: rgba(245,158,11,.15); color: #d97706; }
+    .badge-low    { background: rgba(34,197,94,.15);  color: #16a34a; }
+
+    .badge-new           { background: rgba(99,102,241,.15); color: #4f46e5; }
+    .badge-acknowledged  { background: rgba(6,182,212,.15);  color: #0891b2; }
+    .badge-in_progress   { background: rgba(245,158,11,.15); color: #d97706; }
+    .badge-resolved      { background: rgba(34,197,94,.15);  color: #16a34a; }
+    .badge-wontfix       { background: rgba(148,163,184,.2); color: #64748b; }
+
+    /* =====================================================================
+       ALERTS
+       ===================================================================== */
+    .alert {
+      border: none;
+      border-radius: var(--radius);
+      border-inline-start: 4px solid;
+      font-size: .9rem;
+    }
+
+    .alert-success { background: rgba(34,197,94,.1);  border-color: #22c55e; color: #15803d; }
+    .alert-warning { background: rgba(245,158,11,.1); border-color: #f59e0b; color: #92400e; }
+    .alert-danger  { background: rgba(239,68,68,.1);  border-color: #ef4444; color: #b91c1c; }
+    .alert-info    { background: rgba(6,182,212,.1);  border-color: #06b6d4; color: #0e7490; }
+
+    /* =====================================================================
+       CHILD TOGGLE CARDS (manual entry + camp registration)
+       ===================================================================== */
+    .child-toggle-card {
+      border: 2px solid var(--cream-dark);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      user-select: none;
+    }
+
+    .child-toggle-card:hover:not(.disabled) {
+      border-color: var(--green-600);
+      background: rgba(27,63,42,.04);
+    }
+
+    .child-toggle-card.selected {
+      border-color: var(--green-600);
+      background: rgba(27,63,42,.07);
+    }
+
+    .child-toggle-card.disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      background: var(--cream-dark);
+    }
+
+    .child-toggle-card .toggle-indicator {
+      width: 2.5rem;
+      height: 1.4rem;
+      border-radius: 999px;
+      background: var(--cream-dark);
+      position: relative;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+
+    .child-toggle-card .toggle-indicator::after {
+      content: '';
+      position: absolute;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background: var(--white);
+      top: .2rem;
+      left: .2rem;
+      transition: transform var(--transition);
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+
+    .child-toggle-card.selected .toggle-indicator {
+      background: var(--green-600);
+    }
+
+    .child-toggle-card.selected .toggle-indicator::after {
+      transform: translateX(1.1rem);
+    }
+
+    /* =====================================================================
+       CHECK-IN MODE OVERLAY
+       Full-screen mode for staff check-in — overrides everything
+       ===================================================================== */
+    body.checkin-mode {
+      background: var(--green-900);
+    }
+
+    body.checkin-mode .navbar {
+      border-bottom-color: rgba(184,244,66,.3);
+    }
+
+    /* QR code display */
+    .qr-container {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: inline-block;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* =====================================================================
+       INDEPENDENT TRAVEL BANNER
+       (shown prominently on checkout confirmation)
+       ===================================================================== */
+    .travel-banner {
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .travel-banner.can-go {
+      background: rgba(34,197,94,.15);
+      border: 2px solid #22c55e;
+      color: #15803d;
+    }
+
+    .travel-banner.needs-pickup {
+      background: rgba(239,68,68,.15);
+      border: 2px solid #ef4444;
+      color: #b91c1c;
+    }
+
+    .travel-banner .travel-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: .5rem;
+    }
+
+    /* =====================================================================
+       MEDICAL NOTES INDICATOR
+       ===================================================================== */
+    .medical-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: .75rem;
+      font-weight: 600;
+      color: #dc2626;
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: 6px;
+      padding: .15rem .5rem;
+    }
+
+    /* =====================================================================
+       PAGINATION
+       ===================================================================== */
+    .pagination .page-link {
+      color: var(--green-700);
+      border-color: var(--cream-dark);
+      border-radius: var(--radius) !important;
+      margin: 0 2px;
+      font-weight: 500;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: var(--green-800);
+      border-color: var(--green-800);
+    }
+
+    /* =====================================================================
+       FOOTER
+       ===================================================================== */
+    footer {
+      background: var(--green-900);
+      color: rgba(255,255,255,.45);
+      padding: 1.5rem 0;
+      font-size: .8rem;
+      margin-top: auto;
+    }
+
+    footer a { color: rgba(255,255,255,.6); }
+    footer a:hover { color: var(--white); text-decoration: none; }
+
+    /* =====================================================================
+       PAGE LOAD ANIMATION
+       ===================================================================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeUp .3s ease both;
+    }
+    /* Disable animations on admin pages */
+    body.blueprint-admin .animate-in,
+    body.blueprint-admin .animate-in-1,
+    body.blueprint-admin .animate-in-2,
+    body.blueprint-admin .animate-in-3,
+    body.blueprint-admin .animate-in-4 {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .animate-in-1 { animation-delay: .05s; }
+    .animate-in-2 { animation-delay: .10s; }
+    .animate-in-3 { animation-delay: .15s; }
+    .animate-in-4 { animation-delay: .20s; }
+
+    /* =====================================================================
+       UTILITIES
+       ===================================================================== */
+    .text-lime { color: var(--lime) !important; }
+    .bg-green-900 { background: var(--green-900) !important; }
+    .bg-green-800 { background: var(--green-800) !important; }
+    .font-display { font-family: var(--font-display); }
+
+    .divider {
+      height: 3px;
+      background: linear-gradient(90deg, var(--lime), transparent);
+      border: none;
+      margin: 2rem 0;
+      border-radius: 2px;
+    }
+
+    /* Honeypot field — visually hidden but accessible to screen readers
+       so it doesn't look like a trap to assistive tech users */
+    .field-trap {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* =====================================================================
+       RESPONSIVE
+       ===================================================================== */
+    @media (max-width: 768px) {
+      .page-header { padding: 1.5rem 0 1.25rem; }
+      .page-header h1 { font-size: 1.6rem; }
+      .stat-card .stat-number { font-size: 2.2rem; }
+      .table-responsive { font-size: .82rem; }
+    }
+
+    {% block extra_style %}{% endblock %}
+  </style>
+</head>
+<body class="{% block body_class %}{% endblock %} blueprint-{{ request.blueprint or 'public' }}">
+{% if config.get('SHOW_TEMPLATE_NAME') %}
+<div id="devTemplateBadge" style="
+  position:fixed;bottom:0;left:0;right:0;z-index:99998;
+  background:#1a1a2e;color:#b8f442;
+  font-family:monospace;font-size:.72rem;
+  padding:.3rem .75rem;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid #2d2d4e;
+  pointer-events:none;
+  opacity:.92;
+">
+  <span>
+    🧩 <strong>{% block _tpl_name %}unknown{% endblock %}</strong>
+    &nbsp;·&nbsp;
+    <span style="color:#93c5fd">{{ request.path }}</span>
+    &nbsp;·&nbsp;
+    <span style="color:#fcd34d">{{ request.blueprint or 'public' }}</span>
+  </span>
+  <span style="color:#6b7280">dev mode</span>
+</div>
+{% else %}
+
+{% endif %}
+
+  {# ===== NAVIGATION ===== #}
+  {% block navbar %}
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('public.index') }}">
+        {# Logo: show image if CAMP_LOGO_DARK_PATH or CAMP_LOGO_PATH is configured,
+           otherwise fall back to text brand. The designer drops a file in
+           static/images/ and sets the env var — no template change needed. #}
+        {% if config.CAMP_LOGO_DARK_PATH %}
+          <img src="{{ url_for('static', filename=config.CAMP_LOGO_DARK_PATH) }}"
+               alt="{{ config.CAMP_NAME }}"
+               style="height:38px;width:auto;object-fit:contain"
+               class="navbar-logo">
+        {% elif config.CAMP_LOGO_PATH %}
+          <img src="{{ url_for('static', filename=config.CAMP_LOGO_PATH) }}"
+               alt="{{ config.CAMP_NAME }}"
+               style="height:38px;width:auto;object-fit:contain;filter:brightness(0) invert(1)"
+               class="navbar-logo">
+        {% else %}
+          {# Placeholder — rendered until designer provides the real logo #}
+          <img src="{{ url_for('static', filename='images/placeholder/logo-placeholder.svg') }}"
+               alt="{{ config.CAMP_NAME }} (Platzhalter-Logo)"
+               style="height:38px;width:auto;object-fit:contain"
+               class="navbar-logo"
+               title="Platzhalter — wird durch echtes Logo ersetzt">
+        {% endif %}
+      </a>
+
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if current_user.is_authenticated %}
+
+            {% if current_user.role == 'parent' %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'parents' %}active{% endif %}"
+                   href="{{ url_for('parents.dashboard') }}">{{ _('Mein Bereich') }}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'announcements' %}active{% endif %}"
+                   href="{{ url_for('announcements.feed') }}">{{ _('Neuigkeiten') }}</a>
+              </li>
+
+            {% elif current_user.role in ('staff', 'admin') %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'staff' and request.endpoint != 'staff.checkin_mode' %}active{% endif %}"
+                   href="{{ url_for('staff.dashboard') }}">{{ _('Team-Dashboard') }}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'parents' %}active{% endif %}"
+                   href="{{ url_for('parents.dashboard') }}">{{ _('Mein Bereich') }}</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'announcements' %}active{% endif %}"
+                   href="{{ url_for('announcements.feed') }}">Neuigkeiten</a>
+              </li>
+              {% if current_user.role == 'admin' %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.blueprint == 'admin' %}active{% endif %}"
+                   href="{{ url_for('admin.dashboard') }}">{{ _('Admin') }}</a>
+              </li>
+              {% endif %}
+            {% endif %}
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}"
+               href="{{ url_for('public.about') }}">{{ _('Über uns') }}</a>
+          </li>
+          {% endif %}
+          
+          
+        </ul>
+
+        <ul class="navbar-nav ms-auto align-items-center gap-1">
+
+          {# ===== LANGUAGE SWITCHER ===== #}
+          {% if config.get('SHOW_LANGUAGE_SWITCHER', False) %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               data-bs-toggle="dropdown"
+               aria-label="{{ _('Sprache') }}"
+               style="font-size:.82rem;padding:.35rem .6rem;letter-spacing:.02em">
+              {% if g.locale == 'ar' %}<i class="bi bi-globe"></i> AR
+              {% elif g.locale == 'en' %}<i class="bi bi-globe"></i> EN
+              {% else %}<i class="bi bi-globe"></i> DE{% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" style="min-width:9rem">
+              <li>
+                <a class="dropdown-item {% if g.locale == 'de' %}active{% endif %}"
+                   href="{{ url_for('public.set_language', locale='de') }}">
+                  🇩🇪 Deutsch
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item {% if g.locale == 'en' %}active{% endif %}"
+                   href="{{ url_for('public.set_language', locale='en') }}">
+                  🇬🇧 English
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item {% if g.locale == 'ar' %}active{% endif %}"
+                   href="{{ url_for('public.set_language', locale='ar') }}"
+                   dir="rtl" lang="ar">
+                  🇸🇦 العربية
+                </a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link nav-feedback-link"
+                 href="{{ url_for('feedback.submit', seite=request.path) }}"
+                 title="Fehler melden"><i class="bi bi-flag"></i> {{ _('Fehler melden') }}</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                 data-bs-toggle="dropdown">
+                {{ current_user.first_name }}
+                <span class="nav-role-badge">
+                  {% if current_user.role == 'parent' %}{{ _('Elternteil') }}
+                  {% elif current_user.role == 'staff' %}{{ _('Mitarbeiter') }}
+                  {% else %}{{ _('Admin') }}{% endif %}
+                </span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                {% if current_user.role == 'parent' %}
+                  <li><a class="dropdown-item" href="{{ url_for('parents.account') }}">{{ _('Mein Konto') }}</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('parents.email_preferences') }}">{{ _('E-Mail-Einstellungen') }}</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('parents.data_privacy') }}">{{ _('Datenschutz') }}</a></li>
+                {% elif current_user.role in ('staff', 'admin') %}
+                  <li><a class="dropdown-item" href="{{ url_for('admin.self_edit') }}">{{ _('Mein Konto') }}</a></li>
+                {% endif %}
+                <li><a class="dropdown-item" href="{{ url_for('feedback.submit') }}">Fehler melden</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('feedback.my_reports') }}">Meine Meldungen</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="POST" action="{{ url_for('auth.logout') }}" class="m-0">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="dropdown-item text-danger">{{ _('Abmelden') }}</button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Anmelden') }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-lime btn-sm ms-2" href="{{ url_for('auth.register') }}">{{ _('Registrieren') }}</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+  {% endblock navbar %}
+
+  {# ===== HEAD COACH WARNING BANNER ===== #}
+  {% if head_coach_warnings is defined and head_coach_warnings %}
+  <div class="banner-head-coach">
+    <i class="bi bi-exclamation-triangle"></i> Kein Haupttrainer zugewiesen:
+    {% for group in head_coach_warnings %}
+      <strong>{{ group.name }}</strong>{% if not loop.last %}, {% endif %}
+    {% endfor %}
+    — <a href="{{ url_for('admin.trainer_assignments', camp_id=head_coach_warnings[0].camp_session_id) }}"
+         style="color:inherit;text-decoration:underline;">Jetzt zuweisen</a>
+  </div>
+  {% endif %}
+
+  {# ===== FLASH MESSAGES → TOASTS ===== #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <script>
+  window._fcFlashMessages = [];
+  {% for cat, msg in messages %}
+  window._fcFlashMessages.push([{{ cat | tojson }}, {{ msg | tojson }}]);
+  {% endfor %}
+  window._fcToastDuration = {{ config.get('TOAST_DURATION', 5) }};
+  </script>
+  {% endif %}
+  {% endwith %}
+
+  {# ===== MAIN CONTENT ===== #}
+  {% block page_header %}{% endblock %}
+
+  <main class="{% block main_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# ===== FOOTER ===== #}
+  {% block footer %}
+  <footer>
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span>© {{ now.year if now is defined else '2025' }} {{ config.CAMP_NAME }}</span>
+      <nav class="d-flex gap-3">
+        <a href="{{ url_for('public.datenschutz') }}">Datenschutz</a>
+        <a href="{{ url_for('public.about') }}">Über uns</a>
+        <a href="{{ url_for('public.kontakt') }}">Kontakt</a>
+        <a href="{{ url_for('public.impressum') }}">Impressum</a>
+      </nav>
+    </div>
+  </footer>
+  {% endblock footer %}
+
+  <style>
+  .password-wrap { position:relative; }
+  .password-wrap .form-control { padding-right: 2.75rem; }
+  .pw-toggle {
+    position:absolute; top:50%; right:.6rem; transform:translateY(-50%);
+    background:none; border:none; padding:.25rem .35rem; cursor:pointer;
+    font-size:1rem; line-height:1; color:var(--text-muted);
+    z-index:5; display:flex; align-items:center;
+  }
+  .pw-toggle:hover { color:var(--text-primary); }
+  </style>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  {% block scripts %}{% endblock %}
+
+  <!-- PWA Service Worker + offline toast -->
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/js/sw.js').catch(() => {});
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.type === 'OFFLINE') showOfflineToast();
+    });
+  }
+  window.addEventListener('online',  () => hideOfflineToast());
+  window.addEventListener('offline', () => showOfflineToast());
+
+  function showOfflineToast() {
+    let t = document.getElementById('offlineToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'offlineToast';
+      t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);' +
+        'background:#1a1a1a;color:white;padding:.75rem 1.25rem;border-radius:8px;' +
+        'font-size:.875rem;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);' +
+        'display:flex;align-items:center;gap:.5rem;white-space:nowrap';
+      t.innerHTML = '<i class="bi bi-lightning-charge"></i> Keine Verbindung — bitte später erneut versuchen';
+      document.body.appendChild(t);
+    }
+    t.style.display = 'flex';
+  }
+  function hideOfflineToast() {
+    const t = document.getElementById('offlineToast');
+    if (t) t.style.display = 'none';
+  }
+  </script>
+
+  <!-- Password visibility toggle — applies to all .password-wrap inputs globally -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.password-wrap').forEach(function(wrap) {
+      var input = wrap.querySelector('input');
+      var btn   = wrap.querySelector('.pw-toggle');
+      if (!input || !btn) return;
+      btn.addEventListener('click', function() {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+        btn.setAttribute('aria-label', show ? 'Passwort verbergen' : 'Passwort anzeigen');
+      });
+    });
+  });
+  </script>
+<!-- ===== GLOBAL CONFIRM MODAL ===== -->
+<div id="gcModal" style="display:none;position:fixed;inset:0;z-index:10000;
+     background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:1rem"
+     onclick="if(event.target===this)gcHide()">
+  <div style="background:white;border-radius:16px;max-width:440px;width:100%;
+              padding:2rem;box-shadow:0 8px 40px rgba(0,0,0,.25);animation:gcIn .2s cubic-bezier(.34,1.56,.64,1)">
+    <div id="gcIcon" style="font-size:2rem;margin-bottom:.65rem"></div>
+    <h2 id="gcTitle" style="font-size:1.05rem;font-weight:800;text-transform:uppercase;
+                             margin-bottom:.5rem;color:#b91c1c"></h2>
+    <p id="gcBody" style="font-size:.9rem;color:#374151;line-height:1.6;margin-bottom:.5rem"></p>
+    <div id="gcWarning" style="display:none"
+         class="alert alert-warning py-2 px-3 mb-3" style="font-size:.82rem"></div>
+    <div class="d-flex gap-2 mt-3">
+      <button onclick="gcHide()" class="btn btn-outline-secondary flex-fill">Abbrechen</button>
+      <button id="gcConfirm" class="btn flex-fill"></button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes gcIn {
+  from { opacity:0; transform:scale(.95) translateY(8px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+</style>
+<script>
+function showConfirmModal(opts) {
+  // opts: {iconClass, iconColor, title, body, warning, confirmLabel, confirmClass, onConfirm}
+  // Use iconClass + iconColor so no HTML is needed in onclick attributes
+  const iconClass = opts.iconClass || 'bi-exclamation-triangle-fill';
+  const iconColor = opts.iconColor || '#dc2626';
+  const icon = '<i class="bi ' + iconClass + '" style="color:' + iconColor + '"></i>';
+  const btnCls  = opts.confirmClass || 'btn-danger';
+  document.getElementById('gcIcon').innerHTML        = icon;
+  document.getElementById('gcTitle').textContent     = opts.title        || 'Bestätigen';
+  document.getElementById('gcTitle').style.color     = opts.titleColor   || '#b91c1c';
+  document.getElementById('gcBody').innerHTML        = opts.body         || '';
+  const warn = document.getElementById('gcWarning');
+  if (opts.warning) {
+    warn.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> ' + opts.warning;
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+  const btn = document.getElementById('gcConfirm');
+  btn.textContent  = opts.confirmLabel || 'Bestätigen';
+  btn.className    = 'btn flex-fill ' + btnCls;
+  btn.onclick      = function() { gcHide(); opts.onConfirm && opts.onConfirm(); };
+  const modal = document.getElementById('gcModal');
+  modal.style.display = 'flex';
+}
+function gcHide() {
+  document.getElementById('gcModal').style.display = 'none';
+}
+</script>
+
+<div id="fcToastContainer"></div>
+
+<style>
+#fcToastContainer {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  max-width: 420px;
+  margin: 0 auto;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  pointer-events: none;
+}
+.fc-toast {
+  pointer-events: all;
+  border-radius: 14px;
+  padding: .85rem 1rem .85rem 1.1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.12);
+  animation: fcToastIn .28s cubic-bezier(.34,1.56,.64,1) forwards;
+  position: relative;
+  will-change: transform, opacity;
+  touch-action: none;
+}
+.fc-toast.hiding {
+  animation: fcToastOut .22s ease-in forwards;
+}
+@keyframes fcToastIn {
+  from { opacity: 0; transform: translateY(-20px) scale(.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fcToastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); max-height: 120px; }
+  to   { opacity: 0; transform: translateY(-12px) scale(.96); max-height: 0; padding-top: 0; padding-bottom: 0; margin: 0; }
+}
+.fc-toast.toast-success { background: #1f4a33; color: #fff; }
+.fc-toast.toast-danger  { background: #7f1d1d; color: #fff; }
+.fc-toast.toast-warning { background: #78350f; color: #fff; }
+.fc-toast.toast-info    { background: #1e3a5f; color: #fff; }
+.fc-toast.toast-message { background: #1f2937; color: #fff; }
+.fc-toast-icon  { font-size: 1.1rem; flex-shrink: 0; margin-top: .1rem; }
+.fc-toast-msg   { flex: 1; font-size: .88rem; line-height: 1.45; }
+.fc-toast-close {
+  flex-shrink: 0; width: 28px; height: 28px;
+  background: none; border: none; padding: 0;
+  cursor: pointer; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -.05rem;
+}
+.fc-toast-close svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.fc-toast-close .ring-track    { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 2.5; }
+.fc-toast-close .ring-progress {
+  fill: none; stroke: rgba(255,255,255,.55); stroke-width: 2.5; stroke-linecap: round;
+  stroke-dasharray: 69.1; stroke-dashoffset: 0;
+}
+.fc-toast-close .x-icon {
+  font-size: .7rem; color: rgba(255,255,255,.75);
+  position: relative; z-index: 1;
+}
+.fc-toast-close:hover .ring-progress { stroke: #fff; }
+.fc-toast-close:hover .x-icon { color: #fff; }
+</style>
+
+<script>
+(function() {
+  const ICONS = {
+    success: 'bi-check-circle-fill',
+    danger:  'bi-x-circle-fill',
+    warning: 'bi-exclamation-triangle-fill',
+    info:    'bi-info-circle-fill',
+    message: 'bi-bell-fill',
+  };
+
+  function fcShowToast(type, message) {
+    const dur = window._fcToastDuration || 5;
+    const container = document.getElementById('fcToastContainer');
+    const t = document.createElement('div');
+    t.className = 'fc-toast toast-' + (type || 'message');
+    t.innerHTML =
+      '<div class="fc-toast-icon"><i class="bi ' + (ICONS[type] || 'bi-bell-fill') + '"></i></div>' +
+      '<div class="fc-toast-msg">' + message + '</div>' +
+      '<button class="fc-toast-close" aria-label="Schließen">' +
+        '<svg viewBox="0 0 28 28"><circle class="ring-track" cx="14" cy="14" r="11"/>' +
+        '<circle class="ring-progress" cx="14" cy="14" r="11" style="animation:fcRing ' + dur + 's linear forwards"/>' +
+        '</svg><span class="x-icon">✕</span>' +
+      '</button>';
+
+    container.appendChild(t);
+
+    // close button
+    t.querySelector('.fc-toast-close').addEventListener('click', function() {
+      fcDismiss(t);
+    });
+
+    // auto-dismiss
+    t._timer = setTimeout(function() { fcDismiss(t); }, dur * 1000);
+
+    // swipe to dismiss
+    let startX = 0, startY = 0, dx = 0, swiping = false;
+    t.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      dx = 0; swiping = false;
+      // Kill the entry animation so inline transform takes full control.
+      // Freeze current visual state as inline styles first, then clear animation.
+      t.style.transform = 'translateX(0px)';
+      t.style.opacity   = '1';
+      t.style.animation = 'none';
+      t.style.transition = 'none';
+    }, {passive: true});
+    t.addEventListener('touchmove', function(e) {
+      dx = e.touches[0].clientX - startX;
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      // Lock to horizontal once intent is clear
+      if (!swiping && Math.abs(dx) > 8 && Math.abs(dx) > dy) {
+        swiping = true;
+      }
+      if (swiping) {
+        e.preventDefault();  // stop page scroll while swiping toast
+        t.style.transform = 'translateX(' + dx + 'px)';
+        t.style.opacity = Math.max(0, 1 - Math.abs(dx) / 140);
+      }
+    }, {passive: false});
+    t.addEventListener('touchend', function() {
+      if (swiping && Math.abs(dx) > 72) {
+        // Fly off in the direction of the swipe
+        t.style.transition = 'transform .2s ease-out, opacity .2s ease-out';
+        t.style.transform = 'translateX(' + (dx > 0 ? '110%' : '-110%') + ')';
+        t.style.opacity = '0';
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 220);
+        clearTimeout(t._timer);
+      } else {
+        // Snap back with spring feel
+        t.style.transition = 'transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s ease';
+        t.style.transform = '';
+        t.style.opacity = '';
+      }
+      swiping = false;
+    });
+  }
+
+  function fcDismiss(t) {
+    if (!t || t.classList.contains('hiding')) return;
+    clearTimeout(t._timer);
+    t.classList.add('hiding');
+    t.addEventListener('animationend', function() { t.remove(); }, {once: true});
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 400);
+  }
+
+  if (window.CSS) {
+    const style = document.createElement('style');
+    style.textContent = '@keyframes fcRing { from { stroke-dashoffset:0 } to { stroke-dashoffset:69.1 } }';
+    document.head.appendChild(style);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var msgs = window._fcFlashMessages || [];
+    msgs.forEach(function(m, i) {
+      setTimeout(function() { fcShowToast(m[0], m[1]); }, i * 120);
+    });
+  });
+
+  window.fcShowToast = fcShowToast;
+})();
+</script>
+</body>
+</html>

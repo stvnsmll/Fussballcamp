@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}staff/roster{% endblock %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Anwesenheitsliste</h1>
+    {% if camp_session %}
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {{ camp_session.name }} · Tag {{ camp_day or '—' }}
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+
+  {# Group filter tabs #}
+  {% if age_groups %}
+  <div class="d-flex gap-2 mb-3 flex-wrap">
+    <a href="{{ url_for('staff.roster') }}"
+       class="btn btn-sm {{ 'btn-primary' if not group_filter else 'btn-outline-secondary' }}">
+      Alle
+    </a>
+    {% for g in age_groups %}
+    <a href="{{ url_for('staff.roster', gruppe=g.id) }}"
+       class="btn btn-sm {{ 'btn-primary' if group_filter == g.id|string else 'btn-outline-secondary' }}">
+      {{ g.name }}
+      {% if g.head_coach %}<span style="font-size:.7rem;opacity:.7"> · {{ g.head_coach.first_name }}</span>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% for group_name, items in roster_by_group.items() %}
+  <div class="mb-4 animate-in">
+    <div class="d-flex align-items-center gap-3 mb-2">
+      <h2 class="h6 fw-800 text-uppercase mb-0" style="letter-spacing:.08em">{{ group_name }}</h2>
+      {% set present = items | selectattr('still_present') | list | length %}
+      {% set total   = items | length %}
+      <span style="font-size:.75rem;color:var(--text-muted)">
+        {{ present }} anwesend / {{ total }} gesamt
+      </span>
+    </div>
+
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Kind</th>
+              <th class="text-center">Eingecheckt</th>
+              <th class="text-center">Ausgecheckt</th>
+              <th>Hinweise</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr style="{{ 'opacity:.5' if item.checked_out else '' }}">
+              <td>
+                <div class="fw-600">
+                  {{ item.child.full_name }}
+                </div>
+                <div style="font-size:.75rem;color:var(--text-muted)">
+                  {% if item.independent_travel %}<i class="bi bi-person-walking"></i> Alleine{% endif %}
+                </div>
+              </td>
+              <td class="text-center">
+                {% if item.checkin_time %}
+                <span class="badge badge-confirmed">
+                  {{ item.checkin_time.strftime('%H:%M') }}
+                </span>
+                {% else %}
+                <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if item.checkout_time %}
+                <span class="badge badge-cancelled">
+                  {{ item.checkout_time.strftime('%H:%M') }}
+                </span>
+                {% elif item.still_present %}
+                <span class="badge badge-attended">Anwesend</span>
+                {% else %}
+                <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if item.child.has_medical_notes %}
+                <span class="medical-badge"><i class="bi bi-heart-pulse"></i></span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{{ url_for('staff.child_detail', child_id=item.child.id) }}"
+                   class="btn btn-xs btn-outline-secondary"
+                   style="font-size:.72rem;padding:.2rem .5rem">Detail</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info">Keine Anmeldungen für heute.</div>
+  {% endfor %}
+
+</div>
+{% endblock %}

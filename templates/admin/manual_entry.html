@@ -1,0 +1,424 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Manuelle Anmeldung') }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ _('Papierformular eintragen') }} · {{ camp_session.name }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+/* Parent search results */
+.parent-search-result {
+  padding:.85rem 1rem;
+  cursor:pointer;
+  border-bottom:1px solid var(--cream-dark);
+  transition:background var(--transition);
+}
+.parent-search-result:hover { background:rgba(27,63,42,.05); }
+.parent-search-result:last-child { border-bottom:none; }
+.search-dropdown {
+  border:1.5px solid var(--green-600);
+  border-radius:var(--radius);
+  background:var(--white);
+  position:absolute;
+  z-index:100;
+  width:100%;
+  max-height:280px;
+  overflow-y:auto;
+  box-shadow:var(--shadow-md);
+  display:none;
+}
+.selected-parent-banner {
+  background:rgba(27,63,42,.07);
+  border:2px solid var(--green-600);
+  border-radius:var(--radius);
+  padding:.75rem 1rem;
+  display:none;
+}
+#childTogglesSection { display:none; }
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5" style="max-width:700px">
+
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+
+      <form method="POST" id="manualEntryForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="existing_child_id" id="existingChildId">
+        <input type="hidden" name="existing_parent_id" id="existingParentId">
+
+        {# ===== STEP 1: PARENT SEARCH ===== #}
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">
+          <span class="badge" style="background:var(--green-800);color:white;margin-right:.5rem">1</span>
+          {{ _('Elternteil suchen oder neu anlegen') }}
+        </h2>
+
+        <div class="position-relative mb-3">
+          <input type="text" id="parentSearchInput" class="form-control"
+                 placeholder="{{ _('Name, E-Mail oder Telefon suchen…') }}"
+                 autocomplete="off">
+          <div class="search-dropdown" id="parentSearchDropdown"></div>
+        </div>
+
+        {# Selected parent banner #}
+        <div class="selected-parent-banner mb-3" id="selectedParentBanner">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-700" id="bannerName"></div>
+              <div class="text-muted" style="font-size:.82rem" id="bannerEmail"></div>
+              <div class="text-muted" style="font-size:.82rem" id="bannerPhone"></div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearParent()">
+              <i class="bi bi-x"></i> {{ _('Anderer Elternteil') }}
+            </button>
+          </div>
+        </div>
+
+        {# Parent fields (greyed when existing parent selected) #}
+        <div id="parentFields">
+          <div id="parentFieldsNote" style="display:none" class="alert alert-info py-1 px-2 mb-2" style="font-size:.8rem">
+            <i class="bi bi-info-circle"></i>
+            Elterndaten werden schreibgeschützt angezeigt.
+            <a href="{{ url_for('admin.user_edit', user_id=0) }}" id="editParentLink" style="font-size:.8rem">Im Profil bearbeiten →</a>
+          </div>
+          <div class="p-3 rounded mb-3" style="background:var(--cream-dark)">
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <label class="form-label">{{ _('Vorname') }} *</label>
+                <input type="text" name="parent_first_name" class="form-control" id="pFirstName">
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label">{{ _('Nachname') }} *</label>
+                <input type="text" name="parent_last_name" class="form-control" id="pLastName">
+              </div>
+              <div class="col-12">
+                <label class="form-label">{{ _('E-Mail') }} *</label>
+                <input type="email" name="parent_email" class="form-control" id="pEmail">
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label">Telefon <span class="text-danger">*</span></label>
+                <input type="tel" name="parent_phone" class="form-control" id="pPhone" required>
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label">{{ _('Straße') }}</label>
+                <input type="text" name="parent_address_street" class="form-control" id="pStreet">
+              </div>
+              <div class="col-sm-8">
+                <label class="form-label">{{ _('Stadt') }}</label>
+                <input type="text" name="parent_address_city" class="form-control" id="pCity">
+              </div>
+              <div class="col-sm-4">
+                <label class="form-label">{{ _('PLZ') }}</label>
+                <input type="text" name="parent_address_postcode" class="form-control" id="pPostcode">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        {# ===== STEP 2: CHILD SELECTION (existing parent) ===== #}
+        <div id="childTogglesSection">
+          <h2 class="h6 fw-700 text-uppercase text-muted mb-3">
+            <span class="badge" style="background:var(--green-800);color:white;margin-right:.5rem">2a</span>
+            {{ _('Bestehendes Kind auswählen') }}
+          </h2>
+          <div id="childToggleCards" class="row g-2 mb-3"></div>
+          <div class="text-center text-muted mb-3" style="font-size:.82rem">— oder —</div>
+        </div>
+
+        {# ===== STEP 2: NEW CHILD ===== #}
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">
+          <span class="badge" style="background:var(--green-800);color:white;margin-right:.5rem" id="childStepBadge">2</span>
+          {{ _('Neues Kind') }}
+        </h2>
+        <div class="p-3 rounded mb-3" style="background:var(--cream-dark)" id="newChildFields">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label">{{ _('Vorname') }} *</label>
+              <input type="text" name="child_first_name" class="form-control">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">{{ _('Nachname') }} *</label>
+              <input type="text" name="child_last_name" class="form-control">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">{{ _('Geburtsdatum') }} *</label>
+              <input type="date" name="child_dob" class="form-control" id="childDob">
+              <div class="form-text" id="ageGroupPreview"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ _('Medizinische Hinweise') }}</label>
+              <textarea name="child_medical_notes" class="form-control" rows="2"
+                        placeholder="{{ _('Allergien, Erkrankungen, Medikamente') }}"></textarea>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">{{ _('Notfallkontakt — Name') }}</label>
+              <input type="text" name="ec_name" class="form-control" id="ecName">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">{{ _('Notfallkontakt — Beziehung') }}</label>
+              <input type="text" name="ec_relationship" class="form-control" id="ecRelationship" placeholder="{{ _('z.B. Mutter') }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ _('Notfallkontakt — Telefon') }}</label>
+              <input type="tel" name="ec_phone" class="form-control" id="ecPhone">
+            </div>
+          </div>
+        </div>
+
+        {# Altersgruppen-Override #}
+        <div class="mb-4">
+          <label class="form-label">{{ _('Altersgruppe (optional — überschreibt Auto-Zuweisung)') }}</label>
+          <select name="force_age_group_id" class="form-select">
+            <option value="">{{ _('Automatisch zuweisen') }}</option>
+            {% for ag in age_groups %}
+            <option value="{{ ag.id }}">{{ ag.name }} ({{ ag.min_age }}–{{ ag.max_age }} Jahre)</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <hr class="divider">
+
+        {# ===== STEP 3: PAPER CONSENTS ===== #}
+        <h2 class="h6 fw-700 text-uppercase text-muted mb-3">
+          <span class="badge" style="background:var(--green-800);color:white;margin-right:.5rem">3</span>
+          {{ _('Einwilligungen auf Papierformular') }}
+        </h2>
+        <div class="p-3 rounded mb-4" style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3)">
+          <p style="font-size:.82rem;color:#92400e;margin-bottom:.75rem">
+            <i class="bi bi-exclamation-triangle"></i> {{ _('Diese Felder dokumentieren, was der/die Erziehungsberechtigte auf dem Papierformular unterschrieben hat. Die digitale Einwilligung erfolgt separat per E-Mail-Bestätigung.') }}
+          </p>
+          <div class="form-check mb-2">
+            <input type="checkbox" name="paper_consent_data" class="form-check-input" id="pcData">
+            <label class="form-check-label" for="pcData">{{ _('Datenschutz / Datenverarbeitung <i class="bi bi-check"></i> (auf Formular)') }}</label>
+          </div>
+          <div class="form-check mb-2">
+            <input type="checkbox" name="paper_consent_photo" class="form-check-input" id="pcPhoto">
+            <label class="form-check-label" for="pcPhoto">{{ _('Fotoerlaubnis <i class="bi bi-check"></i> (auf Formular)') }}</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" name="paper_consent_travel" class="form-check-input" id="pcTravel">
+            <label class="form-check-label" for="pcTravel">{{ _('Heimweg alleine <i class="bi bi-check"></i> (auf Formular)') }}</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-lg">
+          {{ _('Anmeldung speichern &amp; E-Mail senden') }}
+        </button>
+        <p class="text-center text-muted mt-2" style="font-size:.78rem">
+          {{ _('Eine Bestätigungs-E-Mail wird an den/die Erziehungsberechtigte(n) gesendet.') }}
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedParentId = null;
+let selectedChildId = null;
+const campStartDate = '{{ camp_session.start_date.isoformat() }}';
+
+// Age groups data for client-side preview
+const ageGroups = {{ age_groups | map(attribute='__dict__') | list | tojson if false else '[]' }};
+
+// =====================================================================
+// PARENT SEARCH
+// =====================================================================
+let searchTimer;
+document.getElementById('parentSearchInput').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  if (q.length < 2) { closeDropdown(); return; }
+  searchTimer = setTimeout(() => searchParents(q), 250);
+});
+
+async function searchParents(q) {
+  const res = await fetch(`{{ url_for('admin.parent_search_ajax') }}?q=` + encodeURIComponent(q));
+  const data = await res.json();
+  renderDropdown(data);
+}
+
+function renderDropdown(parents) {
+  const dd = document.getElementById('parentSearchDropdown');
+  if (!parents.length) { closeDropdown(); return; }
+  dd.innerHTML = parents.map(p => `
+    <div class="parent-search-result" onclick="selectParent(${p.id})">
+      <div class="fw-600">${p.full_name}</div>
+      <div style="font-size:.78rem;color:var(--text-muted)">
+        ${p.email}${p.phone ? ' · ' + p.phone : ''}
+        · ${p.children.length} Kind(er)
+        ${!p.email_verified ? '<span style="color:#f59e0b;margin-left:.5rem"><i class="bi bi-exclamation-triangle"></i> E-Mail nicht bestätigt</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+  dd.style.display = 'block';
+}
+
+async function selectParent(id) {
+  closeDropdown();
+  const res = await fetch(`{{ url_for('admin.parent_details_ajax', user_id=0) }}`.replace('/0/', `/${id}/`));
+  const data = await res.json();
+  if (data.error) return;
+
+  selectedParentId = id;
+  document.getElementById('existingParentId').value = id;
+
+  // Fill parent fields
+  document.getElementById('pFirstName').value = data.first_name;
+  document.getElementById('pLastName').value  = data.last_name;
+  document.getElementById('pEmail').value     = data.email;
+  document.getElementById('pPhone').value     = data.phone;
+  document.getElementById('pStreet').value    = data.address_street;
+  document.getElementById('pCity').value      = data.address_city;
+  document.getElementById('pPostcode').value  = data.address_postcode;
+
+  // Pre-fill emergency contact from existing sibling if available
+  if (data.emergency_contact) {
+    var ec = data.emergency_contact;
+    document.getElementById('ecName').value         = ec.full_name || '';
+    document.getElementById('ecRelationship').value = ec.relationship || '';
+    document.getElementById('ecPhone').value        = ec.phone_primary || '';
+  }
+
+  // Show banner
+  document.getElementById('bannerName').textContent  = data.first_name + ' ' + data.last_name;
+  document.getElementById('bannerEmail').textContent = data.email;
+  document.getElementById('bannerPhone').textContent = data.phone || '';
+  document.getElementById('selectedParentBanner').style.display = 'block';
+  document.getElementById('parentSearchInput').style.display = 'none';
+
+  // Show parent fields but greyed/readonly — not the place to edit them
+  document.getElementById('parentFields').style.display = 'block';
+  document.getElementById('parentFields').style.opacity = '0.55';
+  document.getElementById('parentFields').style.pointerEvents = 'none';
+  ['pFirstName','pLastName','pEmail','pPhone','pStreet','pCity','pPostcode'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.readOnly = true;
+      el.style.background = 'var(--cream-dark)';
+      el.style.cursor = 'not-allowed';
+    }
+  });
+  document.getElementById('parentFieldsNote').style.display = 'block';
+  // Update "edit in profile" link
+  var editLink = document.getElementById('editParentLink');
+  if (editLink) {
+    editLink.href = editLink.href.replace('/0/', '/' + id + '/');
+  }
+
+  // Render child toggle cards
+  renderChildToggles(data.children);
+}
+
+function clearParent() {
+  selectedParentId = null;
+  selectedChildId  = null;
+  document.getElementById('existingParentId').value = '';
+  document.getElementById('existingChildId').value  = '';
+  document.getElementById('selectedParentBanner').style.display = 'none';
+  document.getElementById('parentFields').style.display = 'block';
+  document.getElementById('parentFields').style.opacity = '1';
+  document.getElementById('parentFields').style.pointerEvents = '';
+  document.getElementById('parentSearchInput').style.display = 'block';
+  document.getElementById('parentFieldsNote').style.display = 'none';
+  ['pFirstName','pLastName','pEmail','pPhone','pStreet','pCity','pPostcode'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.readOnly = false;
+      el.style.background = '';
+      el.style.cursor = '';
+      el.value = '';
+    }
+  });
+  document.getElementById('parentSearchInput').value = '';
+  document.getElementById('childTogglesSection').style.display = 'none';
+  document.getElementById('childStepBadge').textContent = '2';
+  document.getElementById('newChildFields').style.opacity = '1';
+}
+
+function renderChildToggles(children) {
+  const section = document.getElementById('childTogglesSection');
+  const container = document.getElementById('childToggleCards');
+
+  if (!children.length) { section.style.display = 'none'; return; }
+
+  container.innerHTML = children.map(c => {
+    const disabled = !c.eligible;
+    const alreadyReg = c.already_registered;
+    const tooltip = c.ineligible_reason || '';
+    const ageLabel = c.age_group_name ? `Gruppe: ${c.age_group_name}` : `${c.age_on_start} Jahre — kein passendes Alter`;
+    return `<div class="col-12">
+      <div class="child-toggle-card ${disabled ? 'disabled' : ''}"
+           data-child-id="${c.id}"
+           title="${tooltip}"
+           ${!disabled ? `onclick="selectExistingChild(this, ${c.id})"` : ''}
+           role="${disabled ? '' : 'button'}"
+           tabindex="${disabled ? -1 : 0}">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-600">${c.full_name}</div>
+            <div style="font-size:.78rem;color:var(--text-muted)">
+              ${c.dob_display} · ${ageLabel}
+              ${alreadyReg ? '<span style="color:#f59e0b"> · Bereits angemeldet</span>' : ''}
+              ${c.has_medical_notes ? '<span style="color:#ef4444"> · <i class="bi bi-heart-pulse"></i> Med</span>' : ''}
+            </div>
+          </div>
+          <div class="toggle-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  section.style.display = 'block';
+  document.getElementById('childStepBadge').textContent = '2b';
+}
+
+function selectExistingChild(card, childId) {
+  // Deselect all
+  document.querySelectorAll('#childToggleCards .child-toggle-card').forEach(c => c.classList.remove('selected'));
+  // Select this one
+  if (selectedChildId === childId) {
+    // Toggle off — go back to new child
+    selectedChildId = null;
+    document.getElementById('existingChildId').value = '';
+    document.getElementById('newChildFields').style.opacity = '1';
+  } else {
+    card.classList.add('selected');
+    selectedChildId = childId;
+    document.getElementById('existingChildId').value = childId;
+    // Fade new child fields to indicate they won't be used
+    document.getElementById('newChildFields').style.opacity = '.35';
+  }
+}
+
+function closeDropdown() {
+  document.getElementById('parentSearchDropdown').style.display = 'none';
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#parentSearchInput') && !e.target.closest('#parentSearchDropdown')) {
+    closeDropdown();
+  }
+});
+
+// =====================================================================
+// AGE GROUP PREVIEW (on DOB change)
+// =====================================================================
+document.getElementById('childDob').addEventListener('change', function() {
+  const dob = new Date(this.value);
+  const campStart = new Date(campStartDate);
+  let age = campStart.getFullYear() - dob.getFullYear();
+  const m = campStart.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && campStart.getDate() < dob.getDate())) age--;
+  document.getElementById('ageGroupPreview').textContent =
+    `{{ _("Alter am Campstart:") }} ${age} {{ _("Jahre") }}`;
+});
+</script>
+{% endblock %}

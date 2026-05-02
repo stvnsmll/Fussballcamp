@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Analytics') }}</h1>
+    <p style="color:rgba(255,255,255,.55);font-size:.8rem;margin:.4rem 0 0">
+      {{ _('Nur für interne Performance-Überwachung · Keine persönlichen Daten gespeichert') }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+
+  {# Date range selector #}
+  <div class="d-flex gap-2 mb-4 flex-wrap">
+    {% for d, label in [(7, _('7 Tage')),(30, _('30 Tage')),(90, _('90 Tage')),(365, _('1 Jahr'))] %}
+    <a href="{{ url_for('admin.analytics', tage=d) }}"
+       class="btn btn-sm {{ 'btn-primary' if days == d else 'btn-outline-secondary' }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+
+  {# Summary stats #}
+  <div class="row g-3 mb-4">
+    {% set total_views = daily_views | sum(attribute='count') %}
+    <div class="col-6 col-md-3 animate-in">
+      <div class="stat-card accent"><div class="stat-number">{{ total_views }}</div><div class="stat-label">{{ _('Seitenaufrufe') }}</div></div>
+    </div>
+    <div class="col-6 col-md-3 animate-in animate-in-1">
+      <div class="stat-card"><div class="stat-number" style="color:#dc2626">{{ login_fail }}</div><div class="stat-label">{{ _('Login-Fehler') }}</div></div>
+    </div>
+    <div class="col-6 col-md-3 animate-in animate-in-2">
+      <div class="stat-card"><div class="stat-number">{{ login_success }}</div><div class="stat-label">{{ _('Logins') }}</div></div>
+    </div>
+    <div class="col-6 col-md-3 animate-in animate-in-3">
+      <div class="stat-card"><div class="stat-number">{{ error_counts | sum(attribute='count') }}</div><div class="stat-label">{{ _('Fehler') }}</div></div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    {# Top routes #}
+    <div class="col-lg-6 animate-in">
+      <div class="card h-100">
+        <div class="card-header">{{ _('Meistbesuchte Seiten') }}</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead><tr><th>{{ _('Route') }}</th><th class="text-end">{{ _('Aufrufe') }}</th></tr></thead>
+              <tbody>
+                {% for route, count in top_routes %}
+                <tr>
+                  <td style="font-size:.8rem;font-family:monospace">{{ route }}</td>
+                  <td class="text-end fw-600">{{ count }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Device + role split #}
+    <div class="col-lg-6 animate-in animate-in-2">
+      <div class="card mb-3">
+        <div class="card-header">{{ _('Gerättyp') }}</div>
+        <div class="card-body">
+          {% for device, count in device_split %}
+          {% set total_d = device_split | sum(attribute='count') %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span style="font-size:.875rem">{{ device or _('unbekannt') }}</span>
+            <span class="fw-600">{{ count }}</span>
+          </div>
+          <div class="progress mb-2" style="height:6px;background:var(--cream-dark);border-radius:3px">
+            <div class="progress-bar" role="progressbar"
+                 style="width:{{ (count / total_d * 100) | round }}%;background:var(--green-600)"></div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">{{ _('Check-In Methode') }}</div>
+        <div class="card-body">
+          {% if checkin_methods %}
+          {% for method, count in checkin_methods %}
+          <div class="d-flex justify-content-between mb-1" style="font-size:.875rem">
+            <span>{{ method or _('unbekannt') }}</span><span class="fw-600">{{ count }}</span>
+          </div>
+          {% endfor %}
+          {% else %}
+          <p class="text-muted mb-0" style="font-size:.875rem">{{ _('Keine Daten') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# Slow routes #}
+    <div class="col-lg-6 animate-in animate-in-3">
+      <div class="card">
+        <div class="card-header">{{ _('Langsamste Seiten (Ø ms)') }}</div>
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>{{ _('Route') }}</th><th class="text-end">Ø ms</th><th class="text-end">{{ _('Aufrufe') }}</th></tr></thead>
+            <tbody>
+              {% for route, avg_ms, count in slow_routes %}
+              <tr>
+                <td style="font-size:.78rem;font-family:monospace">{{ route }}</td>
+                <td class="text-end fw-600 {{ 'text-danger' if avg_ms > 1000 else '' }}">{{ avg_ms | round | int }}</td>
+                <td class="text-end text-muted">{{ count }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {# Recent errors #}
+    <div class="col-lg-6 animate-in animate-in-4">
+      <div class="card">
+        <div class="card-header">{{ _('Letzte Fehler') }}</div>
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>{{ _('Zeit') }}</th><th>{{ _('Typ') }}</th><th>{{ _('Route') }}</th></tr></thead>
+            <tbody>
+              {% for err in recent_errors[:20] %}
+              <tr>
+                <td style="font-size:.72rem;white-space:nowrap">{{ err.occurred_at.strftime('%d.%m %H:%M') }}</td>
+                <td><span class="badge badge-high" style="font-size:.65rem">{{ err.error_type }}</span></td>
+                <td style="font-size:.75rem;font-family:monospace;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ err.route or '—' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

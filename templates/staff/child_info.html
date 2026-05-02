@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block body_class %}checkin-mode{% endblock %}
+{% block page_header %}{% endblock %}
+{% block content %}
+<div class="checkin-shell">
+  <div class="container" style="max-width:520px">
+
+    <div class="d-flex align-items-center gap-3 mb-4 pt-2">
+      <a href="{{ url_for('staff.checkin_mode') }}" class="btn btn-sm"
+         style="background:rgba(255,255,255,.1);color:var(--white)">← Zurück</a>
+      <h1 class="font-display text-uppercase mb-0" style="font-size:1.2rem;font-weight:800;color:var(--white)">
+        Kind-Info
+      </h1>
+    </div>
+
+    {# Name & age #}
+    <div class="card mb-3" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 style="color:var(--white);font-size:1.4rem;font-weight:800;margin:0">{{ child.full_name }}</h2>
+            <div style="color:rgba(255,255,255,.5);font-size:.85rem;margin-top:.2rem">
+              Geb. {{ child.date_of_birth.strftime('%d.%m.%Y') }}
+              {% if registration and registration.age_group %}
+              · {{ registration.age_group.name }}
+              {% endif %}
+            </div>
+          </div>
+          {% if child.has_medical_notes %}
+          <span style="background:rgba(239,68,68,.2);color:#fca5a5;border-radius:6px;padding:.3rem .6rem;font-size:.8rem;font-weight:700"><i class="bi bi-heart-pulse"></i> Med</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# Medical notes #}
+    {% if child.medical_notes %}
+    <div class="card mb-3" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)">
+      <div class="card-body">
+        <div class="fw-700 mb-1" style="color:#fca5a5;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em"><i class="bi bi-heart-pulse"></i> Medizinische Hinweise</div>
+        <div style="color:var(--white);font-size:.9rem;white-space:pre-wrap">{{ child.medical_notes }}</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Pickup / travel #}
+    <div class="card mb-3" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+      <div class="card-body">
+        <div class="fw-700 mb-2" style="color:var(--lime);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em">Abholung / Heimweg</div>
+        {% if registration %}
+          {% if registration.independent_travel %}
+          <div style="color:var(--white)"><i class="bi bi-person-walking"></i> Darf das Gelände selbstständig verlassen</div>
+          {% else %}
+          <div style="color:rgba(255,255,255,.7)"><i class="bi bi-person"></i>‍<i class="bi bi-person"></i>‍<i class="bi bi-person"></i> Muss abgeholt werden</div>
+          {% endif %}
+        {% else %}
+        <div style="color:rgba(255,255,255,.4)">Keine Anmeldung für aktuelles Camp</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Emergency contacts #}
+    {% if child.emergency_contacts %}
+    <div class="card mb-3" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+      <div class="card-body">
+        <div class="fw-700 mb-2" style="color:var(--lime);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em">Notfallkontakte</div>
+        {% for ec in child.emergency_contacts %}
+        <div class="mb-3">
+          <div style="color:var(--white);font-weight:600">{{ ec.full_name }}
+            {% if ec.relationship %}<span style="color:rgba(255,255,255,.5);font-weight:400"> · {{ ec.relationship }}</span>{% endif %}
+          </div>
+          <a href="tel:{{ ec.phone_primary }}" style="color:var(--lime);font-size:1rem"><i class="bi bi-telephone"></i> {{ ec.phone_primary }}</a>
+          {% if ec.phone_secondary %}
+          <div><a href="tel:{{ ec.phone_secondary }}" style="color:rgba(184,244,66,.7);font-size:.85rem"><i class="bi bi-telephone"></i> {{ ec.phone_secondary }}</a></div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Parent contact #}
+    {% if child.parent %}
+    <div class="card mb-4" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)">
+      <div class="card-body">
+        <div class="fw-700 mb-2" style="color:var(--lime);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em">Elternteil</div>
+        <div style="color:var(--white)">{{ child.parent.full_name }}</div>
+        {% if child.parent.phone %}
+        <a href="tel:{{ child.parent.phone }}" style="color:var(--lime)"><i class="bi bi-telephone"></i> {{ child.parent.phone }}</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Check-in action button #}
+    {% if registration %}
+    <a href="{{ url_for('staff.confirm_checkin', registration_id=registration.id) }}"
+       class="btn w-100 btn-lg mb-3"
+       style="background:var(--lime);color:var(--green-900);font-weight:800;font-family:var(--font-display);text-transform:uppercase">
+      <i class="bi bi-check"></i> Zum Check-In
+    </a>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

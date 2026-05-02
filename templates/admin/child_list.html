@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Kinderverwaltung') }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.user_list') }}">Benutzerverwaltung</a></li>
+        <li class="breadcrumb-item active">Kinder</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <form class="mb-3 d-flex gap-2" method="GET">
+    <input type="text" name="q" class="form-control" placeholder="{{ _('Name oder Elternteil suchen…') }}"
+           value="{{ query_str }}" style="max-width:340px">
+    <button class="btn btn-outline-primary">{{ _('Suchen') }}</button>
+    {% if query_str %}<a href="{{ url_for('admin.child_list') }}" class="btn btn-outline-secondary"><i class="bi bi-x"></i> {{ _('Löschen') }}</a>{% endif %}
+  </form>
+
+  <div class="card" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>{{ _('Kind') }}</th><th>{{ _('Geburtsdatum') }}</th><th>{{ _('Elternteil') }}</th><th>{{ _('Akt. Anmeldung') }}</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for child in children.items %}
+          <tr>
+            <td>
+              <div class="fw-600">{{ child.full_name }}</div>
+              {% if child.has_medical_notes %}
+              <span class="medical-badge"><i class="bi bi-heart-pulse"></i> Med.</span>
+              {% endif %}
+            </td>
+            <td style="font-size:.875rem">{{ child.date_of_birth.strftime('%d.%m.%Y') }}</td>
+            <td style="font-size:.875rem">
+              {% if child.parent %}
+              <a href="{{ url_for('admin.user_detail', user_id=child.parent.id) }}">
+                {{ child.parent.full_name }}
+              </a>
+              {% else %}—{% endif %}
+            </td>
+            <td style="font-size:.8rem">
+              {% set regs = child.registrations | selectattr('status', 'in', ['confirmed','waitlisted','pending_verification']) | list %}
+              {% if regs %}
+                {% for reg in regs %}
+                <div>
+                  <span class="badge badge-{{ reg.status }}" style="font-size:.65rem">{{ reg.status }}</span>
+                  <span class="text-muted ms-1">{{ reg.camp_session.name if reg.camp_session else '?' }}</span>
+                </div>
+                {% endfor %}
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('admin.child_edit', child_id=child.id) }}"
+                 class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:.2rem .5rem">{{ _('Öffnen') }}</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center py-4 text-muted">{{ _('Keine Kinder gefunden.') }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if children.pages > 1 %}
+  <nav class="mt-3">
+    <ul class="pagination pagination-sm justify-content-center">
+      {% for p in children.iter_pages() %}
+        {% if p %}
+        <li class="page-item {{ 'active' if p == children.page else '' }}">
+          <a class="page-link" href="{{ url_for('admin.child_list', seite=p, q=query_str) }}">{{ p }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

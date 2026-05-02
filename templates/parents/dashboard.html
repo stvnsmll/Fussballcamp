@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Mein Bereich</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.5rem 0 0;font-size:.95rem">
+      Willkommen, {{ current_user.first_name }}
+    </p>
+  </div>
+</div>
+
+{% if dev_no_verify %}
+<div id="devModal" style="display:flex;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:1rem">
+  <div class="animate-in" style="background:white;border-radius:16px;max-width:420px;width:100%;padding:2rem;box-shadow:0 8px 40px rgba(0,0,0,.25)">
+    <div style="font-size:2rem;margin-bottom:.75rem"><i class="bi bi-tools"></i></div>
+    <h2 style="font-size:1.1rem;font-weight:800;text-transform:uppercase;margin-bottom:.5rem;color:#d97706">Entwicklungsmodus</h2>
+    <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin-bottom:1.25rem">
+      <strong>Keine E-Mail-Verifizierung erzwungen.</strong><br>
+      Im normalen Betrieb muss das Konto erst per E-Mail-Link bestätigt werden, bevor es genutzt werden kann.
+    </p>
+    <button onclick="document.getElementById('devModal').style.display='none'"
+            class="btn btn-outline-secondary w-100">Verstanden</button>
+  </div>
+</div>
+{% endif %}
+
+{% if show_welcome_modal and not children and not dev_no_verify %}
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem">
+  <div class="animate-in" style="background:white;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);max-width:420px;width:100%;padding:2.5rem 2rem;text-align:center">
+    <div style="font-size:3rem;margin-bottom:1rem"><i class="bi bi-plus-circle"></i></div>
+    <h2 style="font-size:1.3rem;font-weight:800;text-transform:uppercase;margin-bottom:.75rem">Noch kein Kind eingetragen</h2>
+    <p style="color:#6b7280;font-size:.95rem;margin-bottom:2rem;line-height:1.6">Fügen Sie Ihr erstes Kind hinzu um sich für ein Camp anzumelden.</p>
+    <div class="d-flex flex-column gap-2">
+      <a href="{{ url_for('parents.add_child') }}" class="btn btn-primary btn-lg w-100">Kind jetzt hinzufügen</a>
+      <button onclick="document.getElementById('welcomeModal').style.display='none'" class="btn btn-outline-secondary w-100">Später</button>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const m = document.getElementById('welcomeModal');
+    m.style.display = 'flex';
+    m.addEventListener('click', function(e) { if (e.target === m) m.style.display = 'none'; });
+  });
+</script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+  <div class="row g-4">
+
+    {# LEFT COLUMN — camps + children #}
+    <div class="col-lg-8">
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 fw-800 text-uppercase mb-0">Meine Kinder</h2>
+        <a href="{{ url_for('parents.add_child') }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus"></i> Kind hinzufügen
+        </a>
+      </div>
+
+      {% if not children %}
+      <div class="card text-center py-5 animate-in">
+        <div class="card-body">
+          <div style="font-size:3rem;opacity:.4"><i class="bi bi-plus-circle"></i></div>
+          <p class="text-muted mt-2 mb-3">Noch kein Kind eingetragen.</p>
+          <a href="{{ url_for('parents.add_child') }}" class="btn btn-primary">Kind hinzufügen</a>
+        </div>
+      </div>
+
+      {% else %}
+
+      {# ── Per-camp sections ─────────────────────────────────────────────── #}
+      {% if camp_sessions %}
+        {% for camp in camp_sessions %}
+        {% set reg_map = camp_registration_maps[camp.id] %}
+        <div class="card mb-4 animate-in">
+
+          {# Camp header #}
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-house-heart"></i> {{ camp.name }}</span>
+            <span class="d-flex gap-2 align-items-center">
+              <span class="badge badge-{{ camp.status }}" style="font-size:.7rem">{{ camp.status }}</span>
+              {% if camp.is_registration_open %}
+              <span class="badge badge-confirmed" style="font-size:.7rem">Anmeldung offen</span>
+              {% endif %}
+              <span style="font-size:.78rem;color:var(--text-muted)">
+                {{ camp.start_date.strftime('%d.%m.') }}–{{ camp.end_date.strftime('%d.%m.%Y') }}
+              </span>
+            </span>
+          </div>
+
+          <div class="card-body p-0">
+            {% for child in children %}
+            {% set reg = reg_map.get(child.id) %}
+
+            <div class="d-flex justify-content-between align-items-start p-3
+                        {% if not loop.last %}border-bottom{% endif %}"
+                 style="border-color:var(--cream-dark)">
+
+              {# Child avatar + name #}
+              <div class="d-flex gap-3 align-items-center">
+                <div style="width:2.5rem;height:2.5rem;background:var(--green-200);border-radius:50%;
+                             display:flex;align-items:center;justify-content:center;
+                             font-family:var(--font-display);font-weight:800;
+                             color:var(--green-800);flex-shrink:0;font-size:.95rem">
+                  {{ child.first_name[0] }}{{ child.last_name[0] }}
+                </div>
+                <div>
+                  <div class="fw-600" style="font-size:.9rem">{{ child.full_name }}</div>
+                  <div class="text-muted" style="font-size:.78rem">
+                    {{ child.age_on(camp.start_date) }} Jahre
+                    {% if reg and reg.age_group %} · {{ reg.age_group.name }}{% endif %}
+                    {% if child.has_medical_notes %}
+                    · <span style="color:#dc2626"><i class="bi bi-heart-pulse"></i> Med.</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              {# Right side — status + actions #}
+              <div class="d-flex flex-column align-items-end gap-1 flex-shrink-0">
+                {% if reg %}
+                  <span class="badge badge-{{ reg.status }}" style="font-size:.72rem">
+                    {{ reg.status | replace('_', ' ') | title }}
+                  </span>
+                  {% if reg.status == 'waitlisted' and reg.waitlist_position %}
+                  <div style="font-size:.72rem;color:var(--text-muted)">Pos. {{ reg.waitlist_position }}</div>
+                  {% endif %}
+                  <div class="d-flex gap-1 mt-1 flex-wrap justify-content-end">
+                    {% if reg.status == 'confirmed' %}
+                    <a href="{{ url_for('parents.view_qr', child_id=child.id) }}"
+                       class="btn btn-outline-primary btn-sm" style="font-size:.72rem;padding:.2rem .5rem">QR-Code</a>
+                    <a href="{{ url_for('parents.child_status', child_id=child.id) }}"
+                       class="btn btn-sm" style="font-size:.72rem;padding:.2rem .5rem;background:var(--cream-dark)">Status</a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('parents.cancel_registration', registration_id=reg.id) }}"
+                          id="cancelRegForm-{{ reg.id }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn-outline-danger btn-sm"
+                              style="font-size:.72rem;padding:.2rem .5rem">Stornieren</button>
+                    </form>
+                  </div>
+                {% elif camp.is_registration_open %}
+                  <span class="badge" style="background:rgba(99,102,241,.1);color:#6366f1;font-size:.72rem">Nicht angemeldet</span>
+                  <a href="{{ url_for('parents.register_for_camp', session_id=camp.id) }}"
+                     class="btn btn-lime btn-sm mt-1" style="font-size:.75rem;padding:.25rem .6rem">Anmelden →</a>
+                {% else %}
+                  <span class="badge" style="background:var(--cream-dark);color:var(--text-muted);font-size:.72rem">—</span>
+                {% endif %}
+              </div>
+
+            </div>
+            {% endfor %}
+          </div>
+
+          {# Camp footer — register all button if any unregistered #}
+          {% set any_unregistered = children | selectattr('id') | list %}
+          {% if camp.is_registration_open %}
+          <div class="card-footer text-end" style="background:var(--cream);border-top:1px solid var(--cream-dark)">
+            <a href="{{ url_for('parents.register_for_camp', session_id=camp.id) }}"
+               class="btn btn-lime btn-sm">
+              <i class="bi bi-clipboard-check"></i> Alle Kinder für dieses Camp anmelden
+            </a>
+          </div>
+          {% endif %}
+
+        </div>
+        {% endfor %}
+
+      {% else %}
+      {# No active camps — just show children list with edit options #}
+      <div class="row g-3">
+        {% for child in children %}
+        <div class="col-12 animate-in animate-in-{{ loop.index }}">
+          <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div class="d-flex gap-3 align-items-center">
+                <div style="width:2.5rem;height:2.5rem;background:var(--green-200);border-radius:50%;
+                             display:flex;align-items:center;justify-content:center;
+                             font-family:var(--font-display);font-weight:800;color:var(--green-800)">
+                  {{ child.first_name[0] }}{{ child.last_name[0] }}
+                </div>
+                <div>
+                  <div class="fw-600">{{ child.full_name }}</div>
+                  <div class="text-muted" style="font-size:.8rem">{{ child.date_of_birth.strftime('%d.%m.%Y') }}</div>
+                </div>
+              </div>
+              <a href="{{ url_for('parents.edit_child', child_id=child.id) }}" class="btn btn-outline-secondary btn-sm">Bearbeiten</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="alert alert-info mt-3">Derzeit ist kein Camp zur Anmeldung geöffnet.</div>
+      {% endif %}
+
+      {# Edit links at the bottom of each child — outside camp sections #}
+      {% if camp_sessions %}
+      <div class="mt-2">
+        <h6 class="h5 fw-800 text-uppercase mb-0" style="padding-bottom: 12px;">Kind-Profile bearbeiten</h6>
+        <div class="d-flex flex-wrap gap-2">
+          {% for child in children %}
+          <a href="{{ url_for('parents.edit_child', child_id=child.id) }}"
+             class="btn btn-success" style="font-size:.78rem">
+            {{ child.first_name }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% endif %} {# end if not children #}
+    </div>
+
+    {# RIGHT COLUMN — account summary #}
+    <div class="col-lg-4">
+
+      <div class="card animate-in animate-in-2">
+        <div class="card-header"><i class="bi bi-person"></i> Mein Konto</div>
+        <div class="card-body" style="font-size:.875rem">
+          <div class="fw-600">{{ current_user.full_name }}</div>
+          <div class="text-muted">{{ current_user.email }}</div>
+          {% if current_user.phone %}<div class="text-muted mt-1">{{ current_user.phone }}</div>{% endif %}
+          <hr class="my-2">
+          <a href="{{ url_for('parents.account') }}" class="btn btn-outline-primary btn-sm w-100">Konto bearbeiten</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

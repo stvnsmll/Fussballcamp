@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ child.full_name }}</h1>
+    {% if registration %}
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">
+      {{ registration.age_group.name if registration.age_group else '' }}
+      · <span class="badge badge-{{ registration.status }}">{{ registration.status }}</span>
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:640px">
+  <div class="row g-3">
+
+    <div class="col-12 animate-in">
+      <div class="card">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="text-muted" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Geburtsdatum</div>
+              <div class="fw-600">{{ child.date_of_birth.strftime('%d.%m.%Y') }}</div>
+            </div>
+            <div class="col-sm-6">
+              <div class="text-muted" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Heimweg</div>
+              <div class="fw-600">
+                {% if registration and registration.independent_travel %}
+                <span style="color:#16a34a"><i class="bi bi-person-walking"></i> Alleine erlaubt</span>
+                {% else %}
+                <span style="color:#dc2626"><i class="bi bi-car-front"></i> Abholung erforderlich</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if child.medical_notes %}
+    <div class="col-12 animate-in animate-in-2">
+      <div class="card" style="border-left:4px solid #ef4444">
+        <div class="card-header" style="color:#b91c1c"><i class="bi bi-heart-pulse"></i> Medizinische Hinweise</div>
+        <div class="card-body" style="white-space:pre-wrap;font-size:.9rem">
+          {{ child.medical_notes }}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if child.emergency_contacts %}
+    <div class="col-12 animate-in animate-in-3">
+      <div class="card">
+        <div class="card-header">Notfallkontakte</div>
+        <div class="card-body">
+          {% for ec in child.emergency_contacts %}
+          <div class="{{ 'mt-3 pt-3 border-top' if not loop.first else '' }}"
+               style="border-color:var(--cream-dark)!important">
+            <div class="fw-600">{{ ec.full_name }}
+              {% if ec.relationship %}<span class="text-muted fw-400"> ({{ ec.relationship }})</span>{% endif %}
+            </div>
+            <a href="tel:{{ ec.phone_primary }}" class="fw-600" style="font-size:1.1rem">
+              {{ ec.phone_primary }}
+            </a>
+            {% if ec.phone_secondary %}
+            <div><a href="tel:{{ ec.phone_secondary }}">{{ ec.phone_secondary }}</a></div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Today's check-in log #}
+    {% if today_checkins %}
+    <div class="col-12 animate-in animate-in-4">
+      <div class="card">
+        <div class="card-header">Heutige Aktivität</div>
+        <div class="card-body p-0">
+          {% for log in today_checkins %}
+          <div class="px-3 py-2 {{ 'border-top' if not loop.first else '' }}"
+               style="border-color:var(--cream-dark)!important;font-size:.875rem">
+            <div class="d-flex justify-content-between">
+              <span class="fw-600">
+                {% if log.event_type == 'checkin' %}<i class="bi bi-check"></i> Eingecheckt{% else %}<i class="bi bi-x"></i> Ausgecheckt{% endif %}
+              </span>
+              <span class="text-muted">{{ log.timestamp.strftime('%H:%M') }}</span>
+            </div>
+            <div class="text-muted" style="font-size:.75rem">
+              {{ log.method or '' }}
+              {% if log.performed_by %}· {{ log.performed_by.full_name }}{% endif %}
+              {% if log.is_auto_checkout %} · Auto-Checkout{% endif %}
+              {% if log.is_voided %} · <span style="color:#dc2626">Storniert</span>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

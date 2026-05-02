@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Camp-Sessions') }}</h1>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('admin.camp_create') }}" class="btn btn-lime">+ {{ _('Neue Session') }}</a>
+  </div>
+
+  {% if not camps %}
+  <div class="card text-center py-5" style="border:2px dashed var(--cream-dark)">
+    <div class="card-body">
+      <div style="font-size:3rem;opacity:.25"><i class="bi bi-house-heart"></i></div>
+      <p class="text-muted mt-2 mb-3">{{ _('Noch keine Camp-Sessions erstellt.') }}</p>
+      <a href="{{ url_for('admin.camp_create') }}" class="btn btn-primary">{{ _('Erste Session erstellen') }}</a>
+    </div>
+  </div>
+  {% else %}
+  {# Active camps #}
+  {% set active_camps   = camps | selectattr('status', 'in', ['upcoming','open','active','completed','cancelled']) | list %}
+  {% set draft_camps    = camps | selectattr('status', 'equalto', 'draft') | list %}
+  {% set archived_camps = camps | selectattr('status', 'equalto', 'archived') | list %}
+
+  <div class="row g-3">
+    {% for camp in active_camps %}
+    <div class="col-12 animate-in animate-in-{{ loop.index % 4 + 1 }}">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+            <div>
+              <h2 class="h5 fw-700 mb-1">{{ camp.name }}</h2>
+              <div class="text-muted" style="font-size:.875rem">
+                <i class="bi bi-calendar"></i> {{ camp.start_date.strftime('%d.%m.%Y') }} – {{ camp.end_date.strftime('%d.%m.%Y') }}
+                {% if camp.min_age_limit or camp.max_age_limit %}
+                · <i class="bi bi-person"></i>
+                {% if camp.min_age_limit and camp.max_age_limit %}{{ camp.min_age_limit }}–{{ camp.max_age_limit }} J.
+                {% elif camp.min_age_limit %}ab {{ camp.min_age_limit }} J.
+                {% else %}bis {{ camp.max_age_limit }} J.{% endif %}
+                {% endif %}
+                {% if camp.location %}· <i class="bi bi-geo-alt"></i> {{ camp.location }}{% endif %}
+              </div>
+              <div class="mt-2 d-flex gap-2 flex-wrap">
+                <span class="badge badge-{{ camp.status }}">{{ camp.status }}</span>
+                {% if camp.registration_open %}
+                <span class="badge badge-confirmed">{{ _('Anmeldung offen') }}</span>
+                {% endif %}
+                {% if camp.require_head_coaches %}
+                <span class="badge" style="background:rgba(245,158,11,.1);color:#d97706">{{ _('Haupttrainer erforderlich') }}</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}"
+                 class="btn btn-sm btn-outline-primary">{{ _('Bearbeiten') }}</a>
+              <a href="{{ url_for('admin.age_group_list', camp_id=camp.id) }}"
+                 class="btn btn-sm btn-outline-secondary">{{ _('Gruppen') }}</a>
+              <a href="{{ url_for('admin.trainer_assignments', camp_id=camp.id) }}"
+                 class="btn btn-sm btn-outline-secondary">{{ _('Trainer') }}</a>
+              <a href="{{ url_for('admin.waitlist', camp_id=camp.id) }}"
+                 class="btn btn-sm btn-outline-secondary">{{ _('Warteliste') }}</a>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            {% set confirmed = camp.registrations | selectattr('status','equalto','confirmed') | list | length %}
+            {% set waitlisted = camp.registrations | selectattr('status','equalto','waitlisted') | list | length %}
+            <div class="col-6 col-md-3">
+              <div class="stat-card" style="padding:.75rem">
+                <div class="stat-number" style="font-size:1.8rem">{{ confirmed }}</div>
+                <div class="stat-label">{{ _('Bestätigt') }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card" style="padding:.75rem">
+                <div class="stat-number" style="font-size:1.8rem;color:#d97706">{{ waitlisted }}</div>
+                <div class="stat-label">{{ _('Warteliste') }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card" style="padding:.75rem">
+                <div class="stat-number" style="font-size:1.8rem">{{ camp.age_groups | length }}</div>
+                <div class="stat-label">{{ _('Gruppen') }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="stat-card" style="padding:.75rem">
+                <div class="stat-number" style="font-size:1.8rem">{{ camp.camp_days | length }}</div>
+                <div class="stat-label">{{ _('Tage') }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if draft_camps %}
+  <h2 class="h6 fw-700 text-uppercase text-muted mt-4 mb-3">
+    <i class="bi bi-pencil-square"></i> Entwürfe
+  </h2>
+  <div class="row g-3">
+    {% for camp in draft_camps %}
+    <div class="col-12 animate-in">
+      <div class="card" style="opacity:.8;border-style:dashed">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <span class="badge badge-draft me-2">Entwurf</span>
+            <strong>{{ camp.name }}</strong>
+            <span class="text-muted ms-2" style="font-size:.85rem">
+              {{ camp.start_date.strftime('%d.%m.%Y') }} – {{ camp.end_date.strftime('%d.%m.%Y') }}
+            </span>
+          </div>
+          <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}" class="btn btn-sm btn-outline-secondary">Bearbeiten</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if archived_camps %}
+  <h2 class="h6 fw-700 text-uppercase text-muted mt-4 mb-3">
+    <i class="bi bi-archive"></i> Archiv
+  </h2>
+  <div class="row g-3">
+    {% for camp in archived_camps %}
+    <div class="col-12 animate-in">
+      <div class="card" style="opacity:.65">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <span class="badge badge-archived me-2">Archiviert</span>
+            <strong>{{ camp.name }}</strong>
+            <span class="text-muted ms-2" style="font-size:.85rem">
+              {{ camp.start_date.strftime('%d.%m.%Y') }} – {{ camp.end_date.strftime('%d.%m.%Y') }}
+            </span>
+          </div>
+          <a href="{{ url_for('admin.camp_edit', camp_id=camp.id) }}" class="btn btn-sm btn-outline-secondary">Ansehen</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% endif %}
+</div>
+{% endblock %}

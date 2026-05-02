@@ -1,0 +1,53 @@
+{% extends "email_templates/_base_email.html" %}
+
+{% block title %}{{ announcement.title }} – {{ camp_name }}{% endblock %}
+{% block preheader %}Neue Nachricht vom {{ camp_name }}: {{ announcement.title }}{% endblock %}
+
+{% block header_stripe %}
+<tr>
+  <td style="background-color:#b8f442;padding:10px 40px;">
+    <p style="margin:0;font-size:12px;font-weight:700;color:#1b3f2a;letter-spacing:.06em;text-transform:uppercase;">
+      Neue Neuigkeit
+    </p>
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+
+  <h1 style="margin:0 0 8px;font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-0.4px;">
+    {{ announcement.title }}
+  </h1>
+  <p style="margin:0 0 20px;font-size:12px;color:#9ca3af;">
+    {{ camp_name }}
+    {% if announcement.published_at %}
+      · {{ announcement.published_at.strftime('%d.%m.%Y') }}
+    {% endif %}
+  </p>
+
+  <div style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 28px;">
+    {{ announcement.body | truncate(400) }}
+  </div>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">
+    <tr>
+      <td style="background-color:#b8f442;border-radius:9px;">
+        <a href="{{ announcements_url }}"
+           class="cta-button"
+           style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:800;
+                  color:#1b3f2a;text-decoration:none;border-radius:9px;
+                  font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+          Vollständig lesen →
+        </a>
+      </td>
+    </tr>
+  </table>
+
+{% endblock %}
+
+{% block footer_extra %}
+<p style="margin:6px 0 0;font-size:10px;color:#4d7a61;line-height:1.4;">
+  Sie erhalten diese E-Mail, weil Sie Neuigkeiten vom {{ camp_name }} abonniert haben.
+  <a href="{{ unsubscribe_url }}" style="color:#6b9980;">Benachrichtigungen abbestellen</a>
+</p>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>Für Camp anmelden</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.5rem 0 0">
+      {{ camp_session.name }} ·
+      {{ camp_session.start_date.strftime('%d.%m.') }}–{{ camp_session.end_date.strftime('%d.%m.%Y') }}
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:640px">
+
+  {% if not child_data %}
+  <div class="alert alert-warning">
+    <strong>Keine Kinder eingetragen.</strong>
+    <a href="{{ url_for('parents.add_child') }}">Kind hinzufügen →</a>
+  </div>
+  {% else %}
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <h2 class="h5 fw-800 text-uppercase mb-3">Kinder auswählen</h2>
+    <div class="row g-3 mb-4">
+      {% for item in child_data %}
+      {% set child = item.child %}
+      <div class="col-12">
+        {% if item.eligible %}
+        <label class="child-toggle-card selected d-block" style="cursor:pointer">
+          <input type="checkbox" name="child_ids" value="{{ child.id }}"
+                 checked style="display:none" class="child-checkbox">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-3 align-items-center">
+              <div style="width:2.5rem;height:2.5rem;background:var(--green-200);
+                           border-radius:50%;display:flex;align-items:center;justify-content:center;
+                           font-family:var(--font-display);font-weight:800;color:var(--green-800);
+                           flex-shrink:0">
+                {{ child.first_name[0] }}{{ child.last_name[0] }}
+              </div>
+              <div>
+                <div class="fw-600">{{ child.full_name }}</div>
+                <div style="font-size:.8rem;color:var(--text-muted)">
+                  {{ child.age_on(camp_session.start_date) }} Jahre
+                  · Gruppe: <strong>{{ item.age_group.name }}</strong>
+                  {% if item.age_group.is_full %}
+                  <span class="badge badge-waitlisted ms-1">Warteliste</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="toggle-indicator checked-indicator" aria-hidden="true"></div>
+          </div>
+        </label>
+        {% else %}
+        <div class="child-toggle-card disabled" title="{{ item.ineligible_reason }}" aria-disabled="true">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-3 align-items-center">
+              <div style="width:2.5rem;height:2.5rem;background:var(--cream-dark);
+                           border-radius:50%;display:flex;align-items:center;justify-content:center;
+                           font-family:var(--font-display);font-weight:800;color:var(--green-800);
+                           flex-shrink:0">
+                {{ child.first_name[0] }}{{ child.last_name[0] }}
+              </div>
+              <div>
+                <div class="fw-600">{{ child.full_name }}</div>
+                <div style="font-size:.8rem;color:var(--text-muted)">
+                  {{ child.age_on(camp_session.start_date) }} Jahre
+                  · <span style="color:var(--status-cancelled)">{{ item.ineligible_reason }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-lime w-100 btn-lg">
+      Anmelden
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Toggle visual state when checkbox changes — label handles the click natively
+document.querySelectorAll('.child-checkbox').forEach(function(cb) {
+  var card = cb.closest('.child-toggle-card');
+  cb.addEventListener('change', function() {
+    if (cb.checked) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+});
+</script>
+{% endblock %}

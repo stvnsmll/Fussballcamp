@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block body_class %}checkin-mode{% endblock %}
+{% block page_header %}{% endblock %}
+{% block extra_style %}
+.scanner-shell { min-height: 100vh; background: var(--green-900); padding: 1.5rem 0 3rem; color: var(--white); }
+.scanner-panel { background: rgba(0,0,0,.3); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
+.scanner-status { font-size: .8rem; color: rgba(255,255,255,.5); padding: .4rem 0; }
+{% endblock %}
+{% block content %}
+<div class="scanner-shell">
+  <div class="container" style="max-width:520px">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <a href="{{ url_for('staff.dashboard') }}" class="btn btn-sm"
+         style="background:rgba(255,255,255,.1);color:var(--white)">← Dashboard</a>
+      <h1 class="font-display text-uppercase mb-0" style="font-size:1.1rem;font-weight:800">
+        Kind-Info scannen
+      </h1>
+    </div>
+
+    <p style="color:rgba(255,255,255,.6);font-size:.875rem;margin-bottom:1.5rem">
+      QR-Code eines Kindes scannen, um Infos zu sehen — ohne Check-In auszulösen.
+    </p>
+
+    {# Inline camera scanner #}
+    <div class="scanner-panel">
+      <div style="position:relative">
+        <video id="scannerVideo" style="width:100%;display:block;max-height:300px;object-fit:cover;min-height: 220px;" playsinline></video>
+        <canvas id="scannerCanvas" style="display:none"></canvas>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div style="width:200px;height:200px;border:3px solid var(--lime);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.4)"></div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center px-3 py-2">
+        <div class="scanner-status" id="scannerStatus">Kamera wird gestartet…</div>
+        <button onclick="toggleCamera()" id="btnCamera" class="btn btn-sm"
+                style="background:rgba(255,255,255,.1);color:var(--white);font-size:.75rem">Stopp</button>
+      </div>
+    </div>
+
+    {# Manual search fallback #}
+    <div class="text-center mb-3">
+      <button onclick="toggleSearch()" id="btnToggleSearch"
+              style="background:none;border:none;color:rgba(255,255,255,.4);font-size:.78rem;cursor:pointer">
+        <i class="bi bi-search"></i> QR-Code nicht lesbar? Manuell suchen
+      </button>
+    </div>
+    <div id="searchWrap" style="display:none" class="position-relative mb-3" style="z-index:9999">
+      <input type="text" id="searchInput" class="checkin-search-bar"
+             placeholder="Kind suchen…" autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+const infoBase = '{{ url_for("staff.child_info_by_qr", token="TOKEN") }}'.replace('TOKEN', '');
+
+let stream = null, timer = null, running = false;
+
+function startCamera() {
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment', width: { ideal: 1280 } }
+  }).then(s => {
+    stream = s; running = true;
+    const v = document.getElementById('scannerVideo');
+    v.srcObject = s; v.play();
+    document.getElementById('scannerStatus').textContent = 'QR-Code in den Rahmen halten…';
+    document.getElementById('btnCamera').textContent = 'Stopp';
+    timer = setInterval(scanFrame, 200);
+  }).catch(err => {
+    document.getElementById('scannerStatus').textContent =
+      location.protocol !== 'https:' && location.hostname !== 'localhost'
+        ? 'HTTPS erforderlich für Kamerazugriff.'
+        : 'Kamera nicht verfügbar: ' + err.message;
+  });
+}
+
+function stopCamera() {
+  running = false;
+  clearInterval(timer);
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('scannerStatus').textContent = 'Kamera gestoppt.';
+  document.getElementById('btnCamera').textContent = 'Start';
+}
+
+function toggleCamera() {
+  running ? stopCamera() : startCamera();
+}
+
+function scanFrame() {
+  const v = document.getElementById('scannerVideo');
+  const c = document.getElementById('scannerCanvas');
+  if (v.readyState !== v.HAVE_ENOUGH_DATA) return;
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(v, 0, 0, c.width, c.height);
+  const img = ctx.getImageData(0, 0, c.width, c.height);
+  const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+  if (code) {
+    const m = code.data.match(/\/(?:kind-info|qr)\/([A-Za-z0-9_-]+)/);
+    if (m) { stopCamera(); window.location.href = infoBase + m[1]; }
+  }
+}
+
+function toggleSearch() {
+  const w = document.getElementById('searchWrap');
+  const shown = w.style.display !== 'none';
+  w.style.display = shown ? 'none' : 'block';
+  if (!shown) document.getElementById('searchInput').focus();
+}
+
+// Search wiring (same as checkin_mode)
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+let searchTimer;
+searchInput.addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  if (q.length < 2) { searchResults.style.display = 'none'; return; }
+  searchTimer = setTimeout(() => {
+    fetch('/team/suche?q=' + encodeURIComponent(q))
+      .then(r => r.json()).then(data => {
+        if (!data.length) { searchResults.style.display = 'none'; return; }
+        searchResults.innerHTML = data.map(item =>
+          `<div class="search-result-item" onclick="window.location.href='${infoBase}${item.qr_token}'">
+            <strong>${item.name}</strong>
+            <span style="color:rgba(255,255,255,.5);font-size:.8rem">${item.group || ''}</span>
+          </div>`
+        ).join('');
+        searchResults.style.display = 'block';
+      });
+  }, 250);
+});
+
+startCamera();
+</script>
+{% endblock %}

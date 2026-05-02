@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Namensschilder — {{ camp.name }}</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Helvetica Neue', Arial, sans-serif; background: white; }
+
+/* Screen controls */
+.controls {
+  padding: 1rem 1.5rem;
+  background: #f4f3ed;
+  border-bottom: 1px solid #e8e5dc;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+.controls h1 { font-size: 1rem; font-weight: 700; flex: 1; }
+@media print { .controls { display: none !important; } }
+
+/* A4 page grid — 2 columns x 5 rows = 10 cards per page */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 10mm;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, 54mm);
+  gap: 5mm;
+}
+
+/* Each card = business card 85x54mm */
+.card {
+  width: 100%;
+  height: 54mm;
+  border-radius: 4mm;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+/* FRONT card */
+.card-front {
+  flex-direction: row;
+}
+.card-front .card-body {
+  flex: 1;
+  padding: 4mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 197px;
+}
+.card-name {
+  font-size: 22pt;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #1a1a1a;
+}
+.card-sub {
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-top: 2mm;
+}
+.card-medical {
+  font-size: 10pt;
+  color: #dc2626;
+  margin-top: auto;
+  font-weight: 700;
+}
+.card-qr {
+  width: 35mm;
+  flex-shrink: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2mm;
+  border-left: 1px solid rgba(0,0,0,.08);
+}
+.card-qr img { width: 26mm; height: 26mm; }
+
+/* Colour strip at left */
+.card-accent {
+  width: 5mm;
+  flex-shrink: 0;
+}
+
+/* BACK card */
+.card-back {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4mm;
+  background: #1b3f2a;
+  color: white;
+}
+.card-back .camp-name {
+  font-size: 12pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #b8f442;
+}
+.card-back .camp-year {
+  font-size: 9pt;
+  color: rgba(255,255,255,.6);
+  margin-top: 2mm;
+}
+.card-back .camp-logo {
+  font-size: 22pt;
+  margin-bottom: 2mm;
+}
+
+/* Staff card accent */
+.card-staff .card-accent { background: #6366f1; }
+.card-staff .card-sub    { color: #6366f1; }
+
+@media print {
+  body { background: white; }
+  .page {
+    width: 210mm;
+    height: 297mm;
+    padding: 10mm;
+    page-break-after: always;
+  }
+  .card { border-color: #ccc; }
+}
+
+  /* Custom football icon — inherits currentColor like Bootstrap Icons */
+  .icon-fussball {
+    display: inline-block;
+    width: 1em; height: 1em;
+    background-color: currentColor;
+      -webkit-mask-image: url('/static/images/fussball.svg');
+              mask-image: url('/static/images/fussball.svg');
+      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center; mask-position: center;
+    vertical-align: -0.125em;
+   }
+  </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+{# Screen controls #}
+<div class="controls">
+  <h1>Namensschilder — {{ camp.name }} ({{ 'Kinder' if kind == 'kids' else 'Team' }})</h1>
+  <a href="{{ url_for('admin.name_tags', camp_id=camp.id, kind=kind, side='front') }}"
+     class="btn btn-sm {{ 'btn-primary' if side == 'front' else 'btn-outline-secondary' }}">Vorderseite</a>
+  <a href="{{ url_for('admin.name_tags', camp_id=camp.id, kind=kind, side='back') }}"
+     class="btn btn-sm {{ 'btn-primary' if side == 'back' else 'btn-outline-secondary' }}">Rückseite</a>
+  |
+  <a href="{{ url_for('admin.name_tags', camp_id=camp.id, kind='kids', side=side) }}"
+     class="btn btn-sm {{ 'btn-success' if kind == 'kids' else 'btn-outline-secondary' }}">Kinder</a>
+  <a href="{{ url_for('admin.name_tags', camp_id=camp.id, kind='staff', side=side) }}"
+     class="btn btn-sm {{ 'btn-success' if kind == 'staff' else 'btn-outline-secondary' }}">Team</a>
+  |
+  <button onclick="window.print()" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Drucken</button>
+  <a href="{{ url_for('admin.roster', camp_id=camp.id) }}" class="btn btn-outline-secondary btn-sm">← Zurück</a>
+</div>
+
+{# Print tip #}
+<div style="padding:.5rem 1.5rem;font-size:.78rem;color:#888;background:#fff8e1;border-bottom:1px solid #fde68a">
+  <i class="bi bi-lightbulb"></i> Tipp: Vorderseite drucken → Papier umdrehen → Rückseite drucken → schneiden &amp; laminieren
+</div>
+
+{# Pages of 10 cards #}
+{% set ns = namespace(count=0) %}
+{% for chunk_start in range(0, cards|length, 10) %}
+{% set chunk = cards[chunk_start:chunk_start+10] %}
+<div class="page">
+  {% for card in chunk %}
+
+  {% if side == 'front' %}
+  {# FRONT — name, group, QR code #}
+  <div class="card card-front {{ 'card-staff' if card.kind == 'staff' }}">
+    <div class="card-accent" style="background:{{ card.colour }}"></div>
+    <div class="card-body">
+      <div>
+        <div class="card-name">{{ card.name }}</div>
+        <div class="card-sub" style="color:{{ card.colour }}">{{ card.sub }}</div>
+      </div>
+      {% if card.medical %}
+      <div class="card-medical"><i class="bi bi-heart-pulse"></i> Medizinische Hinweise — Trainer Informieren —</div>
+      {% endif %}
+    </div>
+    {% if card.qr_b64 %}
+    <div class="card-qr">
+      <img src="data:image/png;base64,{{ card.qr_b64 }}" alt="QR">
+    </div>
+    {% endif %}
+  </div>
+
+  {% else %}
+  {# BACK — camp branding #}
+  <div class="card card-back">
+    <div class="camp-logo"><i class="icon-fussball"></i></div>
+    <div class="camp-name">{{ camp.name }}</div>
+    <div class="camp-year">{{ camp.year }}</div>
+  </div>
+  {% endif %}
+
+  {% endfor %}
+
+  {# Fill remaining slots to keep grid correct #}
+  {% for i in range(10 - chunk|length) %}
+  <div class="card" style="border:1px dashed #ddd;background:#fafafa"></div>
+  {% endfor %}
+</div>
+{% endfor %}
+
+</body>
+
+</html>

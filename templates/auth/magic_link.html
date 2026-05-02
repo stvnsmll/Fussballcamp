@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block extra_style %}
+.auth-wrap { min-height: calc(100vh - 130px); display:flex; align-items:center; padding:2rem 0; }
+.auth-card { max-width:420px; width:100%; margin:0 auto; }
+.auth-card .card { border:none; box-shadow: var(--shadow-lg); }
+.auth-card .card-body { padding: 2rem; }
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+<div class="auth-card animate-in">
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center mb-4">
+        <div style="font-size:2rem"><i class="bi bi-envelope"></i></div>
+        <h1 class="h4 fw-800 text-uppercase mt-2">Per E-Mail anmelden</h1>
+        <p class="text-muted" style="font-size:.875rem">
+          Wir schicken Ihnen einen Einmal-Link — kein Passwort nötig.
+        </p>
+      </div>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.email.label(class='form-label') }}
+          {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else ''), autocomplete='email', placeholder='ihre@email.de') }}
+          {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">Anmeldelink senden</button>
+      </form>
+      <hr class="my-3">
+      <div class="text-center" style="font-size:.875rem">
+        <a href="{{ url_for('auth.login') }}" class="text-muted">← Zurück zur Anmeldung</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

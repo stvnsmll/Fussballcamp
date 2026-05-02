@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ _('Neuigkeit bearbeiten') if announcement else _('Neue Neuigkeit') }}</h1>
+  </div>
+</div>
+
+<script>
+document.querySelector('form').addEventListener('submit', async function(e) {
+  const sendEmail = document.querySelector('#send_email');
+  if (!sendEmail || !sendEmail.checked) return;
+
+  e.preventDefault();
+  const form = this;
+  const visibility = document.querySelector('#visibility')?.value || 'all';
+
+  try {
+    const res = await fetch('/admin/neuigkeiten/empfaenger-anzahl?visibility=' + visibility);
+    const data = await res.json();
+    const count = data.count;
+    const msg = count === 1
+      ? 'Eine E-Mail wird an <strong>1 Empfänger</strong> gesendet.'
+      : 'Eine E-Mail wird an <strong>' + count + ' Empfänger</strong> gesendet.';
+    showConfirmModal({
+      iconClass: 'bi-envelope-fill', iconColor: '#1d4ed8',
+      titleColor: '#1d4ed8',
+      title: 'E-Mail senden?',
+      body: msg,
+      confirmLabel: 'Ja, senden',
+      confirmClass: 'btn-primary',
+      onConfirm: function(){ form.submit(); }
+    });
+  } catch(err) {
+    showConfirmModal({
+      iconClass: 'bi-envelope-fill', iconColor: '#1d4ed8',
+      titleColor: '#1d4ed8',
+      title: 'E-Mail senden?',
+      body: 'E-Mail-Benachrichtigung an alle Empfänger senden.',
+      confirmLabel: 'Ja, senden',
+      confirmClass: 'btn-primary',
+      onConfirm: function(){ form.submit(); }
+    });
+  }
+});
+</script>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+{% block content %}
+<div class="container pb-5" style="max-width:660px">
+  <div class="card animate-in" style="border:none;box-shadow:var(--shadow-md)">
+    <div class="card-body p-4">
+      <form method="POST" enctype="multipart/form-data" onsubmit="return true" id="announcementForm">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.title.label(class='form-label') }}
+          {{ form.title(class='form-control' + (' is-invalid' if form.title.errors else '')) }}
+          {% for e in form.title.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          {{ form.body.label(class='form-label') }}
+          {{ form.body(class='form-control', rows=8) }}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            {{ form.visibility.label(class='form-label') }}
+            {{ form.visibility(class='form-select') }}
+            <div class="form-text">
+              <strong>all</strong> — {{ _('Eltern &amp; Team') }} ·
+              <strong>staff</strong> — {{ _('nur Team') }}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            {{ form.target_age_groups.label(class='form-label') }}
+            {{ form.target_age_groups(class='form-control', placeholder='z.B. U10, U12 — leer = alle') }}
+            <div class="form-text">{{ _('Kommagetrennte Gruppennamen, oder leer für alle.') }}</div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-auto">
+            <div class="form-check">
+              {{ form.is_pinned(class='form-check-input') }}
+              {{ form.is_pinned.label(class='form-check-label') }}
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check">
+              {{ form.send_email(class='form-check-input') }}
+              {{ form.send_email.label(class='form-check-label') }}
+              <div class="form-text" id="recipientHint" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+
+        {% if form.image %}
+        <div class="mb-4">
+          {{ form.image.label(class='form-label') }}
+          {{ form.image(class='form-control', accept='image/*') }}
+          {% if announcement and announcement.image_url %}
+          <div class="mt-2">
+            <img src="{{ announcement.image_url }}" alt="{{ _('Aktuelles Bild') }}"
+                 style="max-height:120px;border-radius:var(--radius)">
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="d-flex gap-3">
+          <button type="submit" class="btn btn-primary flex-fill">
+            {{ _('Änderungen speichern') if announcement else _('Veröffentlichen') }}
+          </button>
+          <a href="{{ url_for('admin.announcement_list') }}"
+             class="btn btn-outline-secondary">{{ _('Abbrechen') }}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+function updateRecipientCount() {
+  var cb = document.getElementById('send_email');
+  var vis = document.getElementById('visibility');
+  var hint = document.getElementById('recipientHint');
+  if (!vis || !hint || !cb) return;
+  if (!cb.checked) {
+    hint.style.display = 'none';
+    hint.textContent = '';
+    return;
+  }
+  hint.style.display = 'block';
+  hint.textContent = '…';
+  fetch('/admin/neuigkeiten/empfaenger-anzahl?visibility=' + vis.value)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      hint.textContent = d.count + ' Empfänger erhalten diese E-Mail.';
+    }).catch(function(){});
+}
+var vis = document.getElementById('visibility');
+var cb = document.getElementById('send_email');
+if (vis) vis.addEventListener('change', updateRecipientCount);
+if (cb) cb.addEventListener('change', updateRecipientCount);
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="page-header">
+  <div class="container">
+    <h1>{{ user.full_name }}</h1>
+    <p style="color:rgba(255,255,255,.65);margin:.4rem 0 0">{{ user.email }} · {{ user.role }}</p>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container pb-5">
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card animate-in">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          {{ _('Kontodaten') }}
+          <a href="{{ url_for('admin.user_edit', user_id=user.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Bearbeiten') }}</a>
+        </div>
+        <div class="card-body" style="font-size:.875rem">
+          <table class="table table-sm">
+            <tr><td class="text-muted">{{ _('Name') }}</td><td class="fw-600">{{ user.full_name }}</td></tr>
+            <tr><td class="text-muted">{{ _('E-Mail') }}</td><td>{{ user.email }}</td></tr>
+            <tr><td class="text-muted">{{ _('Telefon') }}</td><td>{{ user.phone or '—' }}</td></tr>
+            <tr><td class="text-muted">{{ _('Adresse') }}</td><td>{{ user.address_street or '' }}{% if user.address_city %}, {{ user.address_city }}{% endif %} {{ user.address_postcode or '' }}</td></tr>
+            <tr><td class="text-muted">{{ _('Verifiziert') }}</td><td><i class="{{ 'bi bi-check' if user.email_verified else 'bi bi-x' }}"></i>{{ '' if user.is_active else ' Ausstehend'}}</td></tr>
+            <tr><td class="text-muted">{{ _('Konto aktiv') }}</td><td><i class="{{ 'bi bi-check' if user.is_active else 'bi bi-x' }}"></i></td></tr>
+            <tr><td class="text-muted">{{ _('Einwilligung') }}</td><td>{{ user.consent_version or '—' }}{% if user.consent_given_at %} ({{ user.consent_given_at.strftime('%d.%m.%Y') }}){% endif %}</td></tr>
+            <tr><td class="text-muted">{{ _('Erstellt') }}</td><td>{{ user.created_at.strftime('%d.%m.%Y') }}</td></tr>
+          </table>
+          {% if user.manually_entered %}
+          <div class="alert alert-warning mt-2 mb-0" style="font-size:.8rem">
+            {{ _('Manuell eingetragen — E-Mail-Bestätigung ausstehend') }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Password reset #}
+      <div class="card mt-3 animate-in animate-in-2">
+        <div class="card-header">{{ _('Passwort zurücksetzen') }}</div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('admin.user_reset_password', user_id=user.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="input-group">
+              <input type="text" name="new_password" class="form-control form-control-sm"
+                     placeholder="{{ _('Neues Passwort') }}" minlength="8">
+              <button class="btn btn-sm btn-outline-danger">{{ _('Setzen') }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      {# Children — shown for all roles #}
+      {% set visible_children = user.children | rejectattr('is_deleted') | list %}
+      <div class="card animate-in">
+        <div class="card-header d-flex justify-content-between">
+          {{ _('Kinder') }} ({{ visible_children | length }})
+          {% if user.role == 'parent' %}
+          <a href="{{ url_for('admin.manual_entry') }}" class="btn btn-xs btn-outline-primary" style="font-size:.75rem;padding:.2rem .6rem">+ Anmelden</a>
+          {% endif %}
+        </div>
+        <div class="card-body p-0">
+          {% for child in visible_children %}
+          <div class="p-3 {{ 'border-top' if not loop.first else '' }}" style="border-color:var(--cream-dark)!important">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-600">{{ child.full_name }}</div>
+                <div class="text-muted" style="font-size:.78rem">{{ child.date_of_birth.strftime('%d.%m.%Y') }}</div>
+                {% if child.has_medical_notes %}<span class="medical-badge mt-1"><i class="bi bi-heart-pulse"></i> Med. Hinweise</span>{% endif %}
+                {% for reg in child.registrations %}
+                <div style="font-size:.78rem;margin-top:.25rem">
+                  {{ reg.camp_session.name if reg.camp_session else '' }}:
+                  <span class="badge badge-{{ reg.status }}">{{ reg.status }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="d-flex gap-1">
+                <a href="{{ url_for('admin.child_edit', child_id=child.id) }}" class="btn btn-xs btn-outline-secondary" style="font-size:.72rem;padding:.2rem .5rem"><i class="bi bi-pencil"></i></a>
+                <form method="POST" action="{{ url_for('admin.regenerate_qr', child_id=child.id) }}"
+                      id="qrForm-{{ child.id }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="button"
+                          class="btn btn-xs btn-outline-danger"
+                          style="font-size:.72rem;padding:.2rem .5rem"
+                          title="{{ _('QR neu generieren') }}"
+                          onclick="showConfirmModal({iconClass:'bi-qr-code',iconColor:'#dc2626',title:'QR-Code neu generieren?',body:'Ein neuer QR-Code wird für <strong>{{ child.full_name }}</strong> erstellt.',warning:'Alle gedruckten Namensschilder mit QR-Code für dieses Kind werden ungültig.',confirmLabel:'Ja, neu generieren',onConfirm:function(){document.getElementById('qrForm-{{ child.id }}').submit();}})">
+                    <i class="bi bi-arrow-repeat"></i> Neu QR
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <p class="text-muted p-3 mb-0">{{ _('Keine Kinder.') }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Staff profile #}
+      {% if user.role in ('staff', 'admin') %}
+      <div class="card mt-3 animate-in">
+        <div class="card-header">{{ _('Staff-Profil') }}</div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('admin.user_edit_staff_profile', user_id=user.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-2">
+              <label class="form-label">{{ _('Funktion') }}</label>
+              <select name="staff_class" class="form-select form-select-sm">
+                {% for val, label in [('trainer', _('Trainer')),('general', _('Allgemein')),('food', _('Verpflegung'))] %}
+                <option value="{{ val }}" {{ 'selected' if user.staff_profile and user.staff_profile.staff_class == val else '' }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-check mb-2">
+              <input type="checkbox" name="is_first_aid" class="form-check-input"
+                     {{ 'checked' if user.staff_profile and user.staff_profile.is_first_aid else '' }}>
+              <label class="form-check-label">{{ _('Ersthelfer') }}</label>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">{{ _('Interne Notizen') }}</label>
+              <textarea name="notes" class="form-control form-control-sm" rows="2">{{ user.staff_profile.notes if user.staff_profile else '' }}</textarea>
+            </div>
+            <button class="btn btn-sm btn-primary">Speichern</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      {# Danger zone #}
+      <div class="card mt-3 animate-in animate-in-3" style="border-color:rgba(239,68,68,.3)">
+        <div class="card-header" style="color:#b91c1c">{{ _('Gefahrenzone') }}</div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('admin.user_delete', user_id=user.id) }}" id="delAccountForm-{{ user.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    onclick="showConfirmModal({iconClass:'bi-person-x-fill',iconColor:'#dc2626',title:'Konto löschen?',body:'Das Konto von <strong>{{ user.full_name }}</strong> wird dauerhaft gelöscht.',warning:'Alle Kindprofile und Anmeldungen werden ebenfalls entfernt. Nicht rückgängig zu machen.',confirmLabel:'Ja, Konto löschen',onConfirm:function(){document.getElementById('delAccountForm-{{ user.id }}').submit();}})">
+              {{ _('Konto löschen (DSGVO)') }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

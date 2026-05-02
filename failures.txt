@@ -1,0 +1,214 @@
+tests/test_access_control.py::TestParentAccessControl::test_parent_can_access_parent_routes[GET-/eltern/email-einstellungen] FAILED [ 10%]
+tests/test_access_control.py::TestParentAccessControl::test_parent_can_access_parent_routes[GET-/eltern/datenschutz] FAILED [ 10%]
+tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/roster] FAILED [ 15%]
+tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/checkin] FAILED [ 16%]
+tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/noch-da] FAILED [ 16%]
+tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/admin/einstellungen] FAILED [ 18%]
+tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/roster] FAILED [ 20%]
+tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/checkin] FAILED [ 20%]
+tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/noch-da] FAILED [ 20%]
+tests/test_access_control.py::TestDeletedOrInactiveUsers::test_deleted_user_session_gets_redirected FAILED [ 22%]
+tests/test_admin.py::TestCampManagement::test_edit_camp_get FAILED       [ 24%]
+tests/test_admin.py::TestCampManagement::test_edit_camp_post FAILED      [ 24%]
+tests/test_admin.py::TestCampManagement::test_set_camp_status FAILED     [ 25%]
+tests/test_admin.py::TestUserManagement::test_user_detail FAILED         [ 27%]
+tests/test_admin.py::TestUserManagement::test_user_edit_post FAILED      [ 28%]
+tests/test_admin.py::TestUserManagement::test_cannot_delete_self FAILED  [ 28%]
+tests/test_admin.py::TestChildRegistrationManagement::test_child_edit_post FAILED [ 29%]
+tests/test_admin.py::TestChildRegistrationManagement::test_registration_edit_get FAILED [ 30%]
+tests/test_admin.py::TestChildRegistrationManagement::test_registration_edit_post_changes_status FAILED [ 30%]
+tests/test_admin.py::TestChildRegistrationManagement::test_waitlist_page FAILED [ 30%]
+tests/test_admin.py::TestAnnouncementManagement::test_create_announcement_post FAILED [ 31%]
+tests/test_admin.py::TestStaffInvite::test_invite_post_creates_user FAILED [ 32%]
+tests/test_admin.py::TestStaffInvite::test_invite_duplicate_email_shows_error FAILED [ 32%]
+tests/test_admin.py::TestAnalyticsAndSettings::test_settings_get FAILED  [ 33%]
+tests/test_admin.py::TestAnalyticsAndSettings::test_settings_post_updates_retention FAILED [ 33%]
+tests/test_auth.py::TestRegister::test_get_renders_form FAILED           [ 35%]
+tests/test_auth.py::TestRegister::test_duplicate_email_redirects_to_login_with_vague_message FAILED [ 36%]
+tests/test_auth.py::TestRegister::test_missing_required_field_shows_form_again FAILED [ 36%]
+tests/test_auth.py::TestRegister::test_password_mismatch_shows_error FAILED [ 37%]
+tests/test_auth.py::TestVerifyEmail::test_expired_token_shows_error FAILED [ 38%]
+tests/test_auth.py::TestLogin::test_correct_credentials_redirect_to_dashboard FAILED [ 38%]
+tests/test_auth.py::TestLogin::test_admin_redirects_to_admin_dashboard FAILED [ 38%]
+tests/test_auth.py::TestLogin::test_staff_redirects_to_staff_dashboard FAILED [ 39%]
+tests/test_auth.py::TestLogin::test_unverified_email_blocked FAILED      [ 40%]
+tests/test_auth.py::TestLogin::test_inactive_user_blocked FAILED         [ 40%]
+tests/test_auth.py::TestLogin::test_already_logged_in_redirected FAILED  [ 40%]
+tests/test_auth.py::TestPasswordReset::test_request_with_unknown_email_still_succeeds_silently FAILED [ 41%]
+tests/test_auth.py::TestPasswordReset::test_valid_reset_token_renders_form FAILED [ 42%]
+tests/test_auth.py::TestReconfirmConsent::test_shown_if_consent_outdated FAILED [ 42%]
+tests/test_auth.py::TestRedeemInvite::test_get_renders_form FAILED       [ 43%]
+tests/test_auth.py::TestRedeemInvite::test_invalid_token_redirects_with_error FAILED [ 43%]
+tests/test_auth.py::TestRedeemInvite::test_expired_token_redirects_with_error FAILED [ 44%]
+tests/test_auth.py::TestRedeemInvite::test_post_completes_invite FAILED  [ 44%]
+tests/test_child_status.py::TestChildStatusPage::test_404_for_other_parents_child FAILED [ 46%]
+tests/test_child_status.py::TestLiveCheckinStatus::test_auto_refresh_meta_present_when_child_is_present FAILED [ 48%]
+tests/test_child_status.py::TestStaffAbsenceVisibility::test_group_detail_shows_absence_badge FAILED [ 52%]
+tests/test_child_status.py::TestStaffAbsenceVisibility::test_group_detail_no_badge_when_cancelled FAILED [ 52%]
+tests/test_feedback.py::TestFeedbackSubmit::test_get_renders_for_admin FAILED [ 55%]
+tests/test_feedback.py::TestFeedbackSubmit::test_valid_submission_creates_report FAILED [ 56%]
+tests/test_feedback.py::TestFeedbackSubmit::test_subject_too_short_shows_error FAILED [ 56%]
+tests/test_feedback.py::TestFeedbackSubmit::test_description_too_short_shows_error FAILED [ 56%]
+tests/test_feedback.py::TestFeedbackSubmit::test_html_in_subject_is_stripped FAILED [ 56%]
+tests/test_feedback.py::TestFeedbackSubmit::test_severity_choices FAILED [ 57%]
+tests/test_feedback.py::TestMyReports::test_shows_own_reports FAILED     [ 57%]
+tests/test_helpers.py::TestCheckin::test_checkout_after_checkin_succeeds FAILED [ 64%]
+tests/test_models.py::TestAgeGroupProperties::test_head_coach_returns_correct_assignment FAILED [ 69%]
+tests/test_models.py::TestCampSessionProperties::test_camp_days_returns_correct_list FAILED [ 71%]
+tests/test_parents.py::TestParentDashboard::test_shows_children_and_registrations FAILED [ 76%]
+tests/test_parents.py::TestEditChild::test_get_renders_form FAILED       [ 77%]
+tests/test_parents.py::TestEditChild::test_other_parent_cannot_edit FAILED [ 78%]
+tests/test_parents.py::TestDeleteChild::test_cannot_delete_registered_child FAILED [ 78%]
+tests/test_parents.py::TestCampRegistration::test_get_shows_child_eligibility FAILED [ 78%]
+tests/test_parents.py::TestCampRegistration::test_post_registers_child_as_confirmed FAILED [ 79%]
+tests/test_parents.py::TestCampRegistration::test_full_group_waitlists_child FAILED [ 79%]
+tests/test_parents.py::TestCampRegistration::test_no_children_selected_shows_error FAILED [ 80%]
+tests/test_parents.py::TestCancelRegistration::test_cancels_confirmed_registration FAILED [ 80%]
+tests/test_parents.py::TestCancelRegistration::test_cannot_cancel_other_parents_registration FAILED [ 80%]
+tests/test_parents.py::TestAccountSettings::test_post_updates_name FAILED [ 81%]
+tests/test_parents.py::TestAccountSettings::test_toggle_email_announcements FAILED [ 81%]
+tests/test_public.py::TestPublicPages::test_kontakt_post_valid_shows_success FAILED [ 83%]
+tests/test_public.py::TestPublicPages::test_kontakt_honeypot_silently_discards FAILED [ 84%]
+tests/test_public.py::TestPublicPages::test_kontakt_missing_message_shows_error FAILED [ 84%]
+tests/test_roster.py::TestGroupRosterContent::test_shows_group_name_and_head_coach FAILED [ 94%]
+tests/test_staff.py::TestRoster::test_renders_all_groups FAILED          [ 95%]
+tests/test_staff.py::TestRoster::test_filter_by_group FAILED             [ 96%]
+tests/test_staff.py::TestCheckinMode::test_renders_checkin_page FAILED   [ 96%]
+tests/test_staff.py::TestCheckinMode::test_redirects_without_active_camp FAILED [ 96%]
+tests/test_staff.py::TestQrCheckin::test_invalid_token_shows_error FAILED [ 97%]
+tests/test_staff.py::TestDoCheckinCheckout::test_do_checkin_creates_log FAILED [ 98%]
+tests/test_staff.py::TestDoCheckinCheckout::test_do_checkout_creates_log FAILED [ 98%]
+tests/test_staff.py::TestDoCheckinCheckout::test_confirm_checkin_page_renders FAILED [ 98%]
+tests/test_staff.py::TestDoCheckinCheckout::test_confirm_checkout_page_renders FAILED [ 98%]
+tests/test_staff.py::TestVoidEvent::test_void_marks_log_as_voided FAILED [ 99%]
+tests/test_staff.py::TestIndependentTravel::test_approve_sets_flag FAILED [100%]
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.parents.EmailPreferencesForm object' has no attribute 'email_reminders'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/tests/test_admin.py:279: AssertionError: assert 'Test' == 'Geändert'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'reg' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.auth.RegistrationForm object' has no attribute 'form_rendered_at'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.auth.RegistrationForm object' has no attribute 'form_rendered_at'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.auth.RegistrationForm object' has no attribute 'form_rendered_at'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.auth.RegistrationForm object' has no attribute 'form_rendered_at'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'views.auth.RegistrationForm object' has no attribute 'form_rendered_at'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/tests/test_auth.py:414: AssertionError: assert 'abgelaufen' in '<!doctype html>\n<html lang=en>\n<title>429 too many requests</title>\n<h1>too many requests</h1>\n<p>10 per 1 minute</p>\n'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'group' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'group' is undefined
+/home/jstriggs/fussballcamp/tests/test_helpers.py:318: ValueError: too many values to unpack (expected 3)
+/home/jstriggs/fussballcamp/tests/test_models.py:131: AttributeError: 'User' object has no attribute 'staff_user_id'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:526: jinja2.exceptions.TemplateRuntimeError: No test named 'not in'.
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/tests/test_parents.py:27: AttributeError: 'NoneType' object has no attribute 'id'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:526: jinja2.exceptions.TemplateRuntimeError: No test named 'not in'.
+/home/jstriggs/fussballcamp/templates/parents/register_for_camp.html:128: jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:526: jinja2.exceptions.TemplateRuntimeError: No test named 'not in'.
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:526: jinja2.exceptions.TemplateRuntimeError: No test named 'not in'.
+/home/jstriggs/fussballcamp/templates/parents/register_for_camp.html:128: jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:526: jinja2.exceptions.TemplateRuntimeError: No test named 'not in'.
+/home/jstriggs/fussballcamp/views/parents.py:605: AttributeError: 'NoneType' object has no attribute 'strip'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'sub_modules.models.User object' has no attribute 'staff_user'
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'roster_by_group' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'roster_by_group' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/utils.py:92: jinja2.exceptions.UndefinedError: 'csrf_token' is undefined
+/home/jstriggs/fussballcamp/venv/lib/python3.12/site-packages/jinja2/environment.py:490: jinja2.exceptions.UndefinedError: 'group' is undefined
+FAILED tests/test_access_control.py::TestParentAccessControl::test_parent_can_access_parent_routes[GET-/eltern/email-einstellungen]
+FAILED tests/test_access_control.py::TestParentAccessControl::test_parent_can_access_parent_routes[GET-/eltern/datenschutz]
+FAILED tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/roster]
+FAILED tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/checkin]
+FAILED tests/test_access_control.py::TestStaffAccessControl::test_staff_can_access_staff_routes[GET-/team/noch-da]
+FAILED tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/admin/einstellungen]
+FAILED tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/roster]
+FAILED tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/checkin]
+FAILED tests/test_access_control.py::TestAdminAccessControl::test_admin_can_access_all_routes[GET-/team/noch-da]
+FAILED tests/test_access_control.py::TestDeletedOrInactiveUsers::test_deleted_user_session_gets_redirected
+FAILED tests/test_admin.py::TestCampManagement::test_edit_camp_get - jinja2.e...
+FAILED tests/test_admin.py::TestCampManagement::test_edit_camp_post - jinja2....
+FAILED tests/test_admin.py::TestCampManagement::test_set_camp_status - assert...
+FAILED tests/test_admin.py::TestUserManagement::test_user_detail - jinja2.exc...
+FAILED tests/test_admin.py::TestUserManagement::test_user_edit_post - Asserti...
+FAILED tests/test_admin.py::TestUserManagement::test_cannot_delete_self - jin...
+FAILED tests/test_admin.py::TestChildRegistrationManagement::test_child_edit_post
+FAILED tests/test_admin.py::TestChildRegistrationManagement::test_registration_edit_get
+FAILED tests/test_admin.py::TestChildRegistrationManagement::test_registration_edit_post_changes_status
+FAILED tests/test_admin.py::TestChildRegistrationManagement::test_waitlist_page
+FAILED tests/test_admin.py::TestAnnouncementManagement::test_create_announcement_post
+FAILED tests/test_admin.py::TestStaffInvite::test_invite_post_creates_user - ...
+FAILED tests/test_admin.py::TestStaffInvite::test_invite_duplicate_email_shows_error
+FAILED tests/test_admin.py::TestAnalyticsAndSettings::test_settings_get - jin...
+FAILED tests/test_admin.py::TestAnalyticsAndSettings::test_settings_post_updates_retention
+FAILED tests/test_auth.py::TestRegister::test_get_renders_form - jinja2.excep...
+FAILED tests/test_auth.py::TestRegister::test_duplicate_email_redirects_to_login_with_vague_message
+FAILED tests/test_auth.py::TestRegister::test_missing_required_field_shows_form_again
+FAILED tests/test_auth.py::TestRegister::test_password_mismatch_shows_error
+FAILED tests/test_auth.py::TestVerifyEmail::test_expired_token_shows_error - ...
+FAILED tests/test_auth.py::TestLogin::test_correct_credentials_redirect_to_dashboard
+FAILED tests/test_auth.py::TestLogin::test_admin_redirects_to_admin_dashboard
+FAILED tests/test_auth.py::TestLogin::test_staff_redirects_to_staff_dashboard
+FAILED tests/test_auth.py::TestLogin::test_unverified_email_blocked - assert ...
+FAILED tests/test_auth.py::TestLogin::test_inactive_user_blocked - assert 429...
+FAILED tests/test_auth.py::TestLogin::test_already_logged_in_redirected - ass...
+FAILED tests/test_auth.py::TestPasswordReset::test_request_with_unknown_email_still_succeeds_silently
+FAILED tests/test_auth.py::TestPasswordReset::test_valid_reset_token_renders_form
+FAILED tests/test_auth.py::TestReconfirmConsent::test_shown_if_consent_outdated
+FAILED tests/test_auth.py::TestRedeemInvite::test_get_renders_form - jinja2.e...
+FAILED tests/test_auth.py::TestRedeemInvite::test_invalid_token_redirects_with_error
+FAILED tests/test_auth.py::TestRedeemInvite::test_expired_token_redirects_with_error
+FAILED tests/test_auth.py::TestRedeemInvite::test_post_completes_invite - ass...
+FAILED tests/test_child_status.py::TestChildStatusPage::test_404_for_other_parents_child
+FAILED tests/test_child_status.py::TestLiveCheckinStatus::test_auto_refresh_meta_present_when_child_is_present
+FAILED tests/test_child_status.py::TestStaffAbsenceVisibility::test_group_detail_shows_absence_badge
+FAILED tests/test_child_status.py::TestStaffAbsenceVisibility::test_group_detail_no_badge_when_cancelled
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_get_renders_for_admin
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_valid_submission_creates_report
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_subject_too_short_shows_error
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_description_too_short_shows_error
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_html_in_subject_is_stripped
+FAILED tests/test_feedback.py::TestFeedbackSubmit::test_severity_choices - as...
+FAILED tests/test_feedback.py::TestMyReports::test_shows_own_reports - assert...
+FAILED tests/test_helpers.py::TestCheckin::test_checkout_after_checkin_succeeds
+FAILED tests/test_models.py::TestAgeGroupProperties::test_head_coach_returns_correct_assignment
+FAILED tests/test_models.py::TestCampSessionProperties::test_camp_days_returns_correct_list
+FAILED tests/test_parents.py::TestParentDashboard::test_shows_children_and_registrations
+FAILED tests/test_parents.py::TestEditChild::test_get_renders_form - jinja2.e...
+FAILED tests/test_parents.py::TestEditChild::test_other_parent_cannot_edit - ...
+FAILED tests/test_parents.py::TestDeleteChild::test_cannot_delete_registered_child
+FAILED tests/test_parents.py::TestCampRegistration::test_get_shows_child_eligibility
+FAILED tests/test_parents.py::TestCampRegistration::test_post_registers_child_as_confirmed
+FAILED tests/test_parents.py::TestCampRegistration::test_full_group_waitlists_child
+FAILED tests/test_parents.py::TestCampRegistration::test_no_children_selected_shows_error
+FAILED tests/test_parents.py::TestCancelRegistration::test_cancels_confirmed_registration
+FAILED tests/test_parents.py::TestCancelRegistration::test_cannot_cancel_other_parents_registration
+FAILED tests/test_parents.py::TestAccountSettings::test_post_updates_name - A...
+FAILED tests/test_parents.py::TestAccountSettings::test_toggle_email_announcements
+FAILED tests/test_public.py::TestPublicPages::test_kontakt_post_valid_shows_success
+FAILED tests/test_public.py::TestPublicPages::test_kontakt_honeypot_silently_discards
+FAILED tests/test_public.py::TestPublicPages::test_kontakt_missing_message_shows_error
+FAILED tests/test_roster.py::TestGroupRosterContent::test_shows_group_name_and_head_coach
+FAILED tests/test_staff.py::TestRoster::test_renders_all_groups - jinja2.exce...
+FAILED tests/test_staff.py::TestRoster::test_filter_by_group - jinja2.excepti...
+FAILED tests/test_staff.py::TestCheckinMode::test_renders_checkin_page - jinj...
+FAILED tests/test_staff.py::TestCheckinMode::test_redirects_without_active_camp
+FAILED tests/test_staff.py::TestQrCheckin::test_invalid_token_shows_error - j...
+FAILED tests/test_staff.py::TestDoCheckinCheckout::test_do_checkin_creates_log
+FAILED tests/test_staff.py::TestDoCheckinCheckout::test_do_checkout_creates_log
+FAILED tests/test_staff.py::TestDoCheckinCheckout::test_confirm_checkin_page_renders
+FAILED tests/test_staff.py::TestDoCheckinCheckout::test_confirm_checkout_page_renders
+FAILED tests/test_staff.py::TestVoidEvent::test_void_marks_log_as_voided - ji...
+FAILED tests/test_staff.py::TestIndependentTravel::test_approve_sets_flag - j...
