@@ -770,3 +770,78 @@ def create_staff_invite(email: str, staff_class: str, is_first_aid: bool,
     db.session.commit()
 
     return True, token, f'Einladung für {email} erstellt.'
+
+
+# =============================================================================
+# BOOTSTRAP: First-admin setup — only works when no admin account exists yet.
+# Reads ADMIN_EMAIL + ADMIN_PASSWORD from environment variables.
+# Once an admin exists this route returns 403 permanently.
+# =============================================================================
+
+@auth_bp.route('/setup', methods=['GET', 'POST'])
+def setup():
+    '''
+    One-time admin bootstrap. Accessible without login.
+    Disabled permanently once any admin account exists.
+    '''
+    import os
+    from flask import current_app
+    from sub_modules.models import ConsentVersion
+    from sub_modules.config import CURRENT_CONSENT_VERSION
+    from datetime import date
+
+    # Block if any admin already exists
+    if User.query.filter_by(role='admin').first():
+        return render_template('auth/setup_done.html'), 403
+
+    credentials = None
+    error = None
+
+    if request.method == 'POST':
+        email    = os.environ.get('ADMIN_EMAIL', '').strip().lower()
+        password = os.environ.get('ADMIN_PASSWORD', '').strip()
+
+        if not email or not password:
+            error = ('ADMIN_EMAIL und ADMIN_PASSWORD müssen als '
+                     'Umgebungsvariablen gesetzt sein.')
+        elif User.query.filter_by(email=email).first():
+            error = f'Ein Konto mit {email} existiert bereits (aber kein Admin?). Bitte DB prüfen.'
+        else:
+            # Ensure a consent version row exists (required FK)
+            cv = ConsentVersion.query.filter_by(version=CURRENT_CONSENT_VERSION).first()
+            if not cv:
+                cv = ConsentVersion(
+                    version=CURRENT_CONSENT_VERSION,
+                    summary='Erstveröffentlichung.',
+                    full_text='[Vollständiger Datenschutztext hier einfügen]',
+                    effective_date=date(2025, 1, 1),
+                )
+                db.session.add(cv)
+                db.session.flush()
+
+            admin = User(
+                email=email,
+                password_hash=hash_password(password),
+                first_name='Admin',
+                last_name='',
+                role='admin',
+                email_verified=True,
+                is_active=True,
+                consent_given_at=datetime.utcnow(),
+                consent_version=CURRENT_CONSENT_VERSION,
+            )
+            db.session.add(admin)
+
+            # Admin needs a StaffProfile row (FK constraint)
+            db.session.flush()
+            profile = StaffProfile(user_id=admin.id, staff_class='trainer')
+            db.session.add(profile)
+            db.session.commit()
+
+            credentials = {'email': email, 'password': password}
+
+    return render_template(
+        'auth/setup.html',
+        credentials=credentials,
+        error=error,
+    )

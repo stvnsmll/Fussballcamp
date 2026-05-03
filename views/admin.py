@@ -2145,6 +2145,90 @@ def dev_tools():
             current_app.config['DISABLE_RATE_LIMIT'] = state['DISABLE_RATE_LIMIT']
             flash(f'Rate-Limit Feedback: {"deaktiviert" if state["DISABLE_RATE_LIMIT"] else "aktiv"}.', 'success')
 
+        elif action == 'seed_database':
+            try:
+                from sub_modules.seed import (
+                    _seed_consent_version, _seed_camp_session,
+                    _seed_admin, _seed_staff, _seed_parents,
+                    _seed_announcements, _seed_sample_checkins,
+                )
+                from sub_modules.models import Child
+                keep = request.form.get('seed_keep') == '1'
+                num_parents = int(request.form.get('seed_parents', 30))
+
+                if not keep:
+                    db.drop_all()
+                    db.create_all()
+                    # Re-create the current admin so we don't lock ourselves out
+                    import os
+                    from sub_modules.helpers import hash_password as _hp
+                    from datetime import datetime as _dt
+                    from sub_modules.config import CURRENT_CONSENT_VERSION as _CV
+                    from sub_modules.models import ConsentVersion as _CV_model
+                    from datetime import date as _date
+                    cv = _CV_model(
+                        version=_CV, summary='Seed.',
+                        full_text='[Text]',
+                        effective_date=_date(2025, 1, 1),
+                    )
+                    db.session.add(cv)
+                    db.session.flush()
+                    me = User(
+                        email=current_user.email,
+                        password_hash=current_user.password_hash,
+                        first_name=current_user.first_name,
+                        last_name=current_user.last_name,
+                        role='admin',
+                        email_verified=True,
+                        is_active=True,
+                        consent_given_at=_dt.utcnow(),
+                        consent_version=_CV,
+                    )
+                    db.session.add(me)
+                    db.session.flush()
+                    from sub_modules.models import StaffProfile as _SP
+                    db.session.add(_SP(user_id=me.id, staff_class='trainer'))
+                    db.session.commit()
+
+                _seed_consent_version()
+                camp    = _seed_camp_session()
+                admin   = _seed_admin()
+                staff   = _seed_staff(5)
+                parents = _seed_parents(num_parents, camp)
+                _seed_announcements(camp, admin)
+                _seed_sample_checkins(camp)
+                db.session.commit()
+
+                total_children = Child.query.count()
+                seed_result = {
+                    'camp': f'{camp.name} ({camp.start_date} – {camp.end_date})',
+                    'admin_email': 'admin@example.com',
+                    'admin_password': 'admin1234',
+                    'staff_emails': [f'trainer{i}@example.com' for i in range(1, 6)],
+                    'staff_password': 'staff1234',
+                    'parent_count': len(parents),
+                    'child_count': total_children,
+                    'parent_password': 'parent1234',
+                }
+                _save_dev_state(state)
+                _apply_dev_state(state)
+                return render_template(
+                    'admin/dev_tools.html',
+                    is_dev=is_dev, state=state,
+                    dev_open_registration=state.get('DEV_OPEN_REGISTRATION', False),
+                    dev_suppress_email=state.get('MAIL_SUPPRESS_SEND', False),
+                    show_language_switcher=state.get('SHOW_LANGUAGE_SWITCHER', False),
+                    dev_camp_today=state.get('DEV_CAMP_TODAY', False),
+                    toast_duration=state.get('TOAST_DURATION', 5),
+                    show_template_name=state.get('SHOW_TEMPLATE_NAME', False),
+                    disable_rate_limit=state.get('DISABLE_RATE_LIMIT', False),
+                    camp=camp,
+                    seed_result=seed_result,
+                    title='Dev Tools',
+                )
+            except Exception as e:
+                flash(f'Seed fehlgeschlagen: {e}', 'danger')
+
         _save_dev_state(state)
         _apply_dev_state(state)
         return redirect(url_for('admin.dev_tools'))
