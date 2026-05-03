@@ -1,12 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container text-center py-5">
-  <div class="py-4">
+<div class="container py-5">
+  <div class="text-center py-4">
     <div class="font-display fw-bold" style="font-size:7rem;color:var(--green-200);line-height:1">500</div>
     <h1 class="h3 mt-2">{{ _('Serverfehler') }}</h1>
     <p class="text-muted mt-2 mb-4">{{ _('Es ist ein unerwarteter Fehler aufgetreten. Wir wurden benachrichtigt.') }}</p>
     <a href="{{ url_for('public.index') }}" class="btn btn-primary me-2">{{ _('Zur Startseite') }}</a>
     <a href="{{ url_for('feedback.submit') }}" class="btn btn-outline-primary">{{ _('Fehler melden') }}</a>
   </div>
+
+  {% if traceback %}
+  <div class="mt-4" style="max-width:860px;margin:0 auto;text-align:left">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white d-flex align-items-center gap-2" style="font-size:.85rem">
+        <i class="bi bi-bug-fill"></i>
+        <strong>Dev mode — Fehlerdetails</strong>
+        <span class="ms-auto badge bg-white text-danger">SHOW_ERROR_DETAILS = ON</span>
+      </div>
+      {% if error %}
+      <div class="px-3 pt-3 pb-1" style="font-size:.85rem">
+        <strong>{{ error.__class__.__name__ }}:</strong>
+        <span class="text-danger">{{ error }}</span>
+      </div>
+      {% endif %}
+      <pre class="m-0 p-3" style="font-size:.78rem;overflow-x:auto;background:#1e1e2e;color:#cdd6f4;border-radius:0 0 .4rem .4rem">{{ traceback }}</pre>
+    </div>
+    <p class="text-muted mt-2" style="font-size:.75rem">
+      <i class="bi bi-eye-slash"></i>
+      Dieses Panel ist nur sichtbar wenn <strong>Fehlerdetails</strong> in
+      <a href="{{ url_for('admin.dev_tools') }}">Dev Tools</a> eingeschaltet ist.
+    </p>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
