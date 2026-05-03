@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block _tpl_name %}auth/setup{% endblock %}
+{% block extra_style %}
+.auth-wrap { min-height: calc(100vh - 130px); display:flex; align-items:center; }
+.auth-card { max-width: 480px; width: 100%; margin: 0 auto; }
+.auth-card .card { border: none; box-shadow: var(--shadow-lg); }
+.auth-card .card-body { padding: 2rem; }
+.auth-header { text-align:center; margin-bottom: 1.75rem; }
+.auth-header h1 { font-size: 1.6rem; font-weight: 800; text-transform: uppercase; }
+.cred-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:.5rem; padding:1.25rem; }
+.cred-row { display:flex; justify-content:space-between; align-items:center;
+            padding:.4rem 0; border-bottom:1px solid #dcfce7; font-size:.9rem; }
+.cred-row:last-child { border-bottom:none; }
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap py-4">
+<div class="auth-card animate-in">
+  <div class="card">
+    <div class="card-body">
+
+      <div class="auth-header">
+        <div style="font-size:2.2rem">⚙️</div>
+        <h1>Ersteinrichtung</h1>
+        <div class="subtitle">Admin-Konto anlegen</div>
+      </div>
+
+      {% if credentials %}
+        {# ── Success: show credentials ── #}
+        <div class="cred-box mb-4">
+          <p class="fw-bold text-success mb-3">
+            <i class="bi bi-check-circle-fill"></i> Admin-Konto erstellt!
+          </p>
+          <div class="cred-row">
+            <span class="text-muted">E-Mail</span>
+            <code>{{ credentials.email }}</code>
+          </div>
+          <div class="cred-row">
+            <span class="text-muted">Passwort</span>
+            <code>{{ credentials.password }}</code>
+          </div>
+        </div>
+        <p class="text-muted mb-4" style="font-size:.82rem">
+          <i class="bi bi-shield-lock"></i>
+          Bitte das Passwort nach dem ersten Login ändern.<br>
+          Diese Seite ist ab jetzt gesperrt.
+        </p>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-success w-100">
+          Zum Login →
+        </a>
+
+      {% elif error %}
+        {# ── Error ── #}
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+        <p class="text-muted" style="font-size:.85rem">
+          Setze <code>ADMIN_EMAIL</code> und <code>ADMIN_PASSWORD</code> als
+          Umgebungsvariablen im Render-Dashboard, dann nochmal versuchen.
+        </p>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-primary w-100">Nochmal versuchen</button>
+        </form>
+
+      {% else %}
+        {# ── Initial form ── #}
+        <p class="text-muted mb-4" style="font-size:.88rem">
+          Die Datenbank ist leer. Klicke unten, um den ersten Admin-Account anzulegen.<br><br>
+          E-Mail und Passwort werden aus den Umgebungsvariablen
+          <code>ADMIN_EMAIL</code> und <code>ADMIN_PASSWORD</code> gelesen.
+        </p>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-person-fill-add"></i> Admin-Konto erstellen
+          </button>
+        </form>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
