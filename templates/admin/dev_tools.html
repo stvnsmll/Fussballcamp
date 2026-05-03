@@ -220,100 +220,25 @@
     </div>
     <div class="p-3">
       <p class="text-muted mb-3" style="font-size:.85rem">
-        Erstellt realistische Testdaten (Faker). <strong>„Neu seeden"</strong> löscht alle
-        vorhandenen Daten und legt dein Admin-Konto neu an. Dein aktuelles Login bleibt erhalten.
+        Fügt realistische Testdaten (Faker) zur Datenbank hinzu. Bereits vorhandene Konten werden übersprungen.
       </p>
-      {# Hidden form — submitted by the modal confirm button #}
-      <form method="POST" id="seedForm">
+      <form method="POST">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="seed_database">
-        <input type="hidden" name="seed_keep" id="seedKeepInput" value="0">
         <div class="d-flex align-items-center gap-2 mb-3">
           <label style="font-size:.85rem;font-weight:600;white-space:nowrap">Eltern-Konten:</label>
           <input type="number" name="seed_parents" value="30" min="5" max="200"
                  class="form-control form-control-sm" style="width:80px">
         </div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-danger btn-sm"
-                  onclick="openSeedModal(false)">
-            <i class="bi bi-arrow-counterclockwise"></i> Neu seeden (löscht alles)
-          </button>
-          <button type="button" name="seed_keep" value="1" class="btn btn-outline-secondary btn-sm"
-                  onclick="openSeedModal(true)">
-            <i class="bi bi-plus-circle"></i> Hinzufügen (behalten)
-          </button>
-        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-circle"></i> Demo-Daten hinzufügen
+        </button>
       </form>
-
-      {# Confirmation modal #}
-      <div id="seedModal" style="display:none;position:fixed;inset:0;z-index:9999;
-           background:rgba(0,0,0,.6);align-items:center;justify-content:center">
-        <div class="card border-danger animate-in" style="max-width:440px;width:90%;margin:auto">
-          <div class="card-header bg-danger text-white d-flex align-items-center gap-2">
-            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-            <strong id="seedModalTitle">Achtung — Alle Daten werden gelöscht</strong>
-          </div>
-          <div class="card-body">
-            <p id="seedModalBody" class="mb-3" style="font-size:.9rem"></p>
-            <ul id="seedModalList" style="font-size:.85rem;color:var(--text-muted)" class="mb-3">
-              <li>Alle Registrierungen, Kinder &amp; Eltern-Konten</li>
-              <li>Alle Camps, Altersgruppen &amp; Einteilungen</li>
-              <li>Alle Check-ins, Meldungen &amp; Ankündigungen</li>
-              <li>Alle Fehlerprotokolle &amp; Analytics</li>
-            </ul>
-            <p style="font-size:.82rem" class="text-muted mb-0">
-              <i class="bi bi-shield-check"></i>
-              Dein Admin-Konto bleibt erhalten. Diese Aktion kann nicht rückgängig gemacht werden.
-            </p>
-          </div>
-          <div class="card-footer d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm"
-                    onclick="closeSeedModal()">Abbrechen</button>
-            <button type="button" class="btn btn-danger btn-sm" id="seedConfirmBtn"
-                    onclick="confirmSeed()">
-              <i class="bi bi-exclamation-triangle-fill"></i> Ja, fortfahren
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <script>
-        var _seedKeep = false;
-        function openSeedModal(keep) {
-          _seedKeep = keep;
-          var modal = document.getElementById('seedModal');
-          var title = document.getElementById('seedModalTitle');
-          var body  = document.getElementById('seedModalBody');
-          var list  = document.getElementById('seedModalList');
-          var btn   = document.getElementById('seedConfirmBtn');
-          if (keep) {
-            title.textContent = 'Demo-Daten hinzufügen';
-            body.textContent  = 'Neue Testdaten werden zu den bestehenden Daten hinzugefügt. Bestehende Einträge bleiben erhalten.';
-            list.style.display = 'none';
-            btn.innerHTML = '<i class="bi bi-plus-circle"></i> Ja, hinzufügen';
-            btn.className = 'btn btn-secondary btn-sm';
-          } else {
-            title.textContent = 'Achtung — Alle Daten werden gelöscht!';
-            body.textContent  = 'Folgende Daten werden unwiderruflich gelöscht und durch neue Testdaten ersetzt:';
-            list.style.display = '';
-            btn.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Ja, alles löschen';
-            btn.className = 'btn btn-danger btn-sm';
-          }
-          modal.style.display = 'flex';
-        }
-        function closeSeedModal() {
-          document.getElementById('seedModal').style.display = 'none';
-        }
-        function confirmSeed() {
-          document.getElementById('seedKeepInput').value = _seedKeep ? '1' : '0';
-          closeSeedModal();
-          document.getElementById('seedForm').submit();
-        }
-        // Close on backdrop click
-        document.getElementById('seedModal').addEventListener('click', function(e) {
-          if (e.target === this) closeSeedModal();
-        });
-      </script>
+      <p class="text-muted mt-3 mb-0" style="font-size:.78rem">
+        <i class="bi bi-info-circle"></i>
+        Bestehende Konten (admin@example.com, trainer1–5) werden übersprungen — es werden nur neue Daten hinzugefügt.
+        Für einen kompletten Neustart: PostgreSQL-Datenbank in Render löschen und neu anlegen, dann neu deployen.
+      </p>
     </div>
 
     {% if seed_result %}
