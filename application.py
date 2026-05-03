@@ -240,11 +240,14 @@ def create_app(config_name=None):
 
     @app.errorhandler(500)
     def server_error(e):
-        # Log with full exception info for debugging
+        import traceback as _tb
         app.logger.error(f'[500] {request.path} — {str(e)}', exc_info=True)
         log_analytics_event('error_500', detail=request.path[:100])
         _log_error('http_500', message=str(e), status_code=500)
-        return render_template('errors/500.html'), 500
+        tb = None
+        if app.config.get('SHOW_ERROR_DETAILS', False):
+            tb = _tb.format_exc()
+        return render_template('errors/500.html', error=e, traceback=tb), 500
 
     # ----------------------------------------------------------
     # K - No-cache headers + analytics capture
@@ -272,6 +275,7 @@ def create_app(config_name=None):
                 app.config['DEV_CAMP_TODAY']         = state.get('DEV_CAMP_TODAY', False)
                 app.config['SHOW_TEMPLATE_NAME']     = state.get('SHOW_TEMPLATE_NAME', False)
                 app.config['DISABLE_RATE_LIMIT']     = state.get('DISABLE_RATE_LIMIT', False)
+                app.config['SHOW_ERROR_DETAILS']     = state.get('SHOW_ERROR_DETAILS', True)
                 app.config['TOAST_DURATION']         = state.get('TOAST_DURATION', 5)
             except (FileNotFoundError, Exception):
                 pass
