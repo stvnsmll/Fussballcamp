@@ -187,6 +187,57 @@
   <p class="text-muted mt-3" style="font-size:.75rem">
     <i class="bi bi-exclamation-triangle"></i> Alle Toggles werden beim Neustart des Servers zurückgesetzt.
   </p>
-  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+
+  {# ── Seed card ─────────────────────────────────────────────── #}
+  <div class="card mt-4 animate-in">
+    <div class="card-header d-flex align-items-center gap-2">
+      <i class="bi bi-database-fill-add"></i> Demo-Daten seeden
+    </div>
+    <div class="p-3">
+      <p class="text-muted mb-3" style="font-size:.85rem">
+        Erstellt realistische Testdaten (Faker). <strong>„Neu seeden"</strong> löscht alle
+        vorhandenen Daten und legt dein Admin-Konto neu an. Dein aktuelles Login bleibt erhalten.
+      </p>
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="seed_database">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <label style="font-size:.85rem;font-weight:600;white-space:nowrap">Eltern-Konten:</label>
+          <input type="number" name="seed_parents" value="30" min="5" max="200"
+                 class="form-control form-control-sm" style="width:80px">
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-danger btn-sm"
+                  onclick="return confirm('Alle Daten löschen und neu seeden?')">
+            <i class="bi bi-arrow-counterclockwise"></i> Neu seeden (löscht alles)
+          </button>
+          <button type="submit" name="seed_keep" value="1" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-plus-circle"></i> Hinzufügen (behalten)
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if seed_result %}
+    <div class="p-3 border-top" style="background:#f0fdf4;border-radius:0 0 .5rem .5rem">
+      <p class="mb-2 fw-bold text-success"><i class="bi bi-check-circle-fill"></i> Seed abgeschlossen!</p>
+      <table class="table table-sm mb-0" style="font-size:.82rem">
+        <tr><td class="text-muted">Camp</td><td><strong>{{ seed_result.camp }}</strong></td></tr>
+        <tr><td class="text-muted">Admin</td>
+            <td><code>{{ seed_result.admin_email }}</code> / <code>{{ seed_result.admin_password }}</code></td></tr>
+        <tr><td class="text-muted">Staff (×5)</td>
+            <td><code>trainer1–5@example.com</code> / <code>{{ seed_result.staff_password }}</code></td></tr>
+        <tr><td class="text-muted">Eltern ({{ seed_result.parent_count }})</td>
+            <td>zufällige E-Mails / <code>{{ seed_result.parent_password }}</code></td></tr>
+        <tr><td class="text-muted">Kinder</td><td>{{ seed_result.child_count }} gesamt</td></tr>
+      </table>
+      <p class="text-muted mt-2 mb-0" style="font-size:.75rem">
+        <i class="bi bi-eye-slash"></i> Diese Anzeige verschwindet beim nächsten Seitenaufruf.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm mt-3">← Dashboard</a>
 </div>
 {% endblock %}
