@@ -126,14 +126,88 @@ pytest -k "age_group"             # by name pattern
 
 ---
 
-## Production Deployment (Render)
+## Production Deployment (Render — Free Tier)
 
-1. Push your repo to GitHub
-2. Create a new Web Service on [render.com](https://render.com)
-3. Set environment variables in Render dashboard (see `.env.example`)
-4. Add a PostgreSQL database via Render's Add-on (free tier)
-5. Set `DATABASE_URL` to the Render PostgreSQL connection string
-6. Deploy — Render runs `gunicorn application:app` automatically via Procfile
+### First-time deploy
+
+**1. Push to GitHub**
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/fussballcamp.git
+git push -u origin main
+```
+
+**2. Connect to Render**
+
+- Go to [render.com](https://render.com) and sign up (no credit card needed for the free tier)
+- Click **New → Blueprint** and connect your GitHub repo
+- Render will detect `render.yaml` and show two services to create: a web service and a PostgreSQL database
+- Click **Apply**
+
+**3. Set environment variables**
+
+While the build runs, go to your web service → **Environment** and add:
+
+| Variable | Value |
+|---|---|
+| `ADMIN_EMAIL` | your email address |
+| `ADMIN_PASSWORD` | a strong password |
+| `SENDGRID_API_KEY` | `demo` (email is suppressed on the free tier anyway) |
+| `MAIL_DEFAULT_SENDER` | `noreply@demo.de` (or anything) |
+| `CAMP_NAME` | your camp's name |
+| `CAMP_CONTACT_EMAIL` | your contact email |
+| `CAMP_LOCATION` | e.g. `Sportplatz Hamm` |
+| `CAMP_ORGANISER_NAME` | your name or club |
+| `CAMP_ORGANISER_ADDRESS` | your address |
+
+`DATABASE_URL` and `SECRET_KEY` are set automatically — don't touch those.
+
+**4. Create the first admin account**
+
+Once the build succeeds and the service shows **Live**, visit:
+
+```
+https://YOUR-APP-NAME.onrender.com/auth/setup
+```
+
+Click **"Admin-Konto erstellen"**. Your credentials (from `ADMIN_EMAIL` / `ADMIN_PASSWORD`) are shown on screen. This page disables itself permanently once an admin exists.
+
+**5. Seed demo data (optional)**
+
+Log in with your admin account, then go to:
+
+```
+Admin → Dev Tools → Demo-Daten seeden
+```
+
+Click **"Neu seeden"** to populate the database with realistic fake data. The credentials for all generated accounts are shown on screen immediately after seeding:
+
+| Account | Email | Password |
+|---|---|---|
+| Admin (seed) | `admin@example.com` | `admin1234` |
+| Staff (×5) | `trainer1–5@example.com` | `staff1234` |
+| Parents | random Faker emails | `parent1234` |
+
+> **Note:** "Neu seeden" wipes all existing data but preserves your current admin login.
+
+---
+
+### Free tier limitations
+
+| Limitation | Detail |
+|---|---|
+| Cold starts | Service sleeps after 15 min idle; first visit takes ~1 min to wake |
+| PostgreSQL expiry | Free DB expires after 30 days — delete and recreate to reset |
+| Email | SMTP ports are blocked; `MAIL_SUPPRESS_SEND=1` silently drops all emails |
+| Shell access | Not available on free tier — use `/auth/setup` and Dev Tools instead |
+
+### Redeploying after changes
+
+Push to `main` and Render auto-deploys. Migrations run automatically as part of the build command.
 
 ---
 
