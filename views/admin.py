@@ -2029,6 +2029,7 @@ def _load_dev_state():
         'DEV_CAMP_ORIG_START': None,
         'DEV_CAMP_ORIG_END': None,
         'DEV_CAMP_ORIG_STATUS': None,
+        'SHOW_ERROR_DETAILS': True,   # on by default — turn off once stable
     }
     try:
         with open(_dev_state_path()) as f:
@@ -2062,6 +2063,7 @@ def _apply_dev_state(state):
     current_app.config['TOAST_DURATION']         = state.get('TOAST_DURATION', 5)
     current_app.config['SHOW_TEMPLATE_NAME']     = state.get('SHOW_TEMPLATE_NAME', False)
     current_app.config['DISABLE_RATE_LIMIT']     = state.get('DISABLE_RATE_LIMIT', False)
+    current_app.config['SHOW_ERROR_DETAILS']     = state.get('SHOW_ERROR_DETAILS', True)
 
 
 @admin_bp.route('/dev-tools', methods=['GET', 'POST'])
@@ -2145,6 +2147,11 @@ def dev_tools():
             current_app.config['DISABLE_RATE_LIMIT'] = state['DISABLE_RATE_LIMIT']
             flash(f'Rate-Limit Feedback: {"deaktiviert" if state["DISABLE_RATE_LIMIT"] else "aktiv"}.', 'success')
 
+        elif action == 'toggle_error_details':
+            state['SHOW_ERROR_DETAILS'] = not state.get('SHOW_ERROR_DETAILS', True)
+            current_app.config['SHOW_ERROR_DETAILS'] = state['SHOW_ERROR_DETAILS']
+            flash(f'Fehlerdetails auf 500-Seite: {"sichtbar" if state["SHOW_ERROR_DETAILS"] else "versteckt"}.', 'success')
+
         elif action == 'seed_database':
             try:
                 from sub_modules.seed import (
@@ -2222,6 +2229,7 @@ def dev_tools():
                     toast_duration=state.get('TOAST_DURATION', 5),
                     show_template_name=state.get('SHOW_TEMPLATE_NAME', False),
                     disable_rate_limit=state.get('DISABLE_RATE_LIMIT', False),
+                    show_error_details=state.get('SHOW_ERROR_DETAILS', True),
                     camp=camp,
                     seed_result=seed_result,
                     title='Dev Tools',
@@ -2247,7 +2255,9 @@ def dev_tools():
         toast_duration=state.get('TOAST_DURATION', 5),
         show_template_name=state.get('SHOW_TEMPLATE_NAME', False),
         disable_rate_limit=state.get('DISABLE_RATE_LIMIT', False),
+        show_error_details=state.get('SHOW_ERROR_DETAILS', True),
         camp=camp,
+        seed_result=None,
         title='Dev Tools'
     )
 
