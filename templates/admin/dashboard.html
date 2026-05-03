@@ -14,6 +14,31 @@
 {% block content %}
 <div class="container pb-5">
 
+  {# Quick action cards — always visible #}
+  <div class="row g-3 mb-4">
+    {% set actions = [
+      (url_for('admin.camp_list'), 'bi bi-house-heart', _('Alle Camps'), _('Entwürfe, aktive und archivierte Camps')),
+      (url_for('admin.manual_entry'), 'bi bi-pencil-square', _('Manuelle Anmeldung'), _('Papierformular eintragen')),
+      (url_for('admin.user_list'), 'bi bi-people', _('Benutzerverwaltung'), _('Eltern, Team, Admins, Kinder')),
+      (url_for('admin.invite_staff'), 'bi bi-envelope', _('Team einladen'), _('Einladungslink senden')),
+      (url_for('admin.analytics'), 'bi bi-bar-chart', _('Analytics'), _('Nutzungsstatistiken')),
+      (url_for('admin.bug_report_list'), 'bi bi-bug', _('Fehlermeldungen'), _('Bug Reports verwalten')),
+      (url_for('admin.dev_tools'), 'bi bi-tools', _('Dev Tools'), _('Entwickler-Toggles')),
+      (url_for('admin.csv_import'), 'bi bi-file-earmark-arrow-up', _('CSV-Import'), _('Historische Daten importieren')),
+    ] %}
+    {% for href, icon, label, desc in actions %}
+    <div class="col-sm-6 col-lg-3 animate-in animate-in-{{ loop.index % 4 + 1 }}">
+      <a href="{{ href }}" class="card text-decoration-none h-100">
+        <div class="card-body">
+          <div style="font-size:1.8rem mb-1"><i class="{{ icon }}"></i></div>
+          <div class="fw-700 font-display text-uppercase" style="font-size:.95rem">{{ label }}</div>
+          <div class="text-muted" style="font-size:.78rem">{{ desc }}</div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
   {% if camp_session %}
   {# Stats row #}
   <div class="row g-3 mb-4">
@@ -57,31 +82,6 @@
     — <a href="{{ url_for('admin.trainer_assignments', camp_id=camp_session.id) }}">Jetzt zuweisen</a>
   </div>
   {% endif %}
-
-  {# Quick action cards #}
-  <div class="row g-3 mb-4">
-    {% set actions = [
-      (url_for('admin.camp_list'), 'bi bi-house-heart', _('Alle Camps'), _('Entwürfe, aktive und archivierte Camps')),
-      (url_for('admin.manual_entry'), 'bi bi-pencil-square', _('Manuelle Anmeldung'), _('Papierformular eintragen')),
-      (url_for('admin.user_list'), 'bi bi-people', _('Benutzerverwaltung'), _('Eltern, Team, Admins, Kinder')),
-      (url_for('admin.invite_staff'), 'bi bi-envelope', _('Team einladen'), _('Einladungslink senden')),
-      (url_for('admin.analytics'), 'bi bi-bar-chart', _('Analytics'), _('Nutzungsstatistiken')),
-      (url_for('admin.bug_report_list'), 'bi bi-bug', _('Fehlermeldungen'), _('Bug Reports verwalten')),
-      (url_for('admin.dev_tools'), 'bi bi-tools', _('Dev Tools'), _('Entwickler-Toggles')),
-      (url_for('admin.csv_import'), 'bi bi-file-earmark-arrow-up', _('CSV-Import'), _('Historische Daten importieren')),
-    ] %}
-    {% for href, icon, label, desc in actions %}
-    <div class="col-sm-6 col-lg-3 animate-in animate-in-{{ loop.index % 4 + 1 }}">
-      <a href="{{ href }}" class="card text-decoration-none h-100">
-        <div class="card-body">
-          <div style="font-size:1.8rem mb-1"><i class="{{ icon }}"></i></div>
-          <div class="fw-700 font-display text-uppercase" style="font-size:.95rem">{{ label }}</div>
-          <div class="text-muted" style="font-size:.78rem">{{ desc }}</div>
-        </div>
-      </a>
-    </div>
-    {% endfor %}
-  </div>
 
   {# Camp session management #}
   <div class="row g-3">
