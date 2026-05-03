@@ -2155,49 +2155,66 @@ def dev_tools():
         elif action == 'seed_database':
             try:
                 from sub_modules.seed import (
-                    _seed_consent_version, _seed_camp_session,
-                    _seed_admin, _seed_staff, _seed_parents,
-                    _seed_announcements, _seed_sample_checkins,
+                    _seed_camp_session, _seed_admin, _seed_staff,
+                    _seed_parents, _seed_announcements, _seed_sample_checkins,
                 )
-                from sub_modules.models import Child
-                keep = request.form.get('seed_keep') == '1'
+                from sub_modules.models import (
+                    Child, CheckinLog, AbsenceReport, QRToken, Registration,
+                    EmergencyContact, GroupAssignment, AgeGroup, Announcement,
+                    EmailLog, AnalyticsEvent, ErrorLog, BugReport,
+                    ConsentVersion, CampSession,
+                )
+                from sub_modules.config import CURRENT_CONSENT_VERSION as _CV
+                from datetime import date as _date
+
+                keep       = request.form.get('seed_keep') == '1'
                 num_parents = int(request.form.get('seed_parents', 30))
 
                 if not keep:
-                    db.drop_all()
-                    db.create_all()
-                    # Re-create the current admin so we don't lock ourselves out
-                    import os
-                    from sub_modules.helpers import hash_password as _hp
-                    from datetime import datetime as _dt
-                    from sub_modules.config import CURRENT_CONSENT_VERSION as _CV
-                    from sub_modules.models import ConsentVersion as _CV_model
-                    from datetime import date as _date
-                    cv = _CV_model(
-                        version=_CV, summary='Seed.',
-                        full_text='[Text]',
-                        effective_date=_date(2025, 1, 1),
+                    # Delete in FK-safe order — never drop tables (kills the session)
+                    # Save current user's identity before we touch User table
+                    _my_email    = current_user.email
+                    _my_hash     = current_user.password_hash
+                    _my_fname    = current_user.first_name or 'Admin'
+                    _my_lname    = current_user.last_name or ''
+
+                    CheckinLog.query.delete()
+                    AbsenceReport.query.delete()
+                    QRToken.query.delete()
+                    Registration.query.delete()
+                    EmergencyContact.query.delete()
+                    GroupAssignment.query.delete()
+                    Child.query.delete()
+                    AgeGroup.query.delete()
+                    Announcement.query.delete()
+                    EmailLog.query.delete()
+                    AnalyticsEvent.query.delete()
+                    ErrorLog.query.delete()
+                    BugReport.query.delete()
+                    CampSession.query.delete()
+                    # Delete all users except the current admin
+                    from sub_modules.models import StaffProfile
+                    StaffProfile.query.filter(
+                        StaffProfile.user_id != current_user.id
+                    ).delete(synchronize_session=False)
+                    User.query.filter(User.id != current_user.id).delete(
+                        synchronize_session=False
+                    )
+                    ConsentVersion.query.delete()
+                    db.session.flush()
+
+                # Seed consent version (skip if already exists)
+                if not ConsentVersion.query.filter_by(version=_CV).first():
+                    from datetime import date as _d
+                    cv = ConsentVersion(
+                        version=_CV,
+                        summary='Erstveröffentlichung der Datenschutzerklärung.',
+                        full_text='[Vollständiger Text der Datenschutzerklärung hier einfügen]',
+                        effective_date=_d(2025, 1, 1),
                     )
                     db.session.add(cv)
                     db.session.flush()
-                    me = User(
-                        email=current_user.email,
-                        password_hash=current_user.password_hash,
-                        first_name=current_user.first_name,
-                        last_name=current_user.last_name,
-                        role='admin',
-                        email_verified=True,
-                        is_active=True,
-                        consent_given_at=_dt.utcnow(),
-                        consent_version=_CV,
-                    )
-                    db.session.add(me)
-                    db.session.flush()
-                    from sub_modules.models import StaffProfile as _SP
-                    db.session.add(_SP(user_id=me.id, staff_class='trainer'))
-                    db.session.commit()
 
-                _seed_consent_version()
                 camp    = _seed_camp_session()
                 admin   = _seed_admin()
                 staff   = _seed_staff(5)
@@ -2211,7 +2228,6 @@ def dev_tools():
                     'camp': f'{camp.name} ({camp.start_date} – {camp.end_date})',
                     'admin_email': 'admin@example.com',
                     'admin_password': 'admin1234',
-                    'staff_emails': [f'trainer{i}@example.com' for i in range(1, 6)],
                     'staff_password': 'staff1234',
                     'parent_count': len(parents),
                     'child_count': total_children,
@@ -2235,6 +2251,8 @@ def dev_tools():
                     title='Dev Tools',
                 )
             except Exception as e:
+                import traceback
+                current_app.logger.error(f'Seed failed: {e}\n{traceback.format_exc()}')
                 flash(f'Seed fehlgeschlagen: {e}', 'danger')
 
         _save_dev_state(state)
