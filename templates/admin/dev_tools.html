@@ -188,6 +188,31 @@
     <i class="bi bi-exclamation-triangle"></i> Alle Toggles werden beim Neustart des Servers zurückgesetzt.
   </p>
 
+  {# ── Error details toggle ───────────────────────────────────── #}
+  <div class="card mt-3 animate-in">
+    <div class="card-header d-flex align-items-center gap-2">
+      <i class="bi bi-bug"></i> Fehlerdetails (500-Seite)
+      {% if show_error_details %}
+        <span class="badge bg-danger ms-auto">AN</span>
+      {% else %}
+        <span class="badge bg-secondary ms-auto">AUS</span>
+      {% endif %}
+    </div>
+    <div class="p-3 d-flex align-items-center justify-content-between gap-3">
+      <p class="text-muted mb-0" style="font-size:.85rem">
+        Zeigt Python-Traceback auf der 500-Fehlerseite.
+        <strong>Standardmäßig AN</strong> — vor dem Go-Live ausschalten.
+      </p>
+      <form method="POST" class="flex-shrink-0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="toggle_error_details">
+        <button type="submit" class="btn btn-sm {{ 'btn-danger' if show_error_details else 'btn-outline-secondary' }}">
+          {{ 'Ausschalten' if show_error_details else 'Einschalten' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
   {# ── Seed card ─────────────────────────────────────────────── #}
   <div class="card mt-4 animate-in">
     <div class="card-header d-flex align-items-center gap-2">
