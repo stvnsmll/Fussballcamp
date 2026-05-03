@@ -2158,54 +2158,17 @@ def dev_tools():
                     _seed_camp_session, _seed_admin, _seed_staff,
                     _seed_parents, _seed_announcements, _seed_sample_checkins,
                 )
-                from sub_modules.models import (
-                    Child, CheckinLog, AbsenceReport, QRToken, Registration,
-                    EmergencyContact, GroupAssignment, AgeGroup, Announcement,
-                    EmailLog, AnalyticsEvent, ErrorLog, BugReport,
-                    ConsentVersion, CampSession,
-                )
+                from sub_modules.models import Child, ConsentVersion
                 from sub_modules.config import CURRENT_CONSENT_VERSION as _CV
-                from datetime import date as _date
+                from datetime import date as _d
 
-                keep       = request.form.get('seed_keep') == '1'
                 num_parents = int(request.form.get('seed_parents', 30))
 
-                if not keep:
-                    # Delete in FK-safe order — never drop tables (kills the session)
-                    # Save current user's identity before we touch User table
-                    _my_email    = current_user.email
-                    _my_hash     = current_user.password_hash
-                    _my_fname    = current_user.first_name or 'Admin'
-                    _my_lname    = current_user.last_name or ''
+                # Seed is always additive — for a full reset, delete the
+                # Render PostgreSQL database and redeploy.
 
-                    CheckinLog.query.delete()
-                    AbsenceReport.query.delete()
-                    QRToken.query.delete()
-                    Registration.query.delete()
-                    EmergencyContact.query.delete()
-                    GroupAssignment.query.delete()
-                    Child.query.delete()
-                    AgeGroup.query.delete()
-                    Announcement.query.delete()
-                    EmailLog.query.delete()
-                    AnalyticsEvent.query.delete()
-                    ErrorLog.query.delete()
-                    BugReport.query.delete()
-                    CampSession.query.delete()
-                    # Delete all users except the current admin
-                    from sub_modules.models import StaffProfile
-                    StaffProfile.query.filter(
-                        StaffProfile.user_id != current_user.id
-                    ).delete(synchronize_session=False)
-                    User.query.filter(User.id != current_user.id).delete(
-                        synchronize_session=False
-                    )
-                    ConsentVersion.query.delete()
-                    db.session.flush()
-
-                # Seed consent version (skip if already exists)
+                # Consent version — skip if already exists
                 if not ConsentVersion.query.filter_by(version=_CV).first():
-                    from datetime import date as _d
                     cv = ConsentVersion(
                         version=_CV,
                         summary='Erstveröffentlichung der Datenschutzerklärung.',
@@ -2215,9 +2178,26 @@ def dev_tools():
                     db.session.add(cv)
                     db.session.flush()
 
-                camp    = _seed_camp_session()
-                admin   = _seed_admin()
-                staff   = _seed_staff(5)
+                camp = _seed_camp_session()
+
+                # Seed admin — skip if admin@example.com already exists
+                if User.query.filter_by(email='admin@example.com').first():
+                    admin = User.query.filter_by(email='admin@example.com').first()
+                else:
+                    admin = _seed_admin()
+
+                # Seed staff — skip trainers that already exist
+                existing_emails = {
+                    u.email for u in User.query.filter(
+                        User.email.like('trainer%@example.com')
+                    ).all()
+                }
+                staff_to_seed = [
+                    i for i in range(1, 6)
+                    if f'trainer{i}@example.com' not in existing_emails
+                ]
+                staff = _seed_staff(len(staff_to_seed)) if staff_to_seed else []
+
                 parents = _seed_parents(num_parents, camp)
                 _seed_announcements(camp, admin)
                 _seed_sample_checkins(camp)
