@@ -222,7 +222,7 @@
       <p class="text-muted mb-3" style="font-size:.85rem">
         Fügt realistische Testdaten (Faker) zur Datenbank hinzu. Bereits vorhandene Konten werden übersprungen.
       </p>
-      <form method="POST">
+      <form method="POST" id="seedForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="seed_database">
         <div class="d-flex align-items-center gap-2 mb-3">
@@ -230,7 +230,10 @@
           <input type="number" name="seed_parents" value="30" min="5" max="200"
                  class="form-control form-control-sm" style="width:80px">
         </div>
-        <button type="submit" class="btn btn-primary btn-sm">
+        <button type="submit" id="seedBtn" class="btn btn-primary btn-sm"
+                onclick="this.disabled=true;
+                         this.innerHTML='<span class=\'spinner-border spinner-border-sm me-1\' role=\'status\'></span> Wird geladen…';
+                         document.getElementById(\'seedForm\').submit();">
           <i class="bi bi-plus-circle"></i> Demo-Daten hinzufügen
         </button>
       </form>
