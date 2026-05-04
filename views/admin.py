@@ -2158,7 +2158,7 @@ def dev_tools():
                     _seed_camp_session, _seed_admin, _seed_staff,
                     _seed_parents, _seed_announcements, _seed_sample_checkins,
                 )
-                from sub_modules.models import Child, ConsentVersion
+                from sub_modules.models import Child, ConsentVersion, CampSession
                 from sub_modules.config import CURRENT_CONSENT_VERSION as _CV
                 from datetime import date as _d
 
@@ -2178,29 +2178,38 @@ def dev_tools():
                     db.session.add(cv)
                     db.session.flush()
 
-                camp = _seed_camp_session()
-
-                # Seed admin — skip if admin@example.com already exists
-                if User.query.filter_by(email='admin@example.com').first():
-                    admin = User.query.filter_by(email='admin@example.com').first()
+                # Use existing camp if one exists, otherwise create a new one
+                existing_camp = CampSession.query.order_by(
+                    CampSession.created_at.desc()
+                ).first()
+                if existing_camp:
+                    camp = existing_camp
                 else:
-                    admin = _seed_admin()
+                    camp = _seed_camp_session()
 
-                # Seed staff — skip trainers that already exist
-                existing_emails = {
-                    u.email for u in User.query.filter(
-                        User.email.like('trainer%@example.com')
-                    ).all()
-                }
-                staff_to_seed = [
-                    i for i in range(1, 6)
-                    if f'trainer{i}@example.com' not in existing_emails
-                ]
-                staff = _seed_staff(len(staff_to_seed)) if staff_to_seed else []
+                    # Only seed admin, staff, announcements and checkins
+                    # for a brand-new camp — skip if camp already existed
+                    if User.query.filter_by(email='admin@example.com').first():
+                        admin = User.query.filter_by(email='admin@example.com').first()
+                    else:
+                        admin = _seed_admin()
 
+                    existing_emails = {
+                        u.email for u in User.query.filter(
+                            User.email.like('trainer%@example.com')
+                        ).all()
+                    }
+                    staff_to_seed = [
+                        i for i in range(1, 6)
+                        if f'trainer{i}@example.com' not in existing_emails
+                    ]
+                    _seed_staff(len(staff_to_seed)) if staff_to_seed else []
+                    admin = User.query.filter_by(email='admin@example.com').first()
+                    _seed_announcements(camp, admin)
+                    _seed_sample_checkins(camp)
+
+                # Always add more parents + children linked to the camp
                 parents = _seed_parents(num_parents, camp)
-                _seed_announcements(camp, admin)
-                _seed_sample_checkins(camp)
                 db.session.commit()
 
                 total_children = Child.query.count()
