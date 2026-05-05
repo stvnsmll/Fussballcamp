@@ -14,12 +14,12 @@ Built with Flask, PostgreSQL, and Bootstrap 5. Designed for German-speaking club
 - Staff accounts (Trainer, Allgemein, Verpflegung) via invite link
 - First aid flag for any staff member
 - Head coach assignment per age group, swappable by admin
-- Mobile-first check-in / check-out (name search + QR code)
+- Mobile-first check-in / check-out (name search + QR code), printable name cards with QR code
 - Staff auto-checkout at configurable daily time
-- Announcements with photo attachments, pinning, and age group targeting
+- Announcements with pinning and age group or team member directed messages
 - Internal staff messaging with tags
 - GDPR-compliant: consent versioning, data retention tracking, soft deletion, Datenschutzerklärung page
-- Google Translate widget for multilingual access
+- Development tools including new feature testing
 - Fake data seeder for local development and testing
 
 ---
